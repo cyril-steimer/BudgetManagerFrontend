@@ -1,9 +1,21 @@
 export class Expense {
   id: number
-  name: string
-  amount: number
-  category: string
+  name: Name
+  amount: Amount
+  category: Category
   date: Date
+}
+
+export class Amount {
+  amount: number
+}
+
+export class Name {
+  name: string
+}
+
+export class Category {
+  name: string
 }
 
 export class SubList<T> {

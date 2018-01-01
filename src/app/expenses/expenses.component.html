@@ -1,25 +1,33 @@
+<mat-form-field>
+  <input matInput #searchBox type="text" placeholder="Search" (keyup)="search(searchBox.value)"/>
+  <button mat-button *ngIf="searchBox.value" matSuffix mat-icon-button aria-label="Clear" (click)="searchBox.value=''">
+    <mat-icon>close</mat-icon>
+  </button>
+</mat-form-field>
+  
+
 <div class="example-container mat-elevation-z8">
   <div class="example-loading-shade" *ngIf="isLoadingResults">
     <mat-spinner></mat-spinner>
   </div>
 
   <mat-table #table [dataSource]="expenses"
-    matSort matSortActive="date" 
-    matSortDisableClear matSortDirection="desc">
+    matSort matSortActive="{{sort.active}}" 
+    matSortDisableClear matSortDirection="{{sort.direction}}">
 
     <ng-container matColumnDef="name">
       <mat-header-cell mat-sort-header *matHeaderCellDef> Name </mat-header-cell>
-      <mat-cell *matCellDef="let element"> {{element.name}} </mat-cell>
+      <mat-cell *matCellDef="let element"> {{element.name.name}} </mat-cell>
     </ng-container>
 
     <ng-container matColumnDef="amount">
       <mat-header-cell mat-sort-header *matHeaderCellDef> Amount </mat-header-cell>
-      <mat-cell *matCellDef="let element"> {{element.amount | currency:'CHF'}} </mat-cell>
+      <mat-cell *matCellDef="let element"> {{element.amount.amount | currency:'CHF'}} </mat-cell>
     </ng-container>
 
     <ng-container matColumnDef="category">
       <mat-header-cell mat-sort-header *matHeaderCellDef> Category </mat-header-cell>
-      <mat-cell *matCellDef="let element"> {{element.category}} </mat-cell>
+      <mat-cell *matCellDef="let element"> {{element.category.name}} </mat-cell>
     </ng-container>
 
     <ng-container matColumnDef="date">

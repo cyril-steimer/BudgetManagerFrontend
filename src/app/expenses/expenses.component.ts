@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { SubList, Expense } from '../model';
 import { ExpenseService } from '../expense.service';
-import { MatTableDataSource, MatSort } from '@angular/material';
+import { MatTableDataSource, MatSort, MatSortable } from '@angular/material';
 
 @Component({
   selector: 'app-expenses',
@@ -17,14 +17,18 @@ export class ExpensesComponent implements OnInit {
   @ViewChild(MatSort) sort = new MatSort()
   
   length = 0
-  pagination = {from: 0, count: 3}
+  pagination = {from: 0, count: 20}
+
+  private searchTerm = ""
 
 
   constructor(private expenseService: ExpenseService) { }
 
   ngOnInit() {
-    this.sort.sortChange.subscribe(() => this.getExpenses())
+    let sortable: MatSortable = { id: "date", start: "desc", disableClear: null }
+    this.sort.sort(sortable)
     this.getExpenses()
+    this.sort.sortChange.subscribe(() => this.getExpenses())
   }
 
   setPagination(event: any) {
@@ -34,10 +38,13 @@ export class ExpensesComponent implements OnInit {
     this.getExpenses()
   }
 
+  search(value: string) {
+    console.log(value)
+  }
+
   private getExpenses() {
     this.isLoadingResults = true
     let sort = null
-    console.log(this.sort)
     if (this.sort.active) {
       sort = {field: this.sort.active, direction: this.sort.direction}
     }
