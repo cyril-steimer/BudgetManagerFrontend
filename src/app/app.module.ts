@@ -5,7 +5,9 @@ import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
 import { ExpensesComponent } from './expenses/expenses.component';
 import { ExpenseService } from './expense.service';
-import { MatTableModule } from '@angular/material';
+import { MatTableModule, MatPaginatorModule, MatProgressSpinnerModule, MatSortModule } from '@angular/material';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import { HttpClientModule } from '@angular/common/http';
 
 
 @NgModule({
@@ -15,7 +17,12 @@ import { MatTableModule } from '@angular/material';
   ],
   imports: [
     BrowserModule,
-    MatTableModule
+    HttpClientModule,
+    BrowserAnimationsModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatProgressSpinnerModule,
+    MatSortModule
   ],
   providers: [
     ExpenseService
