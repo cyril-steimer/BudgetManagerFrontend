@@ -5,6 +5,7 @@ import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
 import { ExpensesComponent } from './expenses/expenses.component';
 import { ExpenseService } from './expense.service';
+import { MatTableModule } from '@angular/material';
 
 
 @NgModule({
@@ -13,7 +14,8 @@ import { ExpenseService } from './expense.service';
     ExpensesComponent
   ],
   imports: [
-    BrowserModule
+    BrowserModule,
+    MatTableModule
   ],
   providers: [
     ExpenseService

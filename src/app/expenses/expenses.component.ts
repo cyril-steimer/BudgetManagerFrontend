@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { SubList, Expense } from '../model';
 import { ExpenseService } from '../expense.service';
+import { MatTableDataSource } from '@angular/material';
 
 @Component({
   selector: 'app-expenses',
@@ -9,12 +10,13 @@ import { ExpenseService } from '../expense.service';
 })
 export class ExpensesComponent implements OnInit {
 
-  expenses: SubList<Expense>
+  displayedColumns = ["name", "amount", "category", "date"]
+  expenses = new MatTableDataSource()
 
   constructor(private expenseService: ExpenseService) { }
 
   ngOnInit() {
     this.expenseService.getAllExpenses()
-      .subscribe(expenses => this.expenses = expenses)
+      .subscribe(expenses => this.expenses.data = expenses.values)
   }
 }
