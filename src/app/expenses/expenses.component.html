@@ -1,10 +1,9 @@
 <mat-form-field>
-  <input matInput #searchBox type="text" placeholder="Search" (keyup)="search(searchBox.value)"/>
+  <input matInput #searchBox type="text" placeholder="Search" (keyup)="search($event, searchBox.value)"/>
   <button mat-button *ngIf="searchBox.value" matSuffix mat-icon-button aria-label="Clear" (click)="searchBox.value=''">
     <mat-icon>close</mat-icon>
   </button>
 </mat-form-field>
-  
 
 <div class="example-container mat-elevation-z8">
   <div class="example-loading-shade" *ngIf="isLoadingResults">
