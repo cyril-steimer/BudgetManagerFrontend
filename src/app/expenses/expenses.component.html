@@ -1,0 +1,14 @@
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Amount</th>
+    <th>Category</th>
+    <th>Date</th>
+  </tr>
+  <tr *ngFor="let expense of expenses.values">
+    <td>{{expense.name}}</td>
+    <td>{{expense.amount | currency:'CHF'}}</td>
+    <td>{{expense.category}}</td>
+    <td>{{expense.date | date:'dd.MM.yyyy'}}</td>
+  </tr>
+</table>
