@@ -1,5 +1,3 @@
-import { setTimeout } from "timers";
-
 export class DelayedSearch {
 
   private modifications = 0
@@ -13,7 +11,7 @@ export class DelayedSearch {
   }
 
   set(term: string) {
-    let localModifications = this.modifications++
+    let localModifications = ++this.modifications
     setTimeout(args => this.invokeCallback(term, localModifications), this.delayMs)
   }
 

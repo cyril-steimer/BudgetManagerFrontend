@@ -3,6 +3,7 @@ import { SubList, Expense } from '../model';
 import { ExpenseService } from '../expense.service';
 import { MatTableDataSource, MatSort, MatSortable } from '@angular/material';
 import { Observable } from 'rxjs/Observable';
+import { DelayedSearch } from '../delayed.search';
 
 @Component({
   selector: 'app-expenses',
@@ -20,7 +21,8 @@ export class ExpensesComponent implements OnInit {
   length = 0
   pagination = {from: 0, count: 20}
 
-  private searchTerm = ""
+  private delayedSearch = new DelayedSearch(300, term => this.setSearchTerm(term))
+  private searchTerm: string = ""
 
   constructor(private expenseService: ExpenseService) { }
 
@@ -38,11 +40,13 @@ export class ExpensesComponent implements OnInit {
     this.getExpenses()
   }
 
-  search(event: any, term: string) {
-    if (event.key == "Enter") {
-      this.searchTerm = term
-      this.getExpenses()
-    }
+  search(term: string) {
+    this.delayedSearch.set(term)
+  }
+
+  private setSearchTerm(term: string) {
+    this.searchTerm = term
+    this.getExpenses()
   }
 
   private getExpenses() {
