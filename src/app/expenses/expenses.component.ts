@@ -4,6 +4,7 @@ import { ExpenseService } from '../expense.service';
 import { MatTableDataSource, MatSort, MatSortable } from '@angular/material';
 import { Observable } from 'rxjs/Observable';
 import { DelayedSearch } from '../delayed.search';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-expenses',
@@ -24,9 +25,14 @@ export class ExpensesComponent implements OnInit {
   private delayedSearch = new DelayedSearch(300, term => this.setSearchTerm(term))
   private searchTerm: string = ""
 
-  constructor(private expenseService: ExpenseService) { }
+  private searchBody: {}
+
+  constructor(
+    private expenseService: ExpenseService,
+    private route: ActivatedRoute) { }
 
   ngOnInit() {
+    this.getSearchBody()
     let sortable: MatSortable = { id: "date", start: "desc", disableClear: null }
     this.sort.sort(sortable)
     this.getExpenses()
@@ -42,6 +48,32 @@ export class ExpensesComponent implements OnInit {
 
   search(term: string) {
     this.delayedSearch.set(term)
+  }
+
+  private getSearchBody() {
+    let year = this.route.snapshot.paramMap.get("year")
+    let month = this.route.snapshot.paramMap.get("month")
+    if (year && month) {
+      let start = new Date(+year, +month)
+      let end = new Date(+year, +month + 1)
+      //TODO This is ugly as hell....
+      this.searchBody = {
+        and: [
+          {
+            date: {
+              date: start,
+              comparison: ">="
+            }
+          },
+          {
+            date: {
+              date: end,
+              comparison: "<"
+            }
+          }
+        ]
+      }
+    }
   }
 
   private setSearchTerm(term: string) {
@@ -61,7 +93,7 @@ export class ExpensesComponent implements OnInit {
       sort = {field: this.sort.active, direction: this.sort.direction}
     }
     return this.expenseService.getExpenses(
-      this.searchTerm, null, sort, this.pagination)
+      this.searchTerm, this.searchBody, sort, this.pagination)
   }
 
   private setExpenses(res: SubList<Expense>) {
