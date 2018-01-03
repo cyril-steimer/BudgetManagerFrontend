@@ -40,18 +40,24 @@ import {
 } from '@angular/material';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { HttpClientModule } from '@angular/common/http';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NewExpenseComponent } from './new-expense/new-expense.component';
+import { AppRoutingModule } from './/app-routing.module';
+import { MonthlyExpensesComponent } from './monthly-expenses/monthly-expenses.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
-    ExpensesComponent
+    ExpensesComponent,
+    NewExpenseComponent,
+    MonthlyExpensesComponent
   ],
   imports: [
     BrowserModule,
     HttpClientModule,
     FormsModule,
+    ReactiveFormsModule,
     BrowserAnimationsModule,
     MatAutocompleteModule,
     MatButtonModule,
@@ -83,7 +89,8 @@ import { FormsModule } from '@angular/forms';
     MatTableModule,
     MatTabsModule,
     MatToolbarModule,
-    MatTooltipModule
+    MatTooltipModule,
+    AppRoutingModule
   ],
   providers: [
     ExpenseService

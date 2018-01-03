@@ -1,0 +1,24 @@
+<form>
+  <mat-form-field class="expense-input">
+    <input matInput placeholder="Name" name="Name" [(ngModel)]="name">
+  </mat-form-field>
+  <br>
+  <mat-form-field class="expense-input">
+    <input matInput placeholder="Amount" name="Amount" [(ngModel)]="amount">
+    <span matSuffix>CHF</span>
+  </mat-form-field>
+  <br>
+  <mat-form-field class="expense-input">
+    <input matInput placeholder="Category" name="Category" [(ngModel)]="category">
+  </mat-form-field>
+  <br>
+  <mat-form-field class="expense-input">
+    <input matInput [matDatepicker]="datePicker" name="Date" placeholder="Date" [(ngModel)]="date">
+    <mat-datepicker-toggle matSuffix [for]="datePicker"></mat-datepicker-toggle>
+    <mat-datepicker #datePicker></mat-datepicker>
+  </mat-form-field>
+  <br>
+  <button class="expense-input" mat-raised-button color="primary" (click)="addExpense()">
+    Add Expense
+  </button>
+</form>
