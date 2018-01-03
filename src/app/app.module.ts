@@ -43,15 +43,12 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NewExpenseComponent } from './new-expense/new-expense.component';
 import { AppRoutingModule } from './/app-routing.module';
-import { MonthlyExpensesComponent } from './monthly-expenses/monthly-expenses.component';
-
 
 @NgModule({
   declarations: [
     AppComponent,
     ExpensesComponent,
-    NewExpenseComponent,
-    MonthlyExpensesComponent
+    NewExpenseComponent
   ],
   imports: [
     BrowserModule,

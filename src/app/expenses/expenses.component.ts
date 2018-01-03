@@ -60,10 +60,8 @@ export class ExpensesComponent implements OnInit {
     if (this.sort.active) {
       sort = {field: this.sort.active, direction: this.sort.direction}
     }
-    if (this.searchTerm) {
-      return this.expenseService.searchExpenses(this.searchTerm, sort, this.pagination)
-    }
-    return this.expenseService.getAllExpenses(sort, this.pagination)
+    return this.expenseService.getExpenses(
+      this.searchTerm, null, sort, this.pagination)
   }
 
   private setExpenses(res: SubList<Expense>) {

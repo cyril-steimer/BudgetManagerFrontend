@@ -13,27 +13,28 @@ export class ExpenseService {
 
   constructor(private http: HttpClient) { }
 
-  getAllExpenses(sort?: Sort, pagination?: Pagination): Observable<SubList<Expense>> {
-    let options = this.createOptions(sort, pagination)
-    return this.http.get<SubList<Expense>>(this.expenseUrl, options)
-  }
-
-  searchExpenses(search: string, sort?: Sort, pagination?: Pagination): Observable<SubList<Expense>> {
-    let url = `${this.expenseUrl}/search/${search}`
-    let options = this.createOptions(sort, pagination)
-    return this.http.get<SubList<Expense>>(url, options)
-  }
-
-  searchExpensesComplex(search: any, sort?: Sort, pagination?: Pagination): Observable<SubList<Expense>> {
+  getExpenses(filter?: string, searchBody?: any, sort?: Sort, pagination?: Pagination): Observable<SubList<Expense>> {
     this.changeDateToJSON()
-    let url = `${this.expenseUrl}/search`
+    let url = this.getSearchUrl(filter, searchBody)
     let options = this.createOptions(sort, pagination)
-    return this.http.post<SubList<Expense>>(url, search, options)
+    if (searchBody == null) {
+      return this.http.get<SubList<Expense>>(url, options)
+    }
+    return this.http.post<SubList<Expense>>(url, searchBody, options)
   }
 
   addExpense(expense: Expense): Observable<any> {
     this.changeDateToJSON()
     return this.http.post(this.expenseUrl, expense)
+  }
+
+  private getSearchUrl(filter?: string, body?: any) {
+    if (filter) {
+      return `${this.expenseUrl}/search/${filter}`
+    } else if (body) {
+      return `${this.expenseUrl}/search`
+    }
+    return this.expenseUrl
   }
 
   private createOptions(sort?: Sort, pagination?: Pagination): { params: { [param: string]: string;} } {
