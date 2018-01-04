@@ -20,7 +20,6 @@ export class ExpensesComponent implements OnInit {
   @ViewChild(MatSort) sort = new MatSort()
   
   length = 0
-  pagination = {from: 0, count: 20}
 
   nextMonth: Date
   month: Date
@@ -39,13 +38,6 @@ export class ExpensesComponent implements OnInit {
     this.route.params.subscribe(params => this.setMonth(params));
     this.getExpenses()
     this.sort.sortChange.subscribe(() => this.getExpenses())
-  }
-
-  setPagination(event: any) {
-    let size = event.pageSize
-    let page = event.pageIndex
-    this.pagination = {from: size * page, count: size}
-    this.getExpenses()
   }
 
   search(term: string) {
@@ -105,7 +97,7 @@ export class ExpensesComponent implements OnInit {
       sort = {field: this.sort.active, direction: this.sort.direction}
     }
     return this.expenseService.getExpenses(
-      this.searchTerm, this.getSearchBody(), sort, this.pagination)
+      this.searchTerm, this.getSearchBody(), sort, null)
   }
 
   private setExpenses(res: SubList<Expense>) {

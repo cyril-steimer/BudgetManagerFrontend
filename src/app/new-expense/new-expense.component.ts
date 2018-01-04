@@ -10,9 +10,9 @@ import { Location } from '@angular/common';
 })
 export class NewExpenseComponent implements OnInit {
 
-  name: string = "Hello World"
-  amount: number = 100.30
-  category: string = "Food"
+  name: string
+  amount: number
+  category: string
   date: Date = new Date()
 
   constructor(
@@ -20,6 +20,10 @@ export class NewExpenseComponent implements OnInit {
     private location: Location) { }
 
   ngOnInit() {
+  }
+
+  back() {
+    this.location.back()
   }
 
   addExpense() {
