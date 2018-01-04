@@ -42,6 +42,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NewExpenseComponent } from './new-expense/new-expense.component';
 import { AppRoutingModule } from './/app-routing.module';
+import 'materialize-css'
+import { MaterializeModule } from "angular2-materialize"
 import './date.extensions.impl'
 
 @NgModule({
@@ -56,6 +58,7 @@ import './date.extensions.impl'
     FormsModule,
     ReactiveFormsModule,
     BrowserAnimationsModule,
+    MaterializeModule,
     MatAutocompleteModule,
     MatButtonModule,
     MatButtonToggleModule,

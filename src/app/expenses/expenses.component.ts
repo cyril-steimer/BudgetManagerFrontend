@@ -22,7 +22,9 @@ export class ExpensesComponent implements OnInit {
   length = 0
   pagination = {from: 0, count: 20}
 
+  nextMonth: Date
   month: Date
+  prevMonth: Date
 
   private delayedSearch = new DelayedSearch(300, term => this.setSearchTerm(term))
   private searchTerm: string = ""
@@ -32,9 +34,9 @@ export class ExpensesComponent implements OnInit {
     private route: ActivatedRoute) { }
 
   ngOnInit() {
-    this.getMonth()
     let sortable: MatSortable = { id: "date", start: "desc", disableClear: null }
     this.sort.sort(sortable)
+    this.route.params.subscribe(params => this.setMonth(params));
     this.getExpenses()
     this.sort.sortChange.subscribe(() => this.getExpenses())
   }
@@ -49,11 +51,15 @@ export class ExpensesComponent implements OnInit {
   search(term: string) {
     this.delayedSearch.set(term)
   }
-  private getMonth() {
-    let year = this.route.snapshot.paramMap.get("year")
-    let month = this.route.snapshot.paramMap.get("month")
+
+  private setMonth(params: any) {
+    let year = params.year
+    let month = params.month
     if (year && month) {
       this.month = new Date(+year, +month)
+      this.nextMonth = new Date(+year, +month + 1)
+      this.prevMonth = new Date(+year, +month - 1)
+      this.getExpenses()
     }
   }
 

@@ -1,46 +1,73 @@
-<mat-form-field>
-  <input matInput #searchBox type="text" placeholder="Search" (keyup)="search(searchBox.value)"/>
-  <button mat-button *ngIf="searchBox.value" matSuffix mat-icon-button aria-label="Clear" (click)="searchBox.value=''; search(searchBox.value)">
-    <mat-icon>close</mat-icon>
-  </button>
-</mat-form-field>
+<div class="container">
 
-<div class="example-container mat-elevation-z8">
-  <div class="example-loading-shade" *ngIf="isLoadingResults">
-    <mat-spinner></mat-spinner>
+  <div *ngIf="month" class="row">
+    <div class="col s4">
+      <a class="waves-effect waves-light btn"
+      routerLink="/year/{{prevMonth.getFullYear()}}/month/{{prevMonth.getMonth()}}">
+        Previous month
+      </a>
+    </div>
+    
+    <div class="col s4">
+      <h4><span>{{month.getMonthName()}}</span> <span>{{month.getFullYear()}}</span></h4>
+    </div>
+
+    <div class="col s4">
+      <a class="waves-effect waves-light btn"
+      routerLink="/year/{{nextMonth.getFullYear()}}/month/{{nextMonth.getMonth()}}">
+        Next month
+      </a>
+    </div>
+
   </div>
 
-  <mat-table #table [dataSource]="expenses"
-    matSort matSortActive="{{sort.active}}" 
-    matSortDisableClear matSortDirection="{{sort.direction}}">
+  <div class="row">
+    <form>
+    <div class="input-field col s6 offset-s3">
+      <input #searchBox id="search_box" type="search" (keyup)="search(searchBox.value)"/>
+      <label for="search_box">Search</label>
+    </div>
+    </form>
+  </div>
 
-    <ng-container matColumnDef="name">
-      <mat-header-cell mat-sort-header *matHeaderCellDef> Name </mat-header-cell>
-      <mat-cell *matCellDef="let element"> {{element.name.name}} </mat-cell>
-    </ng-container>
+  <div class="example-container mat-elevation-z8">
+    <div class="example-loading-shade" *ngIf="isLoadingResults">
+      <mat-spinner></mat-spinner>
+    </div>
 
-    <ng-container matColumnDef="amount">
-      <mat-header-cell mat-sort-header *matHeaderCellDef> Amount </mat-header-cell>
-      <mat-cell *matCellDef="let element"> {{element.amount.amount | currency:'CHF'}} </mat-cell>
-    </ng-container>
+    <mat-table #table [dataSource]="expenses"
+      matSort matSortActive="{{sort.active}}" 
+      matSortDisableClear matSortDirection="{{sort.direction}}">
 
-    <ng-container matColumnDef="category">
-      <mat-header-cell mat-sort-header *matHeaderCellDef> Category </mat-header-cell>
-      <mat-cell *matCellDef="let element"> {{element.category.name}} </mat-cell>
-    </ng-container>
+      <ng-container matColumnDef="name">
+        <mat-header-cell mat-sort-header *matHeaderCellDef> Name </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.name.name}} </mat-cell>
+      </ng-container>
 
-    <ng-container matColumnDef="date">
-      <mat-header-cell mat-sort-header *matHeaderCellDef> Date </mat-header-cell>
-      <mat-cell *matCellDef="let element"> {{element.date | date:'dd.MM.yyyy'}} </mat-cell>
-    </ng-container>
+      <ng-container matColumnDef="amount">
+        <mat-header-cell mat-sort-header *matHeaderCellDef> Amount </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.amount.amount | currency:'CHF'}} </mat-cell>
+      </ng-container>
 
-    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
-  </mat-table>
+      <ng-container matColumnDef="category">
+        <mat-header-cell mat-sort-header *matHeaderCellDef> Category </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.category.name}} </mat-cell>
+      </ng-container>
 
-  <mat-paginator 
-    [length]="length" 
-    [pageSize]="pagination.count" 
-    (page)="setPagination($event)">
-  </mat-paginator>
+      <ng-container matColumnDef="date">
+        <mat-header-cell mat-sort-header *matHeaderCellDef> Date </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.date | date:'dd.MM.yyyy'}} </mat-cell>
+      </ng-container>
+
+      <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+      <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+    </mat-table>
+
+    <mat-paginator 
+      [length]="length" 
+      [pageSize]="pagination.count" 
+      (page)="setPagination($event)">
+    </mat-paginator>
+  </div>
+
 </div>
