@@ -22,17 +22,17 @@ export class ExpensesComponent implements OnInit {
   length = 0
   pagination = {from: 0, count: 20}
 
+  month: Date
+
   private delayedSearch = new DelayedSearch(300, term => this.setSearchTerm(term))
   private searchTerm: string = ""
-
-  private searchBody: {}
 
   constructor(
     private expenseService: ExpenseService,
     private route: ActivatedRoute) { }
 
   ngOnInit() {
-    this.getSearchBody()
+    this.getMonth()
     let sortable: MatSortable = { id: "date", start: "desc", disableClear: null }
     this.sort.sort(sortable)
     this.getExpenses()
@@ -49,15 +49,20 @@ export class ExpensesComponent implements OnInit {
   search(term: string) {
     this.delayedSearch.set(term)
   }
-
-  private getSearchBody() {
+  private getMonth() {
     let year = this.route.snapshot.paramMap.get("year")
     let month = this.route.snapshot.paramMap.get("month")
     if (year && month) {
-      let start = new Date(+year, +month)
-      let end = new Date(+year, +month + 1)
-      //TODO This is ugly as hell....
-      this.searchBody = {
+      this.month = new Date(+year, +month)
+    }
+  }
+
+  private getSearchBody() {
+    if (this.month) {
+      let start = this.month
+      let end = new Date(start.getFullYear(), start.getMonth() + 1)
+      //TODO Ugly shit.
+      return {
         and: [
           {
             date: {
@@ -74,6 +79,7 @@ export class ExpensesComponent implements OnInit {
         ]
       }
     }
+    return null
   }
 
   private setSearchTerm(term: string) {
@@ -93,7 +99,7 @@ export class ExpensesComponent implements OnInit {
       sort = {field: this.sort.active, direction: this.sort.direction}
     }
     return this.expenseService.getExpenses(
-      this.searchTerm, this.searchBody, sort, this.pagination)
+      this.searchTerm, this.getSearchBody(), sort, this.pagination)
   }
 
   private setExpenses(res: SubList<Expense>) {
