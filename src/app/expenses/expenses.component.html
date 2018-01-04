@@ -1,34 +1,39 @@
 <div class="container">
 
-  <div *ngIf="month" class="row">
-    <div class="col s4">
-      <a class="waves-effect waves-light btn"
-      routerLink="/year/{{prevMonth.getFullYear()}}/month/{{prevMonth.getMonth()}}">
-        Previous month
-      </a>
-    </div>
-    
-    <div class="col s4">
-      <h4><span>{{month.getMonthName()}}</span> <span>{{month.getFullYear()}}</span></h4>
+  <nav class="nav-extended">
+
+    <div class="nav-wrapper" *ngIf="month">
+        <ul class="left">
+          <li>
+            <a class="waves-effect waves-light btn"
+            routerLink="/year/{{prevMonth.getFullYear()}}/month/{{prevMonth.getMonth()}}" >
+              Previous Month
+            </a>
+          </li>
+        </ul>
+        <a class="brand-logo center">{{month.getMonthName()}} {{month.getFullYear()}}</a>
+        <ul class="right">
+          <li>
+            <a class="waves-effect waves-light btn"
+            routerLink="/year/{{nextMonth.getFullYear()}}/month/{{nextMonth.getMonth()}}" >
+              Next Month
+            </a>
+          </li>
+        </ul>
+      </div>
+
+    <div class="nav-wrapper">
+      <form>
+        <div class="input-field">
+          <input #searchBox id="search_box" type="search" (keyup)="search(searchBox.value)"/>
+          <label class="label-icon" for="search_box"><i class="material-icons">search</i></label>
+          <i class="material-icons" (click)="searchBox.value=''; search('')">close</i>
+        </div>
+      </form>
     </div>
 
-    <div class="col s4">
-      <a class="waves-effect waves-light btn"
-      routerLink="/year/{{nextMonth.getFullYear()}}/month/{{nextMonth.getMonth()}}">
-        Next month
-      </a>
-    </div>
+  </nav>
 
-  </div>
-
-  <div class="row">
-    <form>
-    <div class="input-field col s6 offset-s3">
-      <input #searchBox id="search_box" type="search" (keyup)="search(searchBox.value)"/>
-      <label for="search_box">Search</label>
-    </div>
-    </form>
-  </div>
 
   <div class="example-container mat-elevation-z8">
     <div class="example-loading-shade" *ngIf="isLoadingResults">
