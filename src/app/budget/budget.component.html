@@ -23,9 +23,15 @@
     </tr>
 
     <tr *ngIf="otherExpenses && otherExpenses.amount.amount">
-        <td>{{otherExpenses.category.name}}</td>
+        <th>Not Budgeted</th>
         <td>{{otherExpenses.amount.amount | currency:'CHF'}}</td>
         <td>{{otherExpenses.budget.amount | currency:'CHF'}}</td>
+    </tr>
+
+    <tr *ngIf="total">
+        <th>Total</th>
+        <th>{{total.amount.amount | currency:'CHF'}}</th>
+        <th>{{total.budget.amount | currency:'CHF'}}</th>
     </tr>
   </tbody>
 
