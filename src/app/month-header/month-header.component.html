@@ -1,0 +1,21 @@
+<div class="nav-wrapper">
+  <ul class="left">
+    <li>
+      <a class="waves-effect waves-light btn"
+      routerLink="/{{urlPrefix}}/year/{{prevMonth.getFullYear()}}/month/{{prevMonth.getMonth()}}" >
+        <i class="material-icons left">arrow_back</i>
+        Previous Month
+      </a>
+    </li>
+  </ul>
+  <a class="brand-logo center">{{month.getMonthName()}} {{month.getFullYear()}}</a>
+  <ul class="right">
+    <li>
+      <a class="waves-effect waves-light btn"
+      routerLink="/{{urlPrefix}}/year/{{nextMonth.getFullYear()}}/month/{{nextMonth.getMonth()}}" >
+        <i class="material-icons right">arrow_forward</i>
+        Next Month
+      </a>
+    </li>
+  </ul>
+</div>

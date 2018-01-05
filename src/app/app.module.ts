@@ -44,13 +44,17 @@ import { NewExpenseComponent } from './new-expense/new-expense.component';
 import { AppRoutingModule } from './/app-routing.module';
 import 'materialize-css'
 import { MaterializeModule } from "angular2-materialize"
-import './date.extensions.impl'
+import './date.extensions.impl';
+import { BudgetComponent } from './budget/budget.component';
+import { MonthHeaderComponent } from './month-header/month-header.component'
 
 @NgModule({
   declarations: [
     AppComponent,
     ExpensesComponent,
-    NewExpenseComponent
+    NewExpenseComponent,
+    BudgetComponent,
+    MonthHeaderComponent
   ],
   imports: [
     BrowserModule,

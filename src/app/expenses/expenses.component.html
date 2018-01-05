@@ -1,66 +1,43 @@
-<div class="container">
+<nav class="nav-extended">
 
-  <nav class="nav-extended">
+  <app-month-header *ngIf="month" [month]="month" [urlPrefix]="urlPrefix">
+  </app-month-header>
 
-    <div class="nav-wrapper" *ngIf="month">
-        <ul class="left">
-          <li>
-            <a class="waves-effect waves-light btn"
-            routerLink="/year/{{prevMonth.getFullYear()}}/month/{{prevMonth.getMonth()}}" >
-              <i class="material-icons left">arrow_back</i>
-              Previous Month
-            </a>
-          </li>
-        </ul>
-        <a class="brand-logo center">{{month.getMonthName()}} {{month.getFullYear()}}</a>
-        <ul class="right">
-          <li>
-            <a class="waves-effect waves-light btn"
-            routerLink="/year/{{nextMonth.getFullYear()}}/month/{{nextMonth.getMonth()}}" >
-              <i class="material-icons right">arrow_forward</i>
-              Next Month
-            </a>
-          </li>
-        </ul>
+  <div class="nav-wrapper">
+    <form>
+      <div class="input-field">
+        <input #searchBox id="search_box" type="search" (keyup)="search(searchBox.value)"/>
+        <label class="label-icon" for="search_box"><i class="material-icons">search</i></label>
+        <i class="material-icons" (click)="searchBox.value=''; search('')">close</i>
       </div>
-
-    <div class="nav-wrapper">
-      <form>
-        <div class="input-field">
-          <input #searchBox id="search_box" type="search" (keyup)="search(searchBox.value)"/>
-          <label class="label-icon" for="search_box"><i class="material-icons">search</i></label>
-          <i class="material-icons" (click)="searchBox.value=''; search('')">close</i>
-        </div>
-      </form>
-    </div>
-
-  </nav>
-
-
-  <div class="example-loading-shade" *ngIf="isLoadingResults">
-    <mat-spinner></mat-spinner>
+    </form>
   </div>
 
-  <table class="striped" matSortActive="date" matSortDirection="desc" matSort (matSortChange)="sort($event)">
-    
-    <thead>
-      <tr>
-        <th mat-sort-header="name">Name</th>
-        <th mat-sort-header="amount">Amount</th>
-        <th mat-sort-header="category">Category</th>
-        <th mat-sort-header="date">Date</th>
-      </tr>
-    </thead>
+</nav>
 
-    <tbody>
-      <tr *ngFor="let expense of expenses">
-        <td>{{expense.name.name}}</td>
-        <td>{{expense.amount.amount | currency:'CHF'}}</td>
-        <td>{{expense.category.name}}</td>
-        <td>{{expense.date |date:'dd.MM.yyyy'}}</td>
-      </tr>
-    </tbody>
 
-  </table>
-
+<div class="example-loading-shade" *ngIf="isLoadingResults">
+  <mat-spinner></mat-spinner>
 </div>
+
+<table class="striped" matSortActive="date" matSortDirection="desc" matSort (matSortChange)="sort($event)">
+  
+  <thead>
+    <tr>
+      <th mat-sort-header="name">Name</th>
+      <th mat-sort-header="amount">Amount</th>
+      <th mat-sort-header="category">Category</th>
+      <th mat-sort-header="date">Date</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr *ngFor="let expense of expenses">
+      <td>{{expense.name.name}}</td>
+      <td>{{expense.amount.amount | currency:'CHF'}}</td>
+      <td>{{expense.category.name}}</td>
+      <td>{{expense.date |date:'dd.MM.yyyy'}}</td>
+    </tr>
+  </tbody>
+
+</table>

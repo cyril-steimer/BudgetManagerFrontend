@@ -17,9 +17,8 @@ export class ExpensesComponent implements OnInit {
 
   expenses: Expense[] = []
 
-  nextMonth: Date
+  urlPrefix = "expenses"
   month: Date
-  prevMonth: Date
 
   private delayedSearch = new DelayedSearch(300, term => this.setSearchTerm(term))
   private searchTerm: string = ""
@@ -53,8 +52,6 @@ export class ExpensesComponent implements OnInit {
     let month = params.month
     if (year && month) {
       this.month = new Date(+year, +month)
-      this.nextMonth = new Date(+year, +month + 1)
-      this.prevMonth = new Date(+year, +month - 1)
       this.getExpenses()
     }
   }

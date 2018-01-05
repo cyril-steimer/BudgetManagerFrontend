@@ -1,71 +1,43 @@
-<div class="container">
-  <div class="row">
-    <div class="col s8 offset-s2">
-      <div class="row">
-        <div class="input-field col s12">
-          <i class="material-icons prefix">mode_edit</i>
-          <input class="active" type="text" id="name" [(ngModel)]="name">
-          <label for="name">Name</label>
-        </div>
+<div class="row">
+  <div class="col s8 offset-s2">
+    <div class="row">
+      <div class="input-field col s12">
+        <i class="material-icons prefix">mode_edit</i>
+        <input class="active" type="text" id="name" [(ngModel)]="name">
+        <label for="name">Name</label>
       </div>
-      <div class="row">
-        <div class="input-field col s12">
-          <i class="material-icons prefix">mode_edit</i>
-          <input class="active" type="number" id="amount" [(ngModel)]="amount">
-          <label for="amount">Amount</label>
-        </div>
+    </div>
+    <div class="row">
+      <div class="input-field col s12">
+        <i class="material-icons prefix">mode_edit</i>
+        <input class="active" type="number" id="amount" [(ngModel)]="amount">
+        <label for="amount">Amount</label>
       </div>
-      <div class="row">
-        <div class="input-field col s12">
-          <i class="material-icons prefix">mode_edit</i>
-          <input class="active" type="text" id="category" [(ngModel)]="category">
-          <label for="category">Category</label>
-        </div>
+    </div>
+    <div class="row">
+      <div class="input-field col s12">
+        <i class="material-icons prefix">mode_edit</i>
+        <input class="active" type="text" id="category" [(ngModel)]="category">
+        <label for="category">Category</label>
       </div>
-      <div class="row">
-        <div class="input-field col s12">
-          <i class="material-icons prefix">mode_edit</i>
-          <input class="active" type="date" id="date" [(ngModel)]="date">
-          <label for="date">Date</label>
-        </div>
+    </div>
+    <div class="row">
+      <div class="input-field col s12">
+        <i class="material-icons prefix">mode_edit</i>
+        <input class="active" type="date" id="date" [(ngModel)]="date">
+        <label for="date">Date</label>
       </div>
+    </div>
 
-      <div class="row">
-        <div class="input-field col s12">
-          <button class="btn waves-effect waves-light" (click)="back()">Back
-            <i class="material-icons left">arrow_back</i>
-          </button>
-          <button class="btn waves-effect waves-light" (click)="addExpense()">Submit
-            <i class="material-icons right">send</i>
-          </button>
-        </div>
+    <div class="row">
+      <div class="input-field col s12">
+        <button class="btn waves-effect waves-light" (click)="back()">Back
+          <i class="material-icons left">arrow_back</i>
+        </button>
+        <button class="btn waves-effect waves-light" (click)="addExpense()">Submit
+          <i class="material-icons right">send</i>
+        </button>
       </div>
     </div>
   </div>
 </div>
-
-
-<!--<form>
-  <mat-form-field class="expense-input">
-    <input matInput placeholder="Name" name="Name" [(ngModel)]="name">
-  </mat-form-field>
-  <br>
-  <mat-form-field class="expense-input">
-    <input matInput placeholder="Amount" name="Amount" [(ngModel)]="amount">
-    <span matSuffix>CHF</span>
-  </mat-form-field>
-  <br>
-  <mat-form-field class="expense-input">
-    <input matInput placeholder="Category" name="Category" [(ngModel)]="category">
-  </mat-form-field>
-  <br>
-  <mat-form-field class="expense-input">
-    <input matInput [matDatepicker]="datePicker" name="Date" placeholder="Date" [(ngModel)]="date">
-    <mat-datepicker-toggle matSuffix [for]="datePicker"></mat-datepicker-toggle>
-    <mat-datepicker #datePicker></mat-datepicker>
-  </mat-form-field>
-  <br>
-  <button class="expense-input" mat-raised-button color="primary" (click)="addExpense()">
-    Add Expense
-  </button>
-</form>-->
