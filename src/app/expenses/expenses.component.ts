@@ -15,11 +15,7 @@ export class ExpensesComponent implements OnInit {
 
   isLoadingResults = false
 
-  displayedColumns = ["name", "amount", "category", "date"]
-  expenses = new MatTableDataSource()
-  @ViewChild(MatSort) sort = new MatSort()
-  
-  length = 0
+  expenses: Expense[] = []
 
   nextMonth: Date
   month: Date
@@ -33,11 +29,8 @@ export class ExpensesComponent implements OnInit {
     private route: ActivatedRoute) { }
 
   ngOnInit() {
-    let sortable: MatSortable = { id: "date", start: "desc", disableClear: null }
-    this.sort.sort(sortable)
     this.route.params.subscribe(params => this.setMonth(params));
     this.getExpenses()
-    this.sort.sortChange.subscribe(() => this.getExpenses())
   }
 
   search(term: string) {
@@ -92,17 +85,13 @@ export class ExpensesComponent implements OnInit {
   }
 
   private getExpensesObservable(): Observable<SubList<Expense>> {
-    let sort = null
-    if (this.sort.active) {
-      sort = {field: this.sort.active, direction: this.sort.direction}
-    }
+    let sort = { field: "date", direction: "desc" }
     return this.expenseService.getExpenses(
       this.searchTerm, this.getSearchBody(), sort, null)
   }
 
   private setExpenses(res: SubList<Expense>) {
     this.isLoadingResults = false
-    this.length = res.count
-    this.expenses.data = res.values
+    this.expenses = res.values
   }
 }

@@ -7,6 +7,7 @@
           <li>
             <a class="waves-effect waves-light btn"
             routerLink="/year/{{prevMonth.getFullYear()}}/month/{{prevMonth.getMonth()}}" >
+              <i class="material-icons left">arrow_back</i>
               Previous Month
             </a>
           </li>
@@ -16,6 +17,7 @@
           <li>
             <a class="waves-effect waves-light btn"
             routerLink="/year/{{nextMonth.getFullYear()}}/month/{{nextMonth.getMonth()}}" >
+              <i class="material-icons right">arrow_forward</i>
               Next Month
             </a>
           </li>
@@ -35,39 +37,30 @@
   </nav>
 
 
-  <div class="example-container mat-elevation-z8">
-    <div class="example-loading-shade" *ngIf="isLoadingResults">
-      <mat-spinner></mat-spinner>
-    </div>
-
-    <mat-table #table [dataSource]="expenses"
-      matSort matSortActive="{{sort.active}}" 
-      matSortDisableClear matSortDirection="{{sort.direction}}">
-
-      <ng-container matColumnDef="name">
-        <mat-header-cell mat-sort-header *matHeaderCellDef> Name </mat-header-cell>
-        <mat-cell *matCellDef="let element"> {{element.name.name}} </mat-cell>
-      </ng-container>
-
-      <ng-container matColumnDef="amount">
-        <mat-header-cell mat-sort-header *matHeaderCellDef> Amount </mat-header-cell>
-        <mat-cell *matCellDef="let element"> {{element.amount.amount | currency:'CHF'}} </mat-cell>
-      </ng-container>
-
-      <ng-container matColumnDef="category">
-        <mat-header-cell mat-sort-header *matHeaderCellDef> Category </mat-header-cell>
-        <mat-cell *matCellDef="let element"> {{element.category.name}} </mat-cell>
-      </ng-container>
-
-      <ng-container matColumnDef="date">
-        <mat-header-cell mat-sort-header *matHeaderCellDef> Date </mat-header-cell>
-        <mat-cell *matCellDef="let element"> {{element.date | date:'dd.MM.yyyy'}} </mat-cell>
-      </ng-container>
-
-      <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-      <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
-    </mat-table>
-    
+  <div class="example-loading-shade" *ngIf="isLoadingResults">
+    <mat-spinner></mat-spinner>
   </div>
+
+  <table class="striped">
+    
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Amount</th>
+        <th>Category</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let expense of expenses">
+        <td>{{expense.name.name}}</td>
+        <td>{{expense.amount.amount | currency:'CHF'}}</td>
+        <td>{{expense.category.name}}</td>
+        <td>{{expense.date |date:'dd.MM.yyyy'}}</td>
+      </tr>
+    </tbody>
+
+  </table>
 
 </div>
