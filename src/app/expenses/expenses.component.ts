@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { SubList, Expense } from '../model';
+import { SubList, Expense, Sort } from '../model';
 import { ExpenseService } from '../expense.service';
 import { MatTableDataSource, MatSort, MatSortable } from '@angular/material';
 import { Observable } from 'rxjs/Observable';
@@ -24,6 +24,8 @@ export class ExpensesComponent implements OnInit {
   private delayedSearch = new DelayedSearch(300, term => this.setSearchTerm(term))
   private searchTerm: string = ""
 
+  private activeSort: Sort = { field: "date", direction: "desc" }
+
   constructor(
     private expenseService: ExpenseService,
     private route: ActivatedRoute) { }
@@ -35,6 +37,15 @@ export class ExpensesComponent implements OnInit {
 
   search(term: string) {
     this.delayedSearch.set(term)
+  }
+
+  sort(event: any) {
+    if (event.direction == "") {
+      this.activeSort = null
+    } else {
+      this.activeSort = { field: event.active, direction: event.direction }
+    }
+    this.getExpenses()
   }
 
   private setMonth(params: any) {
@@ -85,9 +96,8 @@ export class ExpensesComponent implements OnInit {
   }
 
   private getExpensesObservable(): Observable<SubList<Expense>> {
-    let sort = { field: "date", direction: "desc" }
     return this.expenseService.getExpenses(
-      this.searchTerm, this.getSearchBody(), sort, null)
+      this.searchTerm, this.getSearchBody(), this.activeSort, null)
   }
 
   private setExpenses(res: SubList<Expense>) {

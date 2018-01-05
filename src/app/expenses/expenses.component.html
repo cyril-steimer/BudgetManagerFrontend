@@ -41,14 +41,14 @@
     <mat-spinner></mat-spinner>
   </div>
 
-  <table class="striped">
+  <table class="striped" matSortActive="date" matSortDirection="desc" matSort (matSortChange)="sort($event)">
     
     <thead>
       <tr>
-        <th>Name</th>
-        <th>Amount</th>
-        <th>Category</th>
-        <th>Date</th>
+        <th mat-sort-header="name">Name</th>
+        <th mat-sort-header="amount">Amount</th>
+        <th mat-sort-header="category">Category</th>
+        <th mat-sort-header="date">Date</th>
       </tr>
     </thead>
 
