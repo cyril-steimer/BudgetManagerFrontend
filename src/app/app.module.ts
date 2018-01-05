@@ -46,7 +46,8 @@ import 'materialize-css'
 import { MaterializeModule } from "angular2-materialize"
 import './date.extensions.impl';
 import { BudgetComponent } from './budget/budget.component';
-import { MonthHeaderComponent } from './month-header/month-header.component'
+import { MonthHeaderComponent } from './month-header/month-header.component';
+import { BudgetService } from './budget.service'
 
 @NgModule({
   declarations: [
@@ -97,7 +98,8 @@ import { MonthHeaderComponent } from './month-header/month-header.component'
     AppRoutingModule
   ],
   providers: [
-    ExpenseService
+    ExpenseService,
+    BudgetService
   ],
   bootstrap: [AppComponent]
 })

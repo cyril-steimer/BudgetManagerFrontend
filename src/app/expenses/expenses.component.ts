@@ -5,6 +5,7 @@ import { MatTableDataSource, MatSort, MatSortable } from '@angular/material';
 import { Observable } from 'rxjs/Observable';
 import { DelayedSearch } from '../delayed.search';
 import { ActivatedRoute } from '@angular/router';
+import { QueryUtil } from '../query.util';
 
 @Component({
   selector: 'app-expenses',
@@ -58,25 +59,7 @@ export class ExpensesComponent implements OnInit {
 
   private getSearchBody() {
     if (this.month) {
-      let start = this.month
-      let end = new Date(start.getFullYear(), start.getMonth() + 1)
-      //TODO Ugly shit.
-      return {
-        and: [
-          {
-            date: {
-              date: start,
-              comparison: ">="
-            }
-          },
-          {
-            date: {
-              date: end,
-              comparison: "<"
-            }
-          }
-        ]
-      }
+      return QueryUtil.monthQuery(this.month)
     }
     return null
   }

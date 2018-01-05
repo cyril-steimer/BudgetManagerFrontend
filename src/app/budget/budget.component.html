@@ -4,3 +4,29 @@
   </app-month-header>
 
 </nav>
+
+<table class="striped">
+
+  <thead>
+    <tr>
+      <th>Category</th>
+      <th>Spent</th>
+      <th>Budget</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr *ngFor="let expense of expenses">
+      <td>{{expense.category.name}}</td>
+      <td>{{expense.amount.amount | currency:'CHF'}}</td>
+      <td>{{expense.budget.amount | currency:'CHF'}}</td>
+    </tr>
+
+    <tr *ngIf="otherExpenses && otherExpenses.amount.amount">
+        <td>{{otherExpenses.category.name}}</td>
+        <td>{{otherExpenses.amount.amount | currency:'CHF'}}</td>
+        <td>{{otherExpenses.budget.amount | currency:'CHF'}}</td>
+    </tr>
+  </tbody>
+
+</table>

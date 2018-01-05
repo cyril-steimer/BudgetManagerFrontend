@@ -6,6 +6,17 @@ export class Expense {
   date: Date
 }
 
+export class Budget {
+  category: Category
+  amount: Amount
+}
+
+export class CategoryExpenses {
+  category: Category
+  amount: Amount
+  budget: Amount
+}
+
 export class Amount {
   amount: number
 }

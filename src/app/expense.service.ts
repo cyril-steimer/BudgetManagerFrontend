@@ -14,7 +14,6 @@ export class ExpenseService {
   constructor(private http: HttpClient) { }
 
   getExpenses(filter?: string, searchBody?: any, sort?: Sort, pagination?: Pagination): Observable<SubList<Expense>> {
-    this.changeDateToJSON()
     let url = this.getSearchUrl(filter, searchBody)
     let options = this.createOptions(sort, pagination)
     if (searchBody == null) {
@@ -24,7 +23,6 @@ export class ExpenseService {
   }
 
   addExpense(expense: Expense): Observable<any> {
-    this.changeDateToJSON()
     return this.http.post(this.expenseUrl, expense)
   }
 
@@ -57,20 +55,6 @@ export class ExpenseService {
     if (pagination != null) {
       params["from"] = pagination.from
       params["count"] = pagination.count
-    }
-  }
-
-  //TODO Move this to a better place.
-  //TODO Can we not override the global 'toJSON' method?
-  private changeDateToJSON() {
-    //https://stackoverflow.com/questions/11382606/javascript-date-tojson-dont-get-the-timezone-offset
-    Date.prototype.toJSON = function(this: Date) {
-      function addZ(n) {
-        return (n<10? '0' : '') + n;
-      }
-      return this.getFullYear() + '-' + 
-            addZ(this.getMonth() + 1) + '-' + 
-            addZ(this.getDate());
     }
   }
 }
