@@ -58,14 +58,15 @@ export class BudgetComponent implements OnInit {
     this.expenses = this.budgets
       .map(b => this.calculateCategoryExpensesForBudget(expenses, b))
     this.otherExpenses = this.calculateOtherExpenses(expenses)
-    this.total = this.calculateTotal()
+    this.total = this.calculateTotal(expenses
   }
 
-  private calculateTotal() {
+  private calculateTotal(expenses: Expense[]) {
     let total = { 
       category: { name: "Total"}, 
       amount: this.otherExpenses.amount, 
-      budget: this.otherExpenses.budget 
+      budget: this.otherExpenses.budget,
+      expenses: expenses
     }
     for (let expense of this.expenses) {
       total.amount = ModelUtil.sum(total.amount, expense.amount)
@@ -78,12 +79,12 @@ export class BudgetComponent implements OnInit {
     let other = expenses
       .filter(e => this.budgets.filter(b => b.category.name === e.category.name).length == 0)
     let sum = ModelUtil.sumExpenses(other)
-    return { category: { name: "Other" }, amount: sum, budget: { amount: 0 } }
+    return { category: { name: "Other" }, amount: sum, budget: { amount: 0 }, expenses: other }
   }
 
   private calculateCategoryExpensesForBudget(expenses: Expense[], budget: Budget) {
     let relevant = ModelUtil.getExpensesWithCategory(expenses, budget.category)
     let sum = ModelUtil.sumExpenses(relevant)
-    return { category: budget.category, amount: sum, budget: budget.amount }
+    return { category: budget.category, amount: sum, budget: budget.amount, expenses: relevant }
   }
 }

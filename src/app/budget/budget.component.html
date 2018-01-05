@@ -16,19 +16,21 @@
   </thead>
 
   <tbody>
-    <tr *ngFor="let expense of expenses">
+    <tr *ngFor="let expense of expenses" 
+    [ngClass]="{'red-text': expense.amount.amount > expense.budget.amount}">
       <td>{{expense.category.name}}</td>
       <td>{{expense.amount.amount | currency:'CHF'}}</td>
       <td>{{expense.budget.amount | currency:'CHF'}}</td>
     </tr>
 
-    <tr *ngIf="otherExpenses && otherExpenses.amount.amount">
+    <tr *ngIf="otherExpenses && otherExpenses.amount.amount" class="red-text">
         <th>Not Budgeted</th>
         <td>{{otherExpenses.amount.amount | currency:'CHF'}}</td>
         <td>{{otherExpenses.budget.amount | currency:'CHF'}}</td>
     </tr>
 
-    <tr *ngIf="total">
+    <tr *ngIf="total"
+    [ngClass]="{'red-text': total.amount.amount > total.budget.amount}">
         <th>Total</th>
         <th>{{total.amount.amount | currency:'CHF'}}</th>
         <th>{{total.budget.amount | currency:'CHF'}}</th>

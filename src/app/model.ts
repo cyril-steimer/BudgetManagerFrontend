@@ -15,6 +15,7 @@ export class CategoryExpenses {
   category: Category
   amount: Amount
   budget: Amount
+  expenses: Expense[]
 }
 
 export class Amount {
