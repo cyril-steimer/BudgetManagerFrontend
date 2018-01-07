@@ -17,24 +17,50 @@
 
   <tbody>
     <tr *ngFor="let expense of expenses" 
-    [ngClass]="{'red-text': expense.amount.amount > expense.budget.amount}">
+    [ngClass]="{'red-text': expense.amount.amount > expense.budget.amount}"
+    (click)="showDetails(expense)">
       <td>{{expense.category.name}}</td>
       <td>{{expense.amount.amount | currency:'CHF'}}</td>
       <td>{{expense.budget.amount | currency:'CHF'}}</td>
     </tr>
 
-    <tr *ngIf="otherExpenses && otherExpenses.amount.amount" class="red-text">
-        <th>Not Budgeted</th>
-        <td>{{otherExpenses.amount.amount | currency:'CHF'}}</td>
+    <tr *ngIf="otherExpenses && otherExpenses.amount.amount" class="red-text"
+      (click)="showDetails(otherExpenses)">
+        <th>{{otherExpenses.category.name}}</th>
+        <td>{{otherExpenses.amount.amount | currency:'CHF'}}</td> 
         <td>{{otherExpenses.budget.amount | currency:'CHF'}}</td>
     </tr>
 
     <tr *ngIf="total"
-    [ngClass]="{'red-text': total.amount.amount > total.budget.amount}">
-        <th>Total</th>
+    [ngClass]="{'red-text': total.amount.amount > total.budget.amount}"
+    (click)="showDetails(total)">
+        <th>{{total.category.name}}</th>
         <th>{{total.amount.amount | currency:'CHF'}}</th>
         <th>{{total.budget.amount | currency:'CHF'}}</th>
     </tr>
   </tbody>
 
 </table>
+
+<div *ngIf="detail" id="detail-modal" class="modal">
+
+  <div class="modal-content">
+    <table class="striped">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Amount</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let expense of detail.expenses">
+          <td>{{expense.name.name}}</td>
+          <td>{{expense.amount.amount | currency:'CHF'}}</td>
+          <td>{{expense.date | date:'dd.MM.yyyy'}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>

@@ -4,7 +4,7 @@
       <a class="waves-effect waves-light btn"
       routerLink="/{{urlPrefix}}/year/{{prevMonth.getFullYear()}}/month/{{prevMonth.getMonth()}}" >
         <i class="material-icons left">arrow_back</i>
-        Previous Month
+        {{prevMonth.getMonthName()}} {{prevMonth.getFullYear()}}
       </a>
     </li>
   </ul>
@@ -14,7 +14,7 @@
       <a class="waves-effect waves-light btn"
       routerLink="/{{urlPrefix}}/year/{{nextMonth.getFullYear()}}/month/{{nextMonth.getMonth()}}" >
         <i class="material-icons right">arrow_forward</i>
-        Next Month
+        {{nextMonth.getMonthName()}} {{nextMonth.getFullYear()}}
       </a>
     </li>
   </ul>
