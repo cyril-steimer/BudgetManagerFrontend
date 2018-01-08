@@ -20,24 +20,5 @@
   <mat-spinner></mat-spinner>
 </div>
 
-<table class="striped" matSortActive="date" matSortDirection="desc" matSort (matSortChange)="sort($event)">
-  
-  <thead>
-    <tr>
-      <th mat-sort-header="name">Name</th>
-      <th mat-sort-header="amount">Amount</th>
-      <th mat-sort-header="category">Category</th>
-      <th mat-sort-header="date">Date</th>
-    </tr>
-  </thead>
-
-  <tbody>
-    <tr *ngFor="let expense of expenses">
-      <td>{{expense.name.name}}</td>
-      <td>{{expense.amount.amount | currency:'CHF'}}</td>
-      <td>{{expense.category.name}}</td>
-      <td>{{expense.date.timestamp |date:'dd.MM.yyyy'}}</td>
-    </tr>
-  </tbody>
-
-</table>
+<app-expenses-table [expenses]="expenses" [sorter]="sorter">
+</app-expenses-table>

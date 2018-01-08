@@ -6,13 +6,14 @@ import { Observable } from 'rxjs/Observable';
 import { DelayedSearch } from '../delayed.search';
 import { ActivatedRoute } from '@angular/router';
 import { QueryUtil } from '../query.util';
+import { ExpenseSorter, SortDirection, SortField } from '../expenses-table/expenses-table.component';
 
 @Component({
   selector: 'app-expenses',
   templateUrl: './expenses.component.html',
   styleUrls: ['./expenses.component.css']
 })
-export class ExpensesComponent implements OnInit {
+export class ExpensesComponent implements OnInit, ExpenseSorter {
 
   isLoadingResults = false
 
@@ -20,6 +21,8 @@ export class ExpensesComponent implements OnInit {
 
   urlPrefix = "expenses"
   month: Date
+
+  sorter = this
 
   private delayedSearch = new DelayedSearch(300, term => this.setSearchTerm(term))
   private searchTerm: string = ""
@@ -35,17 +38,18 @@ export class ExpensesComponent implements OnInit {
     this.getExpenses()
   }
 
-  search(term: string) {
-    this.delayedSearch.set(term)
+  sort(field: SortField, dir: SortDirection) {
+    this.activeSort = { field: field.field, direction: dir.dir }
+    this.getExpenses()
   }
 
-  sort(event: any) {
-    if (event.direction == "") {
-      this.activeSort = null
-    } else {
-      this.activeSort = { field: event.active, direction: event.direction }
-    }
+  removeSort() {
+    this.activeSort = null
     this.getExpenses()
+  }
+
+  search(term: string) {
+    this.delayedSearch.set(term)
   }
 
   private setMonth(params: any) {
