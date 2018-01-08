@@ -6,13 +6,14 @@ import { BudgetService } from '../budget.service';
 import { QueryUtil } from '../query.util';
 import { ModelUtil } from '../model.util';
 import * as $ from 'jquery'
+import { BeforeEdit } from '../expenses-table/expenses-table.component';
 
 @Component({
   selector: 'app-budget',
   templateUrl: './budget.component.html',
   styleUrls: ['./budget.component.css']
 })
-export class BudgetComponent implements OnInit {
+export class BudgetComponent implements OnInit, BeforeEdit {
 
   month: Date
   urlPrefix = "budget"
@@ -21,6 +22,8 @@ export class BudgetComponent implements OnInit {
   budgets: Budget[]
 
   detail: CategoryExpenses
+
+  callback = this
 
   constructor(
     private expenseService: ExpenseService,
@@ -31,6 +34,10 @@ export class BudgetComponent implements OnInit {
     this.route.params.subscribe(params => this.setMonth(params));
     this.getBudgets()
     $(".modal").modal()
+  }
+
+  beforeEdit(expense: Expense) {
+    $("#detail-modal").modal("close")
   }
 
   showDetails(expense: CategoryExpenses) {

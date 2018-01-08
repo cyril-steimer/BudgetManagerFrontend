@@ -15,7 +15,7 @@
         <td>{{expense.category.name}}</td>
         <td>{{expense.date | date:'dd.MM.yyyy'}}</td>
         <td>
-          <a routerLink="/edit/expense/{{expense.id}}" class="material-icons edit">edit</a>
+          <a (click)="edit(expense)" class="material-icons edit">edit</a>
         </td>
       </tr>
     </tbody>

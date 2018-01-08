@@ -1,5 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Expense } from '../model';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-expenses-table',
@@ -9,12 +10,21 @@ import { Expense } from '../model';
 export class ExpensesTableComponent implements OnInit {
 
   @Input() expenses: Expense[] = []
+  @Input() beforeEdit: BeforeEdit
 
-  constructor() { }
+  constructor(private router: Router) { }
 
   ngOnInit() {
   }
 
   edit(expense: Expense) {
+    if (this.beforeEdit) {
+      this.beforeEdit.beforeEdit(expense)
+    }
+    this.router.navigate(["edit", "expense", expense.id])
   }
+}
+
+export interface BeforeEdit {
+  beforeEdit(expense: Expense)
 }

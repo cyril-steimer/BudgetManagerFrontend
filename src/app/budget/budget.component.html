@@ -31,7 +31,8 @@
 
   <div class="modal-content">
     <div *ngIf="detail">
-      <app-expenses-table [expenses]="detail.expenses"></app-expenses-table>
+      <app-expenses-table [expenses]="detail.expenses" [beforeEdit]="callback">
+      </app-expenses-table>
     </div>
   </div>
 
