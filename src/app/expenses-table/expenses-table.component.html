@@ -13,7 +13,7 @@
         <td>{{expense.name.name}}</td>
         <td>{{expense.amount.amount | currency:'CHF'}}</td>
         <td>{{expense.category.name}}</td>
-        <td>{{expense.date | date:'dd.MM.yyyy'}}</td>
+        <td>{{expense.date.timestamp | date:'dd.MM.yyyy'}}</td>
         <td>
           <a (click)="edit(expense)" class="material-icons edit">edit</a>
         </td>

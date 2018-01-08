@@ -47,7 +47,7 @@ export class EditExpenseComponent implements OnInit, AfterViewChecked {
         clear: null //Don't show the 'clear' button
       })
       this.picker = input.pickadate("picker")
-      this.picker.set("select", this.expense.date)
+      this.picker.set("select", this.expense.date.timestamp)
     }
   }
 
@@ -63,7 +63,7 @@ export class EditExpenseComponent implements OnInit, AfterViewChecked {
   private onSetDatePicker(select: any) {
     let time = +select.select
     if (!isNaN(time)) {
-      this.expense.date = new Date(time)
+      this.expense.date.timestamp = time
     }
   }
 

@@ -3,7 +3,7 @@ export class Expense {
   name: Name
   amount: Amount
   category: Category
-  date: Date
+  date: Timestamp
 }
 
 export class Budget {
@@ -28,6 +28,10 @@ export class Name {
 
 export class Category {
   name: string
+}
+
+export class Timestamp {
+  timestamp: number
 }
 
 export class SubList<T> {

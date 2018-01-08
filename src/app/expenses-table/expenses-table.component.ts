@@ -15,7 +15,6 @@ export class ExpensesTableComponent implements OnInit {
   constructor(private router: Router) { }
 
   ngOnInit() {
-    console.log(this.expenses)
   }
 
   edit(expense: Expense) {

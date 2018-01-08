@@ -1,8 +1,8 @@
 export class QueryUtil {
   
   static monthQuery(month: Date) {
-    let start = month
-    let end = new Date(start.getFullYear(), start.getMonth() + 1)
+    let start = month.getTime()
+    let end = new Date(month.getFullYear(), month.getMonth() + 1).getTime()
     return {and: [
       {
         date: {

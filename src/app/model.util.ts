@@ -26,7 +26,7 @@ export class ModelUtil {
       id: 0,
       category: { name : null },
       amount: { amount: null },
-      date: null,
+      date: { timestamp: null },
       name: { name: null }
     }
   }
