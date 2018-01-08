@@ -21,6 +21,16 @@ export class ModelUtil {
       .filter(e => e.category.name === category.name)
   }
 
+  static emptyExpense(): Expense {
+    return {
+      id: 0,
+      category: { name : null },
+      amount: { amount: null },
+      date: null,
+      name: { name: null }
+    }
+  }
+
   static sum(a1: Amount, a2: Amount): Amount {
     return { amount: a1.amount + a2.amount }
   }

@@ -13,7 +13,13 @@ export class ExpenseService {
 
   constructor(private http: HttpClient) { }
 
-  getExpenses(filter?: string, searchBody?: any, sort?: Sort, pagination?: Pagination): Observable<SubList<Expense>> {
+  getExpenses(
+    filter?: string, 
+    searchBody?: any, 
+    sort?: Sort, 
+    pagination?: Pagination): Observable<SubList<Expense>> {
+
+    //TODO there is duplicate code..
     let url = this.getSearchUrl(filter, searchBody)
     let options = this.createOptions(sort, pagination)
     if (searchBody == null) {
@@ -22,8 +28,20 @@ export class ExpenseService {
     return this.http.post<SubList<Expense>>(url, searchBody, options)
   }
 
+  getExpenseById(id: number | string): Observable<Expense> {
+    let url = `${this.expenseUrl}/field/id/${id}`
+    let options = {
+      params: { "single": "true" }
+    }
+    return this.http.get<Expense>(url, options)
+  }
+
   addExpense(expense: Expense): Observable<any> {
     return this.http.post(this.expenseUrl, expense)
+  }
+
+  updateExpense(expense: Expense): Observable<any> {
+    return this.http.put(this.expenseUrl, expense)
   }
 
   private getSearchUrl(filter?: string, body?: any) {

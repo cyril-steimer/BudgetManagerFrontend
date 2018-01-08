@@ -16,6 +16,5 @@ export class ExpensesTableComponent implements OnInit {
   }
 
   edit(expense: Expense) {
-    //TODO
   }
 }

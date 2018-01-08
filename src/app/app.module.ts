@@ -40,7 +40,6 @@ import {
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { NewExpenseComponent } from './new-expense/new-expense.component';
 import { AppRoutingModule } from './/app-routing.module';
 import 'materialize-css'
 import { MaterializeModule } from "angular2-materialize"
@@ -48,16 +47,17 @@ import './date.extensions.impl';
 import { BudgetComponent } from './budget/budget.component';
 import { MonthHeaderComponent } from './month-header/month-header.component';
 import { BudgetService } from './budget.service';
-import { ExpensesTableComponent } from './expenses-table/expenses-table.component'
+import { ExpensesTableComponent } from './expenses-table/expenses-table.component';
+import { EditExpenseComponent } from './edit-expense/edit-expense.component'
 
 @NgModule({
   declarations: [
     AppComponent,
     ExpensesComponent,
-    NewExpenseComponent,
     BudgetComponent,
     MonthHeaderComponent,
-    ExpensesTableComponent
+    ExpensesTableComponent,
+    EditExpenseComponent
   ],
   imports: [
     BrowserModule,
