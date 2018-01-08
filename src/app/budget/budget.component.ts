@@ -18,8 +18,6 @@ export class BudgetComponent implements OnInit {
   urlPrefix = "budget"
 
   expenses: CategoryExpenses[]
-  otherExpenses: CategoryExpenses
-  total: CategoryExpenses
   budgets: Budget[]
 
   detail: CategoryExpenses
@@ -32,12 +30,12 @@ export class BudgetComponent implements OnInit {
   ngOnInit() {
     this.route.params.subscribe(params => this.setMonth(params));
     this.getBudgets()
+    $(".modal").modal()
   }
 
   showDetails(expense: CategoryExpenses) {
     if (expense.expenses.length > 0) {
       this.detail = expense
-      $(".modal").modal()
       $("#detail-modal").modal("open")
     }  
   }
@@ -61,29 +59,25 @@ export class BudgetComponent implements OnInit {
 
   private getExpenses() {
     let query = QueryUtil.monthQuery(this.month)
-    this.expenseService.getExpenses(null, query, null, null)
+    let sort = { field: "date", direction: "desc" }
+    this.expenseService.getExpenses(null, query, sort, null)
       .subscribe(expenses => this.calculateCategoryExpenses(expenses.values))
   }
 
   private calculateCategoryExpenses(expenses: Expense[]) {
     this.expenses = this.budgets
       .map(b => this.calculateCategoryExpensesForBudget(expenses, b))
-    this.otherExpenses = this.calculateOtherExpenses(expenses)
-    this.total = this.calculateTotal(expenses)
+    this.expenses.push(this.calculateOtherExpenses(expenses))
+    this.expenses.push(this.calculateTotal(expenses))
   }
 
   private calculateTotal(expenses: Expense[]) {
-    let total = { 
+    return { 
       category: { name: "Total"}, 
-      amount: this.otherExpenses.amount, 
-      budget: this.otherExpenses.budget,
-      expenses: ModelUtil.sortByDateDesc(expenses)
+      amount: ModelUtil.sumExpenses(expenses),
+      budget: ModelUtil.sumBudgets(this.budgets),
+      expenses: expenses
     }
-    for (let expense of this.expenses) {
-      total.amount = ModelUtil.sum(total.amount, expense.amount)
-      total.budget = ModelUtil.sum(total.budget, expense.budget)
-    }
-    return total
   }
 
   private calculateOtherExpenses(expenses: Expense[]) {
@@ -94,7 +88,8 @@ export class BudgetComponent implements OnInit {
       category: { name: "Not Budgeted" }, 
       amount: sum, 
       budget: { amount: 0 }, 
-      expenses: ModelUtil.sortByDateDesc(other) }
+      expenses: other 
+    }
   }
 
   private calculateCategoryExpensesForBudget(expenses: Expense[], budget: Budget) {
@@ -104,6 +99,7 @@ export class BudgetComponent implements OnInit {
       category: budget.category, 
       amount: sum, 
       budget: budget.amount,
-      expenses: ModelUtil.sortByDateDesc(relevant) }
+      expenses: relevant
+    }
   }
 }

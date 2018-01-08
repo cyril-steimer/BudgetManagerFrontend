@@ -23,29 +23,14 @@
       <td>{{expense.amount.amount | currency:'CHF'}}</td>
       <td>{{expense.budget.amount | currency:'CHF'}}</td>
     </tr>
-
-    <tr *ngIf="otherExpenses && otherExpenses.amount.amount" class="red-text"
-      (click)="showDetails(otherExpenses)">
-        <th>{{otherExpenses.category.name}}</th>
-        <td>{{otherExpenses.amount.amount | currency:'CHF'}}</td> 
-        <td>{{otherExpenses.budget.amount | currency:'CHF'}}</td>
-    </tr>
-
-    <tr *ngIf="total"
-    [ngClass]="{'red-text': total.amount.amount > total.budget.amount}"
-    (click)="showDetails(total)">
-        <th>{{total.category.name}}</th>
-        <th>{{total.amount.amount | currency:'CHF'}}</th>
-        <th>{{total.budget.amount | currency:'CHF'}}</th>
-    </tr>
   </tbody>
 
 </table>
 
-<div *ngIf="detail" id="detail-modal" class="modal">
+<div id="detail-modal" class="modal">
 
   <div class="modal-content">
-    <table class="striped">
+    <table class="striped" *ngIf="detail">
       <thead>
         <tr>
           <th>Name</th>
