@@ -6,6 +6,7 @@ import { Location } from '@angular/common';
 import { ModelUtil } from '../model.util';
 import { Observable } from 'rxjs/Observable';
 import * as Materialize from 'materialize-css'
+import * as $ from 'jquery'
 
 @Component({
   selector: 'app-edit-expense',
@@ -16,6 +17,8 @@ export class EditExpenseComponent implements OnInit, AfterViewChecked {
 
   expense: Expense = null
   newExpense: boolean = true
+
+  picker: any = null
 
   constructor(
     private expenseService: ExpenseService,
@@ -38,6 +41,14 @@ export class EditExpenseComponent implements OnInit, AfterViewChecked {
     if (Materialize.updateTextFields) {
       Materialize.updateTextFields()
     }
+    if (this.expense != null && this.picker == null) {
+      let input = $(".datepicker").pickadate({
+        onSet: ctx => this.onSetDatePicker(ctx),
+        clear: null //Don't show the 'clear' button
+      })
+      this.picker = input.pickadate("picker")
+      this.picker.set("select", this.expense.date)
+    }
   }
 
   back() {
@@ -47,6 +58,13 @@ export class EditExpenseComponent implements OnInit, AfterViewChecked {
   submit() {
     this.doSubmit()
       .subscribe(() => this.back())
+  }
+
+  private onSetDatePicker(select: any) {
+    let time = +select.select
+    if (!isNaN(time)) {
+      this.expense.date = new Date(time)
+    }
   }
 
   private doSubmit(): Observable<any> {
