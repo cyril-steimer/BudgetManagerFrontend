@@ -30,22 +30,9 @@
 <div id="detail-modal" class="modal">
 
   <div class="modal-content">
-    <table class="striped" *ngIf="detail">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Amount</th>
-          <th>Date</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let expense of detail.expenses">
-          <td>{{expense.name.name}}</td>
-          <td>{{expense.amount.amount | currency:'CHF'}}</td>
-          <td>{{expense.date | date:'dd.MM.yyyy'}}</td>
-        </tr>
-      </tbody>
-    </table>
+    <div *ngIf="detail">
+      <app-expenses-table [expenses]="detail.expenses"></app-expenses-table>
+    </div>
   </div>
 
 </div>

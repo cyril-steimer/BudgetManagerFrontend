@@ -47,7 +47,8 @@ import { MaterializeModule } from "angular2-materialize"
 import './date.extensions.impl';
 import { BudgetComponent } from './budget/budget.component';
 import { MonthHeaderComponent } from './month-header/month-header.component';
-import { BudgetService } from './budget.service'
+import { BudgetService } from './budget.service';
+import { ExpensesTableComponent } from './expenses-table/expenses-table.component'
 
 @NgModule({
   declarations: [
@@ -55,7 +56,8 @@ import { BudgetService } from './budget.service'
     ExpensesComponent,
     NewExpenseComponent,
     BudgetComponent,
-    MonthHeaderComponent
+    MonthHeaderComponent,
+    ExpensesTableComponent
   ],
   imports: [
     BrowserModule,

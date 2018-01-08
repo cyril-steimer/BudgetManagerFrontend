@@ -1,0 +1,22 @@
+<table class="striped">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Amount</th>
+        <th>Category</th>
+        <th>Date</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let expense of expenses">
+        <td>{{expense.name.name}}</td>
+        <td>{{expense.amount.amount | currency:'CHF'}}</td>
+        <td>{{expense.category.name}}</td>
+        <td>{{expense.date | date:'dd.MM.yyyy'}}</td>
+        <td>
+          <i class="material-icons edit" (click)="edit(expense)">edit</i>
+        </td>
+      </tr>
+    </tbody>
+  </table>
