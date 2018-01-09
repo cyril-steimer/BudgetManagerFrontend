@@ -4,7 +4,7 @@ import { Expense, Budget, CategoryExpenses, Category } from '../model';
 import { ExpenseService } from '../expense.service';
 import { BudgetService } from '../budget.service';
 import { QueryUtil } from '../query.util';
-import { ModelUtil } from '../model.util';
+import { ModelUtil, CategoryExpensesCalculator } from '../model.util';
 import * as $ from 'jquery'
 import { BeforeEdit } from '../expenses-table/expenses-table.component';
 
@@ -72,41 +72,7 @@ export class BudgetComponent implements OnInit, BeforeEdit {
   }
 
   private calculateCategoryExpenses(expenses: Expense[]) {
-    this.expenses = this.budgets
-      .map(b => this.calculateCategoryExpensesForBudget(expenses, b))
-    this.expenses.push(this.calculateOtherExpenses(expenses))
-    this.expenses.push(this.calculateTotal(expenses))
-  }
-
-  private calculateTotal(expenses: Expense[]) {
-    return { 
-      category: { name: "Total"}, 
-      amount: ModelUtil.sumExpenses(expenses),
-      budget: ModelUtil.sumBudgets(this.budgets),
-      expenses: expenses
-    }
-  }
-
-  private calculateOtherExpenses(expenses: Expense[]) {
-    let other = expenses
-      .filter(e => this.budgets.filter(b => b.category.name === e.category.name).length == 0)
-    let sum = ModelUtil.sumExpenses(other)
-    return { 
-      category: { name: "Not Budgeted" }, 
-      amount: sum, 
-      budget: { amount: 0 }, 
-      expenses: other 
-    }
-  }
-
-  private calculateCategoryExpensesForBudget(expenses: Expense[], budget: Budget) {
-    let relevant = ModelUtil.getExpensesWithCategory(expenses, budget.category)
-    let sum = ModelUtil.sumExpenses(relevant)
-    return { 
-      category: budget.category, 
-      amount: sum, 
-      budget: budget.amount,
-      expenses: relevant
-    }
+    let calculator = new CategoryExpensesCalculator(expenses, this.budgets)
+    this.expenses = calculator.calculateAllExpenses()
   }
 }
