@@ -49,6 +49,8 @@ import { MonthHeaderComponent } from './month-header/month-header.component';
 import { BudgetService } from './budget.service';
 import { ExpensesTableComponent } from './expenses-table/expenses-table.component';
 import { EditExpenseComponent } from './edit-expense/edit-expense.component'
+import 'chart.js'
+import { ChartsModule } from 'ng2-charts';
 
 @NgModule({
   declarations: [
@@ -66,6 +68,7 @@ import { EditExpenseComponent } from './edit-expense/edit-expense.component'
     ReactiveFormsModule,
     BrowserAnimationsModule,
     MaterializeModule,
+    ChartsModule,
     MatAutocompleteModule,
     MatButtonModule,
     MatButtonToggleModule,

@@ -18,12 +18,15 @@ export class BudgetComponent implements OnInit, BeforeEdit {
   month: Date
   urlPrefix = "budget"
 
-  expenseCalculator: CategoryExpensesCalculator
-  private budgets: Budget[]
+  expensesForTable: CategoryExpenses[]
 
   detail: CategoryExpenses
 
   callback = this
+
+  pieChartData: number[]
+  pieChartLabels: string[]
+  pieChartType = "pie"
 
   constructor(
     private expenseService: ExpenseService,
@@ -50,11 +53,21 @@ export class BudgetComponent implements OnInit, BeforeEdit {
     }  
   }
 
-  getAllExpensesSortedByBudget() {
-    if (this.expenseCalculator == null) {
-      return []
-    }
-    return this.expenseCalculator.sortByBudget().calculateAllExpenses()
+  private plotData(calc: CategoryExpensesCalculator) {
+    let expenses = this.getExpensesSortedByExpensesWithoutTotal(calc)
+    return expenses.map(e => e.amount.amount)
+  }
+
+  private plotLabels(calc: CategoryExpensesCalculator) {
+    let expenses = this.getExpensesSortedByExpensesWithoutTotal(calc)
+    return expenses.map(e => e.category.name)
+  }
+
+  private getExpensesSortedByExpensesWithoutTotal(calc: CategoryExpensesCalculator) {
+    let calculator = calc.sortByExpenses()
+    let res = calculator.calculateBudgetedExpenses()
+    res.push(calculator.calculateNotBudgetedExpenses())
+    return res
   }
 
   private setMonth(params: any) {
@@ -68,20 +81,20 @@ export class BudgetComponent implements OnInit, BeforeEdit {
 
   private getBudgets() {
     this.budgetService.getBudgets()
-      .subscribe(budgets => {
-        this.budgets = budgets.values
-        this.getExpenses()
-      })
+      .subscribe(budgets => this.getExpenses(budgets.values))
   }
 
-  private getExpenses() {
+  private getExpenses(budgets: Budget[]) {
     let query = QueryUtil.monthQuery(this.month)
     let sort = { field: "date", direction: "desc" }
     this.expenseService.getExpenses(null, query, sort, null)
-      .subscribe(expenses => this.calculateCategoryExpenses(expenses.values))
+      .subscribe(expenses => this.init(expenses.values, budgets))
   }
 
-  private calculateCategoryExpenses(expenses: Expense[]) {
-    this.expenseCalculator = new CategoryExpensesCalculator(expenses, this.budgets)
+  private init(expenses: Expense[], budgets: Budget[]) {
+    let calc = new CategoryExpensesCalculator(expenses, budgets)
+    this.expensesForTable = calc.sortByBudget().calculateAllExpenses()
+    this.pieChartData = this.plotData(calc)
+    this.pieChartLabels = this.plotLabels(calc)
   }
 }
