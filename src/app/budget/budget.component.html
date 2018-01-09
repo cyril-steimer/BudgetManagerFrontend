@@ -16,7 +16,7 @@
   </thead>
 
   <tbody>
-    <tr *ngFor="let expense of expenses" 
+    <tr *ngFor="let expense of getAllExpensesSortedByBudget()" 
     [ngClass]="{'red-text': expense.amount.amount > expense.budget.amount}"
     (click)="showDetails(expense)">
       <td>{{expense.category.name}}</td>

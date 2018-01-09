@@ -18,8 +18,8 @@ export class BudgetComponent implements OnInit, BeforeEdit {
   month: Date
   urlPrefix = "budget"
 
-  expenses: CategoryExpenses[]
-  budgets: Budget[]
+  expenseCalculator: CategoryExpensesCalculator
+  private budgets: Budget[]
 
   detail: CategoryExpenses
 
@@ -34,9 +34,12 @@ export class BudgetComponent implements OnInit, BeforeEdit {
     this.route.params.subscribe(params => this.setMonth(params));
     this.getBudgets()
     $(".modal").modal()
+    $("ul.tabs").tabs()
   }
 
   beforeEdit(expense: Expense) {
+    //The modal would not close correctly on changing the URL
+    //due to the background not being contained in the 'app-root' tag
     $("#detail-modal").modal("close")
   }
 
@@ -45,6 +48,13 @@ export class BudgetComponent implements OnInit, BeforeEdit {
       this.detail = expense
       $("#detail-modal").modal("open")
     }  
+  }
+
+  getAllExpensesSortedByBudget() {
+    if (this.expenseCalculator == null) {
+      return []
+    }
+    return this.expenseCalculator.sortByBudget().calculateAllExpenses()
   }
 
   private setMonth(params: any) {
@@ -72,7 +82,6 @@ export class BudgetComponent implements OnInit, BeforeEdit {
   }
 
   private calculateCategoryExpenses(expenses: Expense[]) {
-    let calculator = new CategoryExpensesCalculator(expenses, this.budgets)
-    this.expenses = calculator.calculateAllExpenses()
+    this.expenseCalculator = new CategoryExpensesCalculator(expenses, this.budgets)
   }
 }

@@ -38,9 +38,24 @@ export class ModelUtil {
 
 export class CategoryExpensesCalculator {
 
+  private sorter: (e1: CategoryExpenses, e2: CategoryExpenses) => number = null
+
   constructor(
     private expenses: Expense[], 
     private budgets: Budget[]) { }
+
+  
+  sortByBudget(): CategoryExpensesCalculator {
+    let res = new CategoryExpensesCalculator(this.expenses, this.budgets)
+    res.sorter = (e1, e2) => e2.budget.amount - e1.budget.amount
+    return res
+  }
+
+  sortByExpenses(): CategoryExpensesCalculator {
+    let res = new CategoryExpensesCalculator(this.expenses, this.budgets)
+    res.sorter = (e1, e2) => e2.amount.amount - e1.amount.amount
+    return res
+  }
 
   calculateAllExpenses(): CategoryExpenses[] {
     let result = this.calculateBudgetedExpenses()
@@ -50,8 +65,12 @@ export class CategoryExpensesCalculator {
   }
 
   calculateBudgetedExpenses(): CategoryExpenses[] {
-    return this.budgets
+    let res = this.budgets
       .map(b => this.calculateCategoryExpensesForBudget(b))
+    if (this.sorter) {
+      return res.sort(this.sorter)
+    }
+    return res
   }
 
   calculateNotBudgetedExpenses(): CategoryExpenses {
@@ -75,7 +94,7 @@ export class CategoryExpensesCalculator {
     }
   }
 
-  private calculateCategoryExpensesForBudget(budget: Budget) {
+  private calculateCategoryExpensesForBudget(budget: Budget): CategoryExpenses {
     let relevant = ModelUtil.getExpensesWithCategory(this.expenses, budget.category)
     let sum = ModelUtil.sumExpenses(relevant)
     return { 
