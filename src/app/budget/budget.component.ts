@@ -7,6 +7,7 @@ import { QueryUtil } from '../query.util';
 import { ModelUtil, CategoryExpensesCalculator } from '../model.util';
 import * as $ from 'jquery'
 import { BeforeEdit } from '../expenses-table/expenses-table.component';
+import { BudgetPeriod } from '../budget.period';
 
 @Component({
   selector: 'app-budget',
@@ -92,7 +93,7 @@ export class BudgetComponent implements OnInit, BeforeEdit {
   }
 
   private init(expenses: Expense[], budgets: Budget[]) {
-    let calc = new CategoryExpensesCalculator(expenses, budgets)
+    let calc = new CategoryExpensesCalculator(expenses, budgets, BudgetPeriod.MONTHLY)
     this.expensesForTable = calc.sortByBudget().calculateAllExpenses()
     this.pieChartData = this.plotData(calc)
     this.pieChartLabels = this.plotLabels(calc)

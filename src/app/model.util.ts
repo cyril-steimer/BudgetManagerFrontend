@@ -1,4 +1,5 @@
 import { Expense, Category, Amount, Budget, CategoryExpenses } from "./model";
+import { BudgetPeriod, BudgetPeriodSwitcher, BudgetConverter } from "./budget.period";
 
 export class ModelUtil {
 
@@ -42,17 +43,22 @@ export class CategoryExpensesCalculator {
 
   constructor(
     private expenses: Expense[], 
-    private budgets: Budget[]) { }
+    private budgets: Budget[],
+    private period: BudgetPeriod) {
+
+      let converter = new BudgetConverter()
+      this.budgets = this.budgets.map(b => converter.convert(b, this.period))
+  }
 
   
   sortByBudget(): CategoryExpensesCalculator {
-    let res = new CategoryExpensesCalculator(this.expenses, this.budgets)
+    let res = new CategoryExpensesCalculator(this.expenses, this.budgets, this.period)
     res.sorter = (e1, e2) => e2.budget.amount - e1.budget.amount
     return res
   }
 
   sortByExpenses(): CategoryExpensesCalculator {
-    let res = new CategoryExpensesCalculator(this.expenses, this.budgets)
+    let res = new CategoryExpensesCalculator(this.expenses, this.budgets, this.period)
     res.sorter = (e1, e2) => e2.amount.amount - e1.amount.amount
     return res
   }
