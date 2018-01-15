@@ -45,19 +45,19 @@ import 'materialize-css'
 import { MaterializeModule } from "angular2-materialize"
 import './date.extensions.impl';
 import { BudgetComponent } from './budget/budget.component';
-import { MonthHeaderComponent } from './month-header/month-header.component';
 import { BudgetService } from './budget.service';
 import { ExpensesTableComponent } from './expenses-table/expenses-table.component';
 import { EditExpenseComponent } from './edit-expense/edit-expense.component'
 import 'chart.js'
 import { ChartsModule } from 'ng2-charts';
+import { DateHeaderComponent } from './date-header/date-header.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ExpensesComponent,
     BudgetComponent,
-    MonthHeaderComponent,
+    DateHeaderComponent,
     ExpensesTableComponent,
     EditExpenseComponent
   ],

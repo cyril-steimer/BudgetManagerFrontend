@@ -2,22 +2,22 @@ import { Component, OnInit, Input } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
-  selector: 'app-month-header',
-  templateUrl: './month-header.component.html',
-  styleUrls: ['./month-header.component.css']
+  selector: 'app-date-header',
+  templateUrl: './date-header.component.html',
+  styleUrls: ['./date-header.component.css']
 })
-export class MonthHeaderComponent implements OnInit {
+export class DateHeaderComponent implements OnInit {
 
-  nextMonth: Date
-  @Input() month: Date
-  prevMonth: Date
+  nextDate: Date
+  @Input() date: Date
+  prevDate: Date
 
   @Input() urlPrefix: string
 
   constructor(private route: ActivatedRoute) {}
 
   ngOnInit() {
-    this.setMonth(this.month)
+    this.setMonth(this.date)
     this.route.params.subscribe(params => this.updateMonth(params))
   }
 
@@ -30,8 +30,8 @@ export class MonthHeaderComponent implements OnInit {
   private setMonth(date: Date) {
     let year = date.getFullYear()
     let month = date.getMonth()
-    this.month = date
-    this.nextMonth = new Date(+year, +month + 1)
-    this.prevMonth = new Date(+year, +month - 1)
+    this.date = date
+    this.nextDate = new Date(+year, +month + 1)
+    this.prevDate = new Date(+year, +month - 1)
   }
 }
