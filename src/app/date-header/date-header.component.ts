@@ -13,7 +13,7 @@ export class DateHeaderComponent implements OnInit {
   @Input() date: Date
   prevDate: Date
 
-  period: BudgetPeriod = BudgetPeriod.MONTHLY
+  @Input() period: BudgetPeriod
   @Input() urlPrefix: string
 
   constructor(private route: ActivatedRoute) {}
