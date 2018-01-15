@@ -18,8 +18,10 @@ export class BudgetPeriodSwitcher<A, R> {
   switch(period: BudgetPeriod, arg: A): R {
     if (period == BudgetPeriod.MONTHLY) {
       return this.mySwitch.caseMonthly(arg)
+    } else if (period == BudgetPeriod.YEARLY) {
+      return this.mySwitch.caseYearly(arg)
     }
-    return this.mySwitch.caseYearly(arg)
+    throw Error("The budget period is invalid")
   }
 }
 

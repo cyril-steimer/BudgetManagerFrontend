@@ -19,8 +19,8 @@ export class DateHeaderComponent implements OnInit {
   constructor(private route: ActivatedRoute) {}
 
   ngOnInit() {
-    this.setMonth(this.date)
-    this.route.params.subscribe(params => this.updateMonth(params))
+    this.setDate(this.date)
+    this.route.params.subscribe(params => this.updateDate(params))
   }
 
   dateToText(date: Date) {
@@ -33,13 +33,12 @@ export class DateHeaderComponent implements OnInit {
     return switcher.switch(this.period, date)
   }
 
-  private updateMonth(params: any) {
-    let year = +params.year
-    let month = +params.month
-    this.setMonth(new Date(year, month))
+  private updateDate(params: any) {
+    let date = new BudgetPeriodSwitcher(new DateExtractor()).switch(this.period, params)
+    this.setDate(date)
   }
 
-  private setMonth(date: Date) {
+  private setDate(date: Date) {
     let year = date.getFullYear()
     let month = date.getMonth()
     this.date = date

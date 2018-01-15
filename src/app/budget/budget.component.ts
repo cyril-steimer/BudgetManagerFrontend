@@ -7,7 +7,7 @@ import { QueryUtil } from '../query.util';
 import { ModelUtil, CategoryExpensesCalculator } from '../model.util';
 import * as $ from 'jquery'
 import { BeforeEdit } from '../expenses-table/expenses-table.component';
-import { BudgetPeriod } from '../budget.period';
+import { BudgetPeriod, BudgetPeriodSwitch, BudgetPeriodSwitcher } from '../budget.period';
 
 @Component({
   selector: 'app-budget',
@@ -16,8 +16,7 @@ import { BudgetPeriod } from '../budget.period';
 })
 export class BudgetComponent implements OnInit, BeforeEdit {
 
-  month: Date
-  urlPrefix = "budget"
+  date: Date
 
   expensesForTable: CategoryExpenses[]
 
@@ -29,13 +28,16 @@ export class BudgetComponent implements OnInit, BeforeEdit {
   pieChartLabels: string[]
   pieChartType = "pie"
 
+  period: BudgetPeriod = BudgetPeriod.YEARLY
+  urlPrefix: string
+
   constructor(
     private expenseService: ExpenseService,
     private budgetService: BudgetService,
     private route: ActivatedRoute) { }
 
   ngOnInit() {
-    this.route.params.subscribe(params => this.setMonth(params));
+    this.route.params.subscribe(params => this.parseRoute(params));
     this.getBudgets()
     $(".modal").modal()
     $("ul.tabs").tabs()
@@ -71,13 +73,18 @@ export class BudgetComponent implements OnInit, BeforeEdit {
     return res
   }
 
-  private setMonth(params: any) {
-    let year = params.year
-    let month = params.month
-    if (year && month) {
-      this.month = new Date(+year, +month)
-      this.getBudgets()
+  private parseRoute(params: any) {
+    let year = +params.year
+    let month = 0
+    if (params.month) {
+      this.period = BudgetPeriod.MONTHLY
+      month = +params.month
+    } else {
+      this.period = BudgetPeriod.YEARLY
     }
+    this.urlPrefix = `budget/${this.period}`
+    this.date = new Date(year, month)
+    this.getBudgets()
   }
 
   private getBudgets() {
@@ -86,16 +93,27 @@ export class BudgetComponent implements OnInit, BeforeEdit {
   }
 
   private getExpenses(budgets: Budget[]) {
-    let query = QueryUtil.monthQuery(this.month)
+    let query = new BudgetPeriodSwitcher(new DateQuery()).switch(this.period, this.date)
     let sort = { field: "date", direction: "desc" }
     this.expenseService.getExpenses(null, query, sort, null)
       .subscribe(expenses => this.init(expenses.values, budgets))
   }
 
   private init(expenses: Expense[], budgets: Budget[]) {
-    let calc = new CategoryExpensesCalculator(expenses, budgets, BudgetPeriod.MONTHLY)
+    let calc = new CategoryExpensesCalculator(expenses, budgets, this.period)
     this.expensesForTable = calc.sortByBudget().calculateAllExpenses()
     this.pieChartData = this.plotData(calc)
     this.pieChartLabels = this.plotLabels(calc)
+  }
+}
+
+class DateQuery implements BudgetPeriodSwitch<Date, any> {
+
+  caseMonthly(arg: Date) {
+    return QueryUtil.monthQuery(arg)
+  }
+
+  caseYearly(arg: Date) {
+    return QueryUtil.yearQuery(arg)
   }
 }
