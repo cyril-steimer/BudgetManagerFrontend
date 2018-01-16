@@ -1,6 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BudgetPeriodSwitch, BudgetPeriod, BudgetPeriodSwitcher } from '../budget.period';
+import { dashCaseToCamelCase } from '@angular/compiler/src/util';
 
 @Component({
   selector: 'app-date-header',
@@ -9,61 +10,54 @@ import { BudgetPeriodSwitch, BudgetPeriod, BudgetPeriodSwitcher } from '../budge
 })
 export class DateHeaderComponent implements OnInit {
 
-  nextDate: Date
   @Input() date: Date
-  prevDate: Date
-
   @Input() switcher: BudgetPeriodSwitcher
   @Input() urlPrefix: string
+
+  nextDateLink: DateLink
+  dateLink: DateLink
+  prevDateLink: DateLink
 
   constructor(private route: ActivatedRoute) {}
 
   ngOnInit() {
-    this.setDate(this.date)
+    this.update(this.date)
     this.route.params.subscribe(params => this.updateDate(params))
-  }
-
-  dateToText(date: Date) {
-    return this.switcher.switch(new DateToText(), date)
-  }
-
-  urlSuffix(date: Date) {
-    return this.switcher.switch(new UrlSuffix(), date)
   }
 
   private updateDate(params: any) {
     let date = this.switcher.switch(new DateExtractor(), params)
-    this.setDate(date)
+    this.update(date)
   }
 
-  private setDate(date: Date) {
-    let year = date.getFullYear()
-    let month = date.getMonth()
-    this.date = date
-    this.nextDate = this.switcher.switch(new NextDate(), date)
-    this.prevDate = this.switcher.switch(new PreviousDate(), date)
-  }
-}
-
-class UrlSuffix implements BudgetPeriodSwitch<Date, string> {
-
-  caseMonthly(arg: Date): string {
-    return `year/${arg.getFullYear()}/month/${arg.getMonth()}`
-  }
-
-  caseYearly(arg: Date): string {
-    return `year/${arg.getFullYear()}`
+  private update(date: Date) {
+    this.dateLink = this.switcher.switch(new DateLinkFactory(), date)
+    let nextDate = this.switcher.switch(new NextDate(), date)
+    this.nextDateLink = this.switcher.switch(new DateLinkFactory(), nextDate)
+    let prevDate = this.switcher.switch(new PreviousDate(), date)
+    this.prevDateLink = this.switcher.switch(new DateLinkFactory(), prevDate)
   }
 }
 
-class DateToText implements BudgetPeriodSwitch<Date, string> {
+class DateLink {
+  label: string
+  urlSuffix: string
+}
 
-  caseMonthly(arg: Date): string {
-    return `${arg.getMonthName()} ${arg.getFullYear()}`
+class DateLinkFactory implements BudgetPeriodSwitch<Date, DateLink> {
+
+  caseMonthly(arg: Date): DateLink {
+    return {
+      label: `${arg.getMonthName()} ${arg.getFullYear()}`,
+      urlSuffix: `year/${arg.getFullYear()}/month/${arg.getMonth()}`
+    }
   }
 
-  caseYearly(arg: Date): string {
-    return `${arg.getFullYear()}`
+  caseYearly(arg: Date): DateLink {
+    return {
+      label: `${arg.getFullYear()}`,
+      urlSuffix: `year/${arg.getFullYear()}`
+    }
   }
 }
 

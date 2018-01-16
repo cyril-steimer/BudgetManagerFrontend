@@ -2,19 +2,19 @@
   <ul class="left">
     <li>
       <a class="waves-effect waves-light btn"
-      routerLink="/{{urlPrefix}}/{{urlSuffix(prevDate)}}" >
+      routerLink="/{{urlPrefix}}/{{prevDateLink.urlSuffix}}" >
         <i class="material-icons left">arrow_back</i>
-        {{ dateToText(prevDate) }}
+        {{ prevDateLink.label }}
       </a>
     </li>
   </ul>
-  <a class="brand-logo center">{{ dateToText(date) }}</a>
+  <a class="brand-logo center">{{ dateLink.label }}</a>
   <ul class="right">
     <li>
       <a class="waves-effect waves-light btn"
-      routerLink="/{{urlPrefix}}/{{urlSuffix(nextDate)}}" >
+      routerLink="/{{urlPrefix}}/{{nextDateLink.urlSuffix}}" >
         <i class="material-icons right">arrow_forward</i>
-        {{ dateToText(nextDate) }}
+        {{ nextDateLink.label }}
       </a>
     </li>
   </ul>
