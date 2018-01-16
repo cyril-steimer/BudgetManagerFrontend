@@ -1,4 +1,17 @@
-export class QueryUtil {
+import { BudgetPeriodSwitcher, BudgetPeriodSwitch } from "./budget.period";
+
+export class PeriodQuery implements BudgetPeriodSwitch<Date, {}> {
+ 
+  caseMonthly(arg: Date): {} {
+    return QueryUtil.monthQuery(arg)
+  }
+
+  caseYearly(arg: Date): {} {
+    return QueryUtil.yearQuery(arg)
+  }
+}
+
+private class QueryUtil {
 
   static yearQuery(year: Date) {
     let start = new Date(year.getFullYear(), 0).getTime()

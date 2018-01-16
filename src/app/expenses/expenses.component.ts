@@ -5,9 +5,9 @@ import { MatTableDataSource, MatSort, MatSortable } from '@angular/material';
 import { Observable } from 'rxjs/Observable';
 import { DelayedSearch } from '../delayed.search';
 import { ActivatedRoute } from '@angular/router';
-import { QueryUtil } from '../query.util';
 import { ExpenseSorter, SortDirection, SortField } from '../expenses-table/expenses-table.component';
-import { BudgetPeriodSwitcher, BudgetPeriod } from '../budget.period';
+import { BudgetPeriodSwitcher, BudgetPeriod, DateExtractor } from '../budget.period';
+import { PeriodQuery } from '../query.util';
 
 @Component({
   selector: 'app-expenses',
@@ -20,12 +20,11 @@ export class ExpensesComponent implements OnInit, ExpenseSorter {
 
   expenses: Expense[] = []
 
+  date: Date
+  switcher: BudgetPeriodSwitcher
   urlPrefix = "expenses"
-  month: Date
 
   sorter = this
-
-  switcher = new BudgetPeriodSwitcher(BudgetPeriod.MONTHLY)
 
   private delayedSearch = new DelayedSearch(300, term => this.setSearchTerm(term))
   private searchTerm: string = ""
@@ -37,7 +36,7 @@ export class ExpensesComponent implements OnInit, ExpenseSorter {
     private route: ActivatedRoute) { }
 
   ngOnInit() {
-    this.route.params.subscribe(params => this.setMonth(params));
+    this.route.params.subscribe(params => this.update(params));
     this.getExpenses()
   }
 
@@ -55,18 +54,21 @@ export class ExpensesComponent implements OnInit, ExpenseSorter {
     this.delayedSearch.set(term)
   }
 
-  private setMonth(params: any) {
-    let year = params.year
-    let month = params.month
-    if (year && month) {
-      this.month = new Date(+year, +month)
-      this.getExpenses()
-    }
+  private update(params: any) {
+    let period = DateExtractor.getBudgetPeriod(params)
+    if (period) {
+      this.switcher = new BudgetPeriodSwitcher(period)
+      this.date = this.switcher.switch(new DateExtractor(), params)
+    } else {
+      this.switcher = null
+      this.date = null
+    }      
+    this.getExpenses()
   }
 
   private getSearchBody() {
-    if (this.month) {
-      return QueryUtil.monthQuery(this.month)
+    if (this.date) {
+      return this.switcher.switch(new PeriodQuery(), this.date)
     }
     return null
   }

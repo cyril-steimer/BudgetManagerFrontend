@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { BudgetPeriodSwitch, BudgetPeriod, BudgetPeriodSwitcher } from '../budget.period';
+import { BudgetPeriodSwitch, BudgetPeriod, BudgetPeriodSwitcher, DateExtractor } from '../budget.period';
 import { dashCaseToCamelCase } from '@angular/compiler/src/util';
 
 @Component({
@@ -103,19 +103,5 @@ class PreviousDate implements BudgetPeriodSwitch<Date, Date> {
 
   caseYearly(arg: Date): Date {
     return new Date(arg.getFullYear() - 1, 0)
-  }
-}
-
-export class DateExtractor implements BudgetPeriodSwitch<{[key: string]: any}, Date> {
-
-  caseMonthly(arg: { [key: string]: any; }): Date {
-    let year = +arg.year
-    let month = +arg.month
-    return new Date(year, month)
-  }
-
-  caseYearly(arg: { [key: string]: any; }): Date {
-    let year = +arg.year
-    return new Date(year, 0)
   }
 }

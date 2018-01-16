@@ -29,6 +29,26 @@ export class BudgetPeriodSwitcher {
   }
 }
 
+export class DateExtractor implements BudgetPeriodSwitch<{[key: string]: string}, Date> {
+  
+  static getBudgetPeriod(params: { [key: string]: string; }) {
+    if (params.month) {
+      return BudgetPeriod.MONTHLY
+    } else if (params.year) {
+      return BudgetPeriod.YEARLY
+    }
+    return null
+  }
+
+  caseMonthly(params: { [key: string]: string; }): Date {
+    return new Date(+params.year, +params.month)
+  }
+
+  caseYearly(params: { [key: string]: string; }): Date {
+    return new Date(+params.year, 0)
+  }
+}
+
 class BudgetToYearly implements BudgetPeriodSwitch<Budget, Budget> {
 
   caseMonthly(arg: Budget): Budget {

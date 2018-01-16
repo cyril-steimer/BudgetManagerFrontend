@@ -8,6 +8,7 @@ import { EditExpenseComponent } from './edit-expense/edit-expense.component';
 const routes: Routes = [
   { path: 'add', component: EditExpenseComponent },
   { path: 'expenses', component: ExpensesComponent },
+  { path: 'expenses/year/:year', component: ExpensesComponent },
   { path: 'expenses/year/:year/month/:month', component: ExpensesComponent },
   { path: 'budget/year/:year', component: BudgetComponent },
   { path: 'budget/year/:year/month/:month', component: BudgetComponent },
