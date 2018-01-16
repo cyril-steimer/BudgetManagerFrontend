@@ -13,7 +13,7 @@ export class DateHeaderComponent implements OnInit {
   @Input() date: Date
   prevDate: Date
 
-  @Input() period: BudgetPeriod
+  @Input() switcher: BudgetPeriodSwitcher
   @Input() urlPrefix: string
 
   constructor(private route: ActivatedRoute) {}
@@ -24,17 +24,15 @@ export class DateHeaderComponent implements OnInit {
   }
 
   dateToText(date: Date) {
-    let switcher = new BudgetPeriodSwitcher(new DateToText())
-    return switcher.switch(this.period, date)
+    return this.switcher.switch(new DateToText(), date)
   }
 
   urlSuffix(date: Date) {
-    let switcher = new BudgetPeriodSwitcher(new UrlSuffix())
-    return switcher.switch(this.period, date)
+    return this.switcher.switch(new UrlSuffix(), date)
   }
 
   private updateDate(params: any) {
-    let date = new BudgetPeriodSwitcher(new DateExtractor()).switch(this.period, params)
+    let date = this.switcher.switch(new DateExtractor(), params)
     this.setDate(date)
   }
 
@@ -42,8 +40,8 @@ export class DateHeaderComponent implements OnInit {
     let year = date.getFullYear()
     let month = date.getMonth()
     this.date = date
-    this.nextDate = new BudgetPeriodSwitcher(new NextDate()).switch(this.period, date)
-    this.prevDate = new BudgetPeriodSwitcher(new PreviousDate()).switch(this.period, date)
+    this.nextDate = this.switcher.switch(new NextDate(), date)
+    this.prevDate = this.switcher.switch(new PreviousDate(), date)
   }
 }
 

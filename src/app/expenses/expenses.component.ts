@@ -7,6 +7,7 @@ import { DelayedSearch } from '../delayed.search';
 import { ActivatedRoute } from '@angular/router';
 import { QueryUtil } from '../query.util';
 import { ExpenseSorter, SortDirection, SortField } from '../expenses-table/expenses-table.component';
+import { BudgetPeriodSwitcher, BudgetPeriod } from '../budget.period';
 
 @Component({
   selector: 'app-expenses',
@@ -23,6 +24,8 @@ export class ExpensesComponent implements OnInit, ExpenseSorter {
   month: Date
 
   sorter = this
+
+  switcher = new BudgetPeriodSwitcher(BudgetPeriod.MONTHLY)
 
   private delayedSearch = new DelayedSearch(300, term => this.setSearchTerm(term))
   private searchTerm: string = ""

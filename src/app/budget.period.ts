@@ -12,16 +12,20 @@ export interface BudgetPeriodSwitch<A, R> {
   caseYearly(arg: A): R
 }
 
-export class BudgetPeriodSwitcher<A, R> {
-  constructor(private mySwitch: BudgetPeriodSwitch<A, R>) {}
+export class BudgetPeriodSwitcher {
+  constructor(private period: BudgetPeriod) {}
 
-  switch(period: BudgetPeriod, arg: A): R {
-    if (period == BudgetPeriod.MONTHLY) {
-      return this.mySwitch.caseMonthly(arg)
-    } else if (period == BudgetPeriod.YEARLY) {
-      return this.mySwitch.caseYearly(arg)
+  switch<A, R>(mySwitch: BudgetPeriodSwitch<A, R>, arg: A): R {
+    if (this.period == BudgetPeriod.MONTHLY) {
+      return mySwitch.caseMonthly(arg)
+    } else if (this.period == BudgetPeriod.YEARLY) {
+      return mySwitch.caseYearly(arg)
     }
     throw Error("The budget period is invalid")
+  }
+
+  getPeriod() {
+    return this.period
   }
 }
 
@@ -54,9 +58,9 @@ class YearlyToPeriod implements BudgetPeriodSwitch<Budget, Budget> {
 export class BudgetConverter {
 
   convert(budget: Budget, period: BudgetPeriod): Budget {
-    let yearly = new BudgetPeriodSwitcher(new BudgetToYearly())
-      .switch(budget.period, budget)
-    return new BudgetPeriodSwitcher(new YearlyToPeriod())
-      .switch(period, yearly)
+    let yearly = new BudgetPeriodSwitcher(budget.period)
+      .switch(new BudgetToYearly(), budget)
+    return new BudgetPeriodSwitcher(period)
+      .switch(new YearlyToPeriod(), yearly)
   }
 }

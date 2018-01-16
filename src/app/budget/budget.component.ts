@@ -28,7 +28,7 @@ export class BudgetComponent implements OnInit, BeforeEdit {
   pieChartLabels: string[]
   pieChartType = "pie"
 
-  period: BudgetPeriod = BudgetPeriod.YEARLY
+  switcher: BudgetPeriodSwitcher
   urlPrefix: string
 
   constructor(
@@ -77,12 +77,12 @@ export class BudgetComponent implements OnInit, BeforeEdit {
     let year = +params.year
     let month = 0
     if (params.month) {
-      this.period = BudgetPeriod.MONTHLY
+      this.switcher = new BudgetPeriodSwitcher(BudgetPeriod.MONTHLY)
       month = +params.month
     } else {
-      this.period = BudgetPeriod.YEARLY
+      this.switcher = new BudgetPeriodSwitcher(BudgetPeriod.YEARLY)
     }
-    this.urlPrefix = `budget/${this.period}`
+    this.urlPrefix = `budget/${this.switcher.getPeriod()}`
     this.date = new Date(year, month)
     this.getBudgets()
   }
@@ -93,14 +93,14 @@ export class BudgetComponent implements OnInit, BeforeEdit {
   }
 
   private getExpenses(budgets: Budget[]) {
-    let query = new BudgetPeriodSwitcher(new DateQuery()).switch(this.period, this.date)
+    let query = this.switcher.switch(new DateQuery(), this.date)
     let sort = { field: "date", direction: "desc" }
     this.expenseService.getExpenses(null, query, sort, null)
       .subscribe(expenses => this.init(expenses.values, budgets))
   }
 
   private init(expenses: Expense[], budgets: Budget[]) {
-    let calc = new CategoryExpensesCalculator(expenses, budgets, this.period)
+    let calc = new CategoryExpensesCalculator(expenses, budgets, this.switcher.getPeriod())
     this.expensesForTable = calc.sortByBudget().calculateAllExpenses()
     this.pieChartData = this.plotData(calc)
     this.pieChartLabels = this.plotLabels(calc)
