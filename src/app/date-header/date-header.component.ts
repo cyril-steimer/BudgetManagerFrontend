@@ -17,6 +17,8 @@ export class DateHeaderComponent implements OnInit {
   nextDateLink: DateLink
   dateLink: DateLink
   prevDateLink: DateLink
+  
+  upDateLink: DateLink
 
   constructor(private route: ActivatedRoute) {}
 
@@ -31,17 +33,38 @@ export class DateHeaderComponent implements OnInit {
   }
 
   private update(date: Date) {
-    this.dateLink = this.switcher.switch(new DateLinkFactory(), date)
+    this.dateLink = DateLink.create(this.switcher, date)
+
     let nextDate = this.switcher.switch(new NextDate(), date)
-    this.nextDateLink = this.switcher.switch(new DateLinkFactory(), nextDate)
+    this.nextDateLink = DateLink.create(this.switcher, nextDate)
+
     let prevDate = this.switcher.switch(new PreviousDate(), date)
-    this.prevDateLink = this.switcher.switch(new DateLinkFactory(), prevDate)
+    this.prevDateLink = DateLink.create(this.switcher, prevDate)
+
+    this.upDateLink = this.switcher.switch(new UpDateLink(), date)
   }
 }
+
 
 class DateLink {
   label: string
   urlSuffix: string
+
+  static create(switcher: BudgetPeriodSwitcher, date: Date) {
+    return switcher.switch(new DateLinkFactory(), date)
+  }
+}
+
+class UpDateLink implements BudgetPeriodSwitch<Date, DateLink> {
+
+  caseMonthly(arg: Date): DateLink {
+    let year = new Date(arg.getFullYear(), 0)
+    return DateLink.create(new BudgetPeriodSwitcher(BudgetPeriod.YEARLY), year)
+  }
+
+  caseYearly(arg: Date): DateLink {
+    return null //There is no coarser view than 'yearly'
+  }
 }
 
 class DateLinkFactory implements BudgetPeriodSwitch<Date, DateLink> {

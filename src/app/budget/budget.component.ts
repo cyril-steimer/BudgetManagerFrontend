@@ -82,7 +82,7 @@ export class BudgetComponent implements OnInit, BeforeEdit {
     } else {
       this.switcher = new BudgetPeriodSwitcher(BudgetPeriod.YEARLY)
     }
-    this.urlPrefix = `budget/${this.switcher.getPeriod()}`
+    this.urlPrefix = `budget`
     this.date = new Date(year, month)
     this.getBudgets()
   }

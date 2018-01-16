@@ -9,8 +9,8 @@ const routes: Routes = [
   { path: 'add', component: EditExpenseComponent },
   { path: 'expenses', component: ExpensesComponent },
   { path: 'expenses/year/:year/month/:month', component: ExpensesComponent },
-  { path: 'budget/yearly/year/:year', component: BudgetComponent },
-  { path: 'budget/monthly/year/:year/month/:month', component: BudgetComponent },
+  { path: 'budget/year/:year', component: BudgetComponent },
+  { path: 'budget/year/:year/month/:month', component: BudgetComponent },
   { path: 'edit/expense/:id', component: EditExpenseComponent }
 ]
 

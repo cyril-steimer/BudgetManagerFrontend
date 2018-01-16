@@ -8,6 +8,17 @@
       </a>
     </li>
   </ul>
+
+  <ul class="left" *ngIf="upDateLink">
+    <li>
+      <a class="waves-effect waves-light btn"
+      routerLink="/{{urlPrefix}}/{{upDateLink.urlSuffix}}" >
+        <i class="material-icons left">arrow_upward</i>
+        {{ upDateLink.label }}
+      </a>
+    </li>
+  </ul>
+
   <a class="brand-logo center">{{ dateLink.label }}</a>
   <ul class="right">
     <li>
