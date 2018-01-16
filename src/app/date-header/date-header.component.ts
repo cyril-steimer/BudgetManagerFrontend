@@ -2,6 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BudgetPeriodSwitch, BudgetPeriod, BudgetPeriodSwitcher, DateExtractor } from '../budget.period';
 import { dashCaseToCamelCase } from '@angular/compiler/src/util';
+import * as $ from 'jquery'
 
 @Component({
   selector: 'app-date-header',
@@ -18,7 +19,8 @@ export class DateHeaderComponent implements OnInit {
   dateLink: DateLink
   prevDateLink: DateLink
   
-  upDateLink: DateLink
+  parent: DateLink
+  children: DateLink[]
 
   constructor(private route: ActivatedRoute) {}
 
@@ -41,25 +43,49 @@ export class DateHeaderComponent implements OnInit {
     let prevDate = this.switcher.switch(new PreviousDate(), date)
     this.prevDateLink = DateLink.create(this.switcher, prevDate)
 
-    this.upDateLink = this.switcher.switch(new UpDateLink(), date)
+    this.parent = this.switcher.switch(new ParentLink(), date)
+    this.children = this.switcher.switch(new ChildrenLinks(), date)
+    
+    $(".dropdown-button").dropdown({
+      constrainWidth: false,
+      hover: true
+    })
   }
 }
-
 
 class DateLink {
   label: string
   urlSuffix: string
 
-  static create(switcher: BudgetPeriodSwitcher, date: Date) {
+  static create(switcher: BudgetPeriodSwitcher | BudgetPeriod, date: Date) {
+    if (!(switcher instanceof BudgetPeriodSwitcher)) {
+      switcher = new BudgetPeriodSwitcher(switcher)
+    }
     return switcher.switch(new DateLinkFactory(), date)
   }
 }
 
-class UpDateLink implements BudgetPeriodSwitch<Date, DateLink> {
+class ChildrenLinks implements BudgetPeriodSwitch<Date, DateLink[]> {
+ 
+  caseMonthly(arg: Date): DateLink[] {
+    return null //There is no finer view than 'monthly'
+  }
+
+  caseYearly(arg: Date): DateLink[] {
+    let result = []
+    for (let month = 0; month < 12; month++) {
+      let date = new Date(arg.getFullYear(), month)
+      result.push(DateLink.create(BudgetPeriod.MONTHLY, date))
+    }
+    return result
+  }
+}
+
+class ParentLink implements BudgetPeriodSwitch<Date, DateLink> {
 
   caseMonthly(arg: Date): DateLink {
     let year = new Date(arg.getFullYear(), 0)
-    return DateLink.create(new BudgetPeriodSwitcher(BudgetPeriod.YEARLY), year)
+    return DateLink.create(BudgetPeriod.YEARLY, year)
   }
 
   caseYearly(arg: Date): DateLink {

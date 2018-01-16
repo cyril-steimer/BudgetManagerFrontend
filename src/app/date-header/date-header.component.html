@@ -7,19 +7,27 @@
         {{ prevDateLink.label }}
       </a>
     </li>
-  </ul>
 
-  <ul class="left" *ngIf="upDateLink">
-    <li>
+    <li *ngIf="parent">
       <a class="waves-effect waves-light btn"
-      routerLink="/{{urlPrefix}}/{{upDateLink.urlSuffix}}" >
+      routerLink="/{{urlPrefix}}/{{parent.urlSuffix}}" >
         <i class="material-icons left">arrow_upward</i>
-        {{ upDateLink.label }}
+        {{ parent.label }}
       </a>
     </li>
   </ul>
 
   <a class="brand-logo center">{{ dateLink.label }}</a>
+
+  <ul *ngIf="children" id="children-dropdown" class="dropdown-content">
+    <li *ngFor="let child of children">
+        <a class="waves-effect waves-light btn"
+        routerLink="/{{urlPrefix}}/{{child.urlSuffix}}" >
+          {{ child.label }}
+        </a>
+    </li>
+  </ul>
+
   <ul class="right">
     <li>
       <a class="waves-effect waves-light btn"
@@ -28,5 +36,13 @@
         {{ nextDateLink.label }}
       </a>
     </li>
+
+    <li *ngIf="children">
+      <a class="dropdown-button btn" href="#!" data-activates="children-dropdown">
+        Drill Down
+      </a>
+    </li>
+
   </ul>
+
 </div>
