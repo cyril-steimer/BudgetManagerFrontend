@@ -15,9 +15,12 @@
       </div>
     </div>
     <div class="row">
-      <div class="input-field col s12">
+      <div class="col s12">
         <i class="material-icons prefix">mode_edit</i>
-        <input type="text" id="category" [(ngModel)]="expense.category.name">
+        <select class="browser-default" id="category" [(ngModel)]="expense.category.name">
+          <option *ngFor="let category of categories" value="{{category.name}}">{{category.name}}</option>
+        </select>
+        <!--<input type="text" id="category" [(ngModel)]="expense.category.name">-->
         <label for="category">Category</label>
       </div>
     </div>

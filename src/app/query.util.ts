@@ -11,7 +11,7 @@ export class PeriodQuery implements BudgetPeriodSwitch<Date, {}> {
   }
 }
 
-private class QueryUtil {
+class QueryUtil {
 
   static yearQuery(year: Date) {
     let start = new Date(year.getFullYear(), 0).getTime()
@@ -26,19 +26,21 @@ private class QueryUtil {
   }
 
   private static betweenDateQuery(start: number, end: number) {
-    return {and: [
-      {
-        date: {
-          date: start,
-          comparison: ">="
+    return {
+      and: [
+        {
+          date: {
+            date: start,
+            comparison: ">="
+          }
+        },
+        {
+          date: {
+            date: end,
+            comparison: "<"
+          }
         }
-      },
-      {
-        date: {
-          date: end,
-          comparison: "<"
-        }
-      }
-    ]
+      ]
+    }
   }
 }

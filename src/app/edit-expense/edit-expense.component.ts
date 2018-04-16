@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef, AfterViewChecked } from '@angular/core';
-import { Expense } from '../model';
+import { Expense, Category } from '../model';
 import { ExpenseService } from '../expense.service';
 import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
@@ -7,6 +7,7 @@ import { ModelUtil } from '../model.util';
 import { Observable } from 'rxjs/Observable';
 import * as Materialize from 'materialize-css'
 import * as $ from 'jquery'
+import { BudgetService } from '../budget.service';
 
 @Component({
   selector: 'app-edit-expense',
@@ -18,10 +19,13 @@ export class EditExpenseComponent implements OnInit, AfterViewChecked {
   expense: Expense = null
   newExpense: boolean = true
 
-  picker: any = null
+  categories: Category[] = []
+
+  initialized = false
 
   constructor(
     private expenseService: ExpenseService,
+    private budgetService: BudgetService,
     private route: ActivatedRoute,
     private location: Location,
     private ref: ChangeDetectorRef) { }
@@ -35,19 +39,24 @@ export class EditExpenseComponent implements OnInit, AfterViewChecked {
       this.expenseService.getExpenseById(id)
         .subscribe(expense => this.setExpense(expense))
     }
+    this.budgetService.getCategories()
+      .subscribe(categories => this.setCategories(categories.values))
   }
 
   ngAfterViewChecked() {
     if (Materialize.updateTextFields) {
       Materialize.updateTextFields()
     }
-    if (this.expense != null && this.picker == null) {
+    if (this.expense != null && this.categories.length > 0
+      && !this.initialized) {
       let input = $(".datepicker").pickadate({
         onSet: ctx => this.onSetDatePicker(ctx),
         clear: null //Don't show the 'clear' button
       })
-      this.picker = input.pickadate("picker")
-      this.picker.set("select", this.expense.date.timestamp)
+      let picker = input.pickadate("picker")
+      picker.set("select", this.expense.date.timestamp)
+      $("#category").material_select()
+      this.initialized = true
     }
   }
 
@@ -58,6 +67,11 @@ export class EditExpenseComponent implements OnInit, AfterViewChecked {
   submit() {
     this.doSubmit()
       .subscribe(() => this.back())
+  }
+
+  private setCategories(categories: Category[]) {
+    this.categories = categories
+    $("#category").material_select()
   }
 
   private onSetDatePicker(select: any) {
