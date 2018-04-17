@@ -51,6 +51,7 @@ import { EditExpenseComponent } from './edit-expense/edit-expense.component'
 import 'chart.js'
 import { ChartsModule } from 'ng2-charts';
 import { DateHeaderComponent } from './date-header/date-header.component';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   declarations: [
@@ -65,6 +66,7 @@ import { DateHeaderComponent } from './date-header/date-header.component';
     BrowserModule,
     HttpClientModule,
     FormsModule,
+    NgbModule.forRoot(),
     ReactiveFormsModule,
     BrowserAnimationsModule,
     MaterializeModule,

@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, AfterViewChecked } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, AfterViewChecked, Injectable } from '@angular/core';
 import { Expense, Category } from '../model';
 import { ExpenseService } from '../expense.service';
 import { ActivatedRoute } from '@angular/router';
@@ -8,87 +8,81 @@ import { Observable } from 'rxjs/Observable';
 import * as Materialize from 'materialize-css'
 import * as $ from 'jquery'
 import { BudgetService } from '../budget.service';
+import { NgbDateStruct, NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap';
+
+@Injectable()
+export class NgbDateTimestampAdapter extends NgbDateAdapter<number> {
+
+	fromModel(value: number): NgbDateStruct {
+		if (value) {
+			let date = new Date(value);
+			return {
+				year: date.getFullYear(),
+				month: date.getMonth() + 1,
+				day: date.getDate()
+			};
+		}
+		return null;
+	}
+	
+	toModel(date: NgbDateStruct): number {
+		if (date) {
+			let res = new Date(date.year, date.month - 1, date.day);
+			return res.getTime();
+		}
+		return null;
+	}
+}
 
 @Component({
-  selector: 'app-edit-expense',
-  templateUrl: './edit-expense.component.html',
-  styleUrls: ['./edit-expense.component.css']
+	selector: 'app-edit-expense',
+	templateUrl: './edit-expense.component.html',
+	styleUrls: ['./edit-expense.component.css'],
+	providers: [{provide: NgbDateAdapter, useClass: NgbDateTimestampAdapter}]
 })
-export class EditExpenseComponent implements OnInit, AfterViewChecked {
+export class EditExpenseComponent implements OnInit {
 
-  expense: Expense = null
-  newExpense: boolean = true
+	expense: Expense = null
+	newExpense: boolean = true
 
-  categories: Category[] = []
+	categories: Category[] = []
 
-  initialized = false
+	initialized = false
 
-  constructor(
-    private expenseService: ExpenseService,
-    private budgetService: BudgetService,
-    private route: ActivatedRoute,
-    private location: Location,
-    private ref: ChangeDetectorRef) { }
+	constructor(
+		private expenseService: ExpenseService,
+		private budgetService: BudgetService,
+		private route: ActivatedRoute,
+		private location: Location,
+		private ref: ChangeDetectorRef) { }
 
-  ngOnInit() {
-    let id = this.route.snapshot.paramMap.get("id")
-    if (id == null) {
-      this.setExpense(ModelUtil.emptyExpense())
-    } else {
-      this.newExpense = false
-      this.expenseService.getExpenseById(id)
-        .subscribe(expense => this.setExpense(expense))
-    }
-    this.budgetService.getCategories()
-      .subscribe(categories => this.setCategories(categories.values))
-  }
+	ngOnInit() {
+		let id = this.route.snapshot.paramMap.get("id")
+		if (id == null) {
+			this.expense = ModelUtil.emptyExpense();
+			this.expense.date.timestamp = new Date().getTime();
+		} else {
+			this.newExpense = false
+			this.expenseService.getExpenseById(id)
+				.subscribe(expense => this.expense = expense);
+		}
+		this.budgetService.getCategories()
+			.subscribe(categories => this.categories = categories.values);
+	}
 
-  ngAfterViewChecked() {
-    if (Materialize.updateTextFields) {
-      Materialize.updateTextFields()
-    }
-    if (this.expense != null && this.categories.length > 0
-      && !this.initialized) {
-      let input = $(".datepicker").pickadate({
-        onSet: ctx => this.onSetDatePicker(ctx),
-        clear: null //Don't show the 'clear' button
-      })
-      let picker = input.pickadate("picker")
-      picker.set("select", this.expense.date.timestamp)
-      $("#category").material_select()
-      this.initialized = true
-    }
-  }
+	back() {
+		this.location.back()
+	}
 
-  back() {
-    this.location.back()
-  }
+	submit() {
+		this.doSubmit()
+			.subscribe(() => this.back())
+	}
 
-  submit() {
-    this.doSubmit()
-      .subscribe(() => this.back())
-  }
-
-  private setCategories(categories: Category[]) {
-    this.categories = categories
-    $("#category").material_select()
-  }
-
-  private onSetDatePicker(select: any) {
-    let time = +select.select
-    if (!isNaN(time)) {
-      this.expense.date.timestamp = time
-    }
-  }
-
-  private doSubmit(): Observable<any> {
-    if (this.newExpense) {
-      return this.expenseService.addExpense(this.expense)
-    }
-    return this.expenseService.updateExpense(this.expense)
-  }
-
-  private setExpense(expense: Expense) {
-    this.expense = expense
-  }
+	private doSubmit(): Observable<any> {
+		if (this.newExpense) {
+			return this.expenseService.addExpense(this.expense)
+		}
+		return this.expenseService.updateExpense(this.expense)
+	}
 }
