@@ -1,58 +1,47 @@
 <nav class="nav-extended">
 
-    <app-date-header [date]="date" [urlPrefix]="urlPrefix" [switcher]="switcher">
-    </app-date-header>
-  
-  </nav>
-  
-  <div class="row">
-    <div class="col s12">
-      <ul class="tabs">
-        <li class="tab col s6"><a class="active" href="#tab1">Overview</a></li>
-        <li class="tab col s6"><a href="#tab2">Expense Distribution</a></li>
-      </ul>
-    </div>
-    
-    <div id="tab1" class="col s12">
-      <table class="striped" *ngIf="expensesForTable">
-  
-        <thead>
-          <tr>
-            <th>Category</th>
-            <th>Spent</th>
-            <th>Budget</th>
-          </tr>
-        </thead>
-  
-        <tbody>
-          <tr *ngFor="let expense of expensesForTable" 
-          [ngClass]="{'red-text': expense.amount.amount > expense.budget.amount}"
-          (click)="showDetails(expense)">
-            <td>{{expense.category.name}}</td>
-            <td>{{expense.amount.amount | currency:'CHF'}}</td>
-            <td>{{expense.budget.amount | currency:'CHF'}}</td>
-          </tr>
-        </tbody>
-  
-      </table>
-    </div>
-  
-    <div id="tab2" class="col s12">
-      <div *ngIf="pieChartLabels">
-        <canvas baseChart [data]="pieChartData" [labels]="pieChartLabels" [chartType]="pieChartType">
-        </canvas>
-      </div>
-    </div>
-  
-  </div>
-  
-  <div id="detail-modal" class="modal">
-  
-    <div class="modal-content">
-      <div *ngIf="detail">
-        <app-expenses-table [expenses]="detail.expenses" [beforeEdit]="callback">
-        </app-expenses-table>
-      </div>
-    </div>
-  
-  </div>
+	<app-date-header [date]="date" [urlPrefix]="urlPrefix" [switcher]="switcher">
+	</app-date-header>
+		
+</nav>
+
+<ngb-tabset>
+	<ngb-tab title="Overview">
+		<ng-template ngbTabContent>
+			<table class="table table-striped" *ngIf="expensesForTable">
+				<thead>
+					<tr>
+						<th>Category</th>
+						<th>Spent</th>
+						<th>Budget</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr *ngFor="let expense of expensesForTable" 
+					[ngClass]="{'red-text': expense.amount.amount > expense.budget.amount}"
+					(click)="showDetails(expense, content)">
+						<td>{{expense.category.name}}</td>
+						<td>{{expense.amount.amount | currency:'CHF'}}</td>
+						<td>{{expense.budget.amount | currency:'CHF'}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</ng-template>
+	</ngb-tab>
+	<ngb-tab title="Expense Distribution">
+		<ng-template ngbTabContent>
+			<canvas baseChart [data]="pieChartData" [labels]="pieChartLabels" [chartType]="pieChartType">
+			</canvas>
+		</ng-template>
+	</ngb-tab>
+</ngb-tabset>
+
+<ng-template #content>
+	<div class="modal-header">
+		<h4 class="modal-title">{{detail.category.name}}</h4>
+	</div>
+	<div class="modal-body">
+		<app-expenses-table [expenses]="detail.expenses" [beforeEdit]="callback">
+		</app-expenses-table>
+	</div>
+</ng-template>
