@@ -1,48 +1,34 @@
-<div class="nav-wrapper">
-  <ul class="left">
-    <li>
-      <a class="waves-effect waves-light btn"
-      routerLink="/{{urlPrefix}}/{{prevDateLink.urlSuffix}}" >
-        <i class="material-icons left">arrow_back</i>
-        {{ prevDateLink.label }}
-      </a>
-    </li>
-
-    <li *ngIf="parent">
-      <a class="waves-effect waves-light btn"
-      routerLink="/{{urlPrefix}}/{{parent.urlSuffix}}" >
-        <i class="material-icons left">arrow_upward</i>
-        {{ parent.label }}
-      </a>
-    </li>
-  </ul>
-
-  <a class="brand-logo center">{{ dateLink.label }}</a>
-
-  <ul *ngIf="children" id="children-dropdown" class="dropdown-content">
-    <li *ngFor="let child of children">
-        <a class="waves-effect waves-light btn"
-        routerLink="/{{urlPrefix}}/{{child.urlSuffix}}" >
-          {{ child.label }}
-        </a>
-    </li>
-  </ul>
-
-  <ul class="right">
-    <li>
-      <a class="waves-effect waves-light btn"
-      routerLink="/{{urlPrefix}}/{{nextDateLink.urlSuffix}}" >
-        <i class="material-icons right">arrow_forward</i>
-        {{ nextDateLink.label }}
-      </a>
-    </li>
-
-    <li *ngIf="children">
-      <a class="dropdown-button btn" href="#!" data-activates="children-dropdown">
-        Drill Down
-      </a>
-    </li>
-
-  </ul>
-
-</div>
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+	<span class="navbar-brand">{{dateLink.label}}</span>
+	<div class="collapse navbar-collapse">
+		<ul class="navbar-nav mr-auto">
+			<li class="nav-item">
+				<a class="nav-link" 
+				routerLink="/{{urlPrefix}}/{{prevDateLink.urlSuffix}}">
+					{{prevDateLink.label}}
+				</a>
+			</li>
+			<li *ngIf="parent" class="nav-item">
+				<a class="nav-link"
+				routerLink="/{{urlPrefix}}/{{parent.urlSuffix}}">
+					{{parent.label}}
+				</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link"
+				routerLink="/{{urlPrefix}}/{{nextDateLink.urlSuffix}}" >
+					{{nextDateLink.label}}
+				</a>
+			</li>
+			<li *ngIf="children" ngbDropdown class="nav-item dropdown">
+				<a class="nav-link dropdown-toggle" role="button" ngbDropdownToggle>Drill down</a>
+				<div ngbDropdownMenu class="dropdown-menu">
+					<a *ngFor="let child of children" class="dropdown-item"
+					routerLink="/{{urlPrefix}}/{{child.urlSuffix}}">
+					{{child.label}}
+					</a>
+				</div>
+			</li>
+		</ul>
+	</div>
+</nav>
