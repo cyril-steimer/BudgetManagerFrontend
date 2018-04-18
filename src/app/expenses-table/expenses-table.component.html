@@ -1,25 +1,23 @@
 <!--TODO Sorting should not always be active -->
-<table class="striped"  matSortActive="date" 
-  matSortDirection="desc" matSort 
-  (matSortChange)="sort($event)">
-    <thead>
-      <tr>
-        <th mat-sort-header="name">Name</th>
-        <th mat-sort-header="amount">Amount</th>
-        <th mat-sort-header="category">Category</th>
-        <th mat-sort-header="date">Date</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let expense of expenses">
-        <td>{{expense.name.name}}</td>
-        <td>{{expense.amount.amount | currency:'CHF'}}</td>
-        <td>{{expense.category.name}}</td>
-        <td>{{expense.date.timestamp | date:'dd.MM.yyyy'}}</td>
-        <td>
-          <a (click)="edit(expense)" class="material-icons edit">edit</a>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+<table class="table table-striped" matSort>
+	<thead>
+		<tr>
+			<th mat-sort-header="name">Name</th>
+			<th mat-sort-header="amount">Amount</th>
+			<th mat-sort-header="category">Category</th>
+			<th mat-sort-header="date">Date</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr *ngFor="let expense of expenses">
+			<td>{{expense.name.name}}</td>
+			<td>{{expense.amount.amount | currency:'CHF'}}</td>
+			<td>{{expense.category.name}}</td>
+			<td>{{expense.date.timestamp | date:'dd.MM.yyyy'}}</td>
+			<td>
+				<button class="btn btn-primary" (click)="edit(expense)">Edit</button>
+			</td>
+		</tr>
+	</tbody>
+</table>
