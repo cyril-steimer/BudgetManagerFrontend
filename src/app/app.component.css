@@ -3,3 +3,7 @@
   bottom: 10px;
   right: 10px;
 }
+
+.new-expense > a {
+  border-radius: 50%;
+}
