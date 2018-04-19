@@ -1,10 +1,11 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 	<span class="navbar-brand">{{dateLink.label}}</span>
 	<div class="collapse navbar-collapse">
 		<ul class="navbar-nav mr-auto">
 			<li class="nav-item">
 				<a class="nav-link" 
 				routerLink="/{{urlPrefix}}/{{prevDateLink.urlSuffix}}">
+					<i class="fas fa-arrow-left"></i>
 					{{prevDateLink.label}}
 				</a>
 			</li>
@@ -12,16 +13,20 @@
 				<a class="nav-link"
 				routerLink="/{{urlPrefix}}/{{parent.urlSuffix}}">
 					{{parent.label}}
+					<i class="fas fa-arrow-up"></i>
 				</a>
 			</li>
 			<li class="nav-item">
 				<a class="nav-link"
 				routerLink="/{{urlPrefix}}/{{nextDateLink.urlSuffix}}" >
 					{{nextDateLink.label}}
+					<i class="fas fa-arrow-right"></i>
 				</a>
 			</li>
 			<li *ngIf="children" ngbDropdown class="nav-item dropdown">
-				<a class="nav-link dropdown-toggle" role="button" ngbDropdownToggle>Drill down</a>
+				<a class="nav-link" role="button" ngbDropdownToggle>
+					<i class="fas fa-arrow-down"></i>
+				</a>
 				<div ngbDropdownMenu class="dropdown-menu">
 					<a *ngFor="let child of children" class="dropdown-item"
 					routerLink="/{{urlPrefix}}/{{child.urlSuffix}}">
@@ -30,5 +35,9 @@
 				</div>
 			</li>
 		</ul>
+		<form *ngIf="search" class="form-inline">
+			<input class="form-control mr-sm-2" #searchBox type="search" 
+			placeholder="Search" (keyup)="doSearch(searchBox.value)">
+		</form>
 	</div>
 </nav>

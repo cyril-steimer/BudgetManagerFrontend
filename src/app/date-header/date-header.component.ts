@@ -4,6 +4,10 @@ import { BudgetPeriodSwitch, BudgetPeriod, BudgetPeriodSwitcher, DateExtractor }
 import { dashCaseToCamelCase } from '@angular/compiler/src/util';
 import * as $ from 'jquery'
 
+export interface ExpenseSearch {
+	search(text: string): void
+} 
+
 @Component({
 	selector: 'app-date-header',
 	templateUrl: './date-header.component.html',
@@ -14,6 +18,7 @@ export class DateHeaderComponent implements OnInit {
 	@Input() date: Date
 	@Input() switcher: BudgetPeriodSwitcher
 	@Input() urlPrefix: string
+	@Input() search: ExpenseSearch
 
 	nextDateLink: DateLink
 	dateLink: DateLink
@@ -27,6 +32,12 @@ export class DateHeaderComponent implements OnInit {
 	ngOnInit() {
 		this.update(this.date)
 		this.route.params.subscribe(params => this.updateDate(params))
+	}
+
+	doSearch(text: string) {
+		if (this.search) {
+			this.search.search(text);
+		}
 	}
 
 	private updateDate(params: any) {
