@@ -4,8 +4,10 @@ import { RouterModule, Routes } from '@angular/router'
 import { ExpensesComponent } from './expenses/expenses.component';
 import { BudgetComponent } from './budget/budget.component';
 import { EditExpenseComponent } from './edit-expense/edit-expense.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
 
 const routes: Routes = [
+  { path: '', component: DashboardComponent },
   { path: 'add', component: EditExpenseComponent },
   { path: 'expenses', component: ExpensesComponent },
   { path: 'expenses/year/:year', component: ExpensesComponent },
