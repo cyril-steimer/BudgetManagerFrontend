@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Text } from '@angular/compiler';
+import { Expense } from '../model';
+import { ExpenseService } from '../expense.service';
 
 @Component({
 	selector: 'app-dashboard',
@@ -10,60 +12,87 @@ export class DashboardComponent {
 
 	cards: Card[] = [];
 
-	constructor() { 
+	filteredExpenses: Expense[] = null;
+
+	constructor(private expenseService: ExpenseService) { 
 		this.initCards();
+	}
+
+	searchExpenses(text: string) {
+		if (text.length == 0) {
+			this.filteredExpenses = null;
+		} else {
+			this.expenseService.getExpenses(text)
+				.subscribe(expenses => this.filteredExpenses = expenses.values);
+		}
 	}
 
 	private initCards() {
 		let date = new Date();
-		this.cards.push(this.monthlyExpenses(date));
-		this.cards.push(this.monthlyBudget(date));
-		this.cards.push(this.yearlyExpenses(date));
-		this.cards.push(this.yearlyBudget(date));
+		this.cards.push(this.expenses(date));
+		this.cards.push(this.budget(date));
+		this.cards.push(this.newExpense());
 	}
 
-	private monthlyExpenses(date: Date): Card {
-		let month = date.getMonthName();
+	private expenses(date: Date): Card {
 		return {
-			title: `Expenses in ${month} ${date.getFullYear()}`,
-			content: `List of all expenses in the month ${month}, ${date.getFullYear()}`,
-			linkName: 'View Expenses',
-			linkUrl: `/expenses/year/${date.getFullYear()}/month/${date.getMonth()}`
-		}
+			title: 'Expenses',
+			content: 'View the list of all expenses during a certain time frame',
+			links: [
+				{
+					name: 'This Month',
+					url: `/expenses/year/${date.getFullYear()}/month/${date.getMonth()}`
+				},
+				{
+					name: 'This Year',
+					url: `/expenses/year/${date.getFullYear()}`
+				},
+				{
+					name: 'All Time',
+					url: '/expenses'
+				}
+			]
+		};
 	}
 
-	private monthlyBudget(date: Date): Card {
-		let month = date.getMonthName();
+	private budget(date: Date): Card {
 		return {
-			title: `Budget in ${month} ${date.getFullYear()}`,
-			content: `Check your budget for the month ${month}, ${date.getFullYear()}`,
-			linkName: 'View Budget',
-			linkUrl: `/budget/year/${date.getFullYear()}/month/${date.getMonth()}`
-		}
+			title: 'Budget',
+			content: 'Check the state of your budget during the current month or year',
+			links: [
+				{
+					name: 'This Month',
+					url: `/budget/year/${date.getFullYear()}/month/${date.getMonth()}`
+				},
+				{
+					name: 'This Year',
+					url: `/budget/year/${date.getFullYear()}`
+				}
+			]
+		};
 	}
 
-	private yearlyExpenses(date: Date): Card {
+	private newExpense(): Card {
 		return {
-			title: `Expenses in ${date.getFullYear()}`,
-			content: `List of all expenses in the year ${date.getFullYear()}`,
-			linkName: 'View Expenses',
-			linkUrl: `/expenses/year/${date.getFullYear()}`
-		}
-	}
-
-	private yearlyBudget(date: Date): Card {
-		return {
-			title: `Budget in ${date.getFullYear()}`,
-			content: `Check your budget for the year ${date.getFullYear()}`,
-			linkName: 'View Budget',
-			linkUrl: `/budget/year/${date.getFullYear()}`
-		}
+			title: 'New expense',
+			content: 'Input a new expense to the budget manager',
+			links: [
+				{
+					name: 'Add Expense',
+					url: '/add'
+				}
+			]
+		};
 	}
 }
 
 class Card {
 	title: string
 	content: string
-	linkName: string
-	linkUrl: string
+	links: Link[]
+}
+
+class Link {
+	name: string
+	url: string
 }

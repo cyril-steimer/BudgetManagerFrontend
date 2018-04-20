@@ -30,7 +30,9 @@ export class DateHeaderComponent implements OnInit {
 	constructor(private route: ActivatedRoute) {}
 
 	ngOnInit() {
-		this.update(this.date)
+		if (this.date != null) {
+			this.update(this.date)
+		}
 		this.route.params.subscribe(params => this.updateDate(params))
 	}
 
@@ -41,8 +43,10 @@ export class DateHeaderComponent implements OnInit {
 	}
 
 	private updateDate(params: any) {
-		let date = this.switcher.switch(new DateExtractor(), params)
-		this.update(date)
+		if (this.switcher != null) {
+			let date = this.switcher.switch(new DateExtractor(), params)
+			this.update(date)
+		}
 	}
 
 	private update(date: Date) {
@@ -56,11 +60,6 @@ export class DateHeaderComponent implements OnInit {
 
 		this.parent = this.switcher.switch(new ParentLink(), date)
 		this.children = this.switcher.switch(new ChildrenLinks(), date)
-		
-		$(".dropdown-button").dropdown({
-			constrainWidth: false,
-			hover: true
-		})
 	}
 }
 
