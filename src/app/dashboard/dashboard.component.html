@@ -1,7 +1,12 @@
-<div *ngFor="let card of cards" class="card border-primary mb-3">
-	<div class="card-header">{{card.title}}</div>
-	<div class="card-body">
-		<p class="card-text">{{card.content}}</p>
-		<a routerLink="{{card.linkUrl}}" class="btn btn-primary">{{card.linkName}}</a>
+<div class="row">
+	<div *ngFor="let card of cards; index as i" class="col-sm-6">
+		<div class="card border-primary mb-3">
+			<div class="card-header">{{card.title}}</div>
+			<div class="card-body">
+				<p class="card-text">{{card.content}}</p>
+				<a routerLink="{{card.linkUrl}}" class="btn btn-primary">{{card.linkName}}</a>
+			</div>
+		</div>
+		<div *ngIf="odd" class="clearfix"></div>
 	</div>
 </div>
