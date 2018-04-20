@@ -5,10 +5,12 @@ import { ExpensesComponent } from './expenses/expenses.component';
 import { BudgetComponent } from './budget/budget.component';
 import { EditExpenseComponent } from './edit-expense/edit-expense.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { EditBudgetComponent } from './edit-budget/edit-budget.component';
 
 const routes: Routes = [
   { path: '', component: DashboardComponent },
   { path: 'add', component: EditExpenseComponent },
+  { path: 'budget/add', component: EditBudgetComponent },
   { path: 'expenses', component: ExpensesComponent },
   { path: 'expenses/year/:year', component: ExpensesComponent },
   { path: 'expenses/year/:year/month/:month', component: ExpensesComponent },

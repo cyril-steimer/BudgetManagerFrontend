@@ -32,6 +32,7 @@ export class DashboardComponent {
 		this.cards.push(this.expenses(date));
 		this.cards.push(this.budget(date));
 		this.cards.push(this.newExpense());
+		this.cards.push(this.newBudget());
 	}
 
 	private expenses(date: Date): Card {
@@ -74,12 +75,25 @@ export class DashboardComponent {
 
 	private newExpense(): Card {
 		return {
-			title: 'New expense',
+			title: 'New Expense',
 			content: 'Input a new expense to the budget manager',
 			links: [
 				{
 					name: 'Add Expense',
 					url: '/add'
+				}
+			]
+		};
+	}
+
+	private newBudget(): Card {
+		return {
+			title: 'New Budget',
+			content: 'Add a new budget to the budget manager',
+			links: [
+				{
+					name: 'Add Budget',
+					url: '/budget/add'
 				}
 			]
 		};

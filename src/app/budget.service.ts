@@ -6,17 +6,21 @@ import { SubList, Budget, Category } from './model';
 @Injectable()
 export class BudgetService {
 
-  private budgetUrl = "/api/v1/budget"
+	private budgetUrl = "/api/v1/budget"
 
-  private categoryUrl = "/api/v1/category"
+	private categoryUrl = "/api/v1/category"
 
-  constructor(private http: HttpClient) { }
+	constructor(private http: HttpClient) { }
 
-  getBudgets(): Observable<SubList<Budget>> {
-    return this.http.get<SubList<Budget>>(this.budgetUrl)
-  }
+	getBudgets(): Observable<SubList<Budget>> {
+		return this.http.get<SubList<Budget>>(this.budgetUrl)
+	}
 
-  getCategories(): Observable<SubList<Category>> {
-    return this.http.get<SubList<Category>>(this.categoryUrl)
-  }
+	getCategories(): Observable<SubList<Category>> {
+		return this.http.get<SubList<Category>>(this.categoryUrl)
+	}
+
+	addBudget(budget: Budget): Observable<any> {
+		return this.http.post(this.budgetUrl, budget)
+	}
 }

@@ -53,6 +53,7 @@ import { ChartsModule } from 'ng2-charts';
 import { DateHeaderComponent } from './date-header/date-header.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { EditBudgetComponent } from './edit-budget/edit-budget.component';
 
 @NgModule({
   declarations: [
@@ -62,7 +63,8 @@ import { DashboardComponent } from './dashboard/dashboard.component';
     DateHeaderComponent,
     ExpensesTableComponent,
     EditExpenseComponent,
-    DashboardComponent
+    DashboardComponent,
+    EditBudgetComponent
   ],
   imports: [
     BrowserModule,
