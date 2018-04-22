@@ -79,6 +79,11 @@ export class EditExpenseComponent implements OnInit {
 			.subscribe(() => this.back())
 	}
 
+	delete() {
+		this.expenseService.deleteExpense(this.expense)
+			.subscribe(() => this.back());
+	}
+
 	private doSubmit(): Observable<any> {
 		if (this.newExpense) {
 			return this.expenseService.addExpense(this.expense)

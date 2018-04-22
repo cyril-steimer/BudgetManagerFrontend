@@ -1,4 +1,7 @@
-<h3>Edit Expense</h3>
+<app-date-header>
+</app-date-header>
+
+<h3>{{newExpense ? 'Add Expense' : 'Edit Expense'}}</h3>
 <div *ngIf="expense">
 	<div class="form-group">
 		<label for="name">Name</label>
@@ -32,5 +35,9 @@
 	<button class="btn btn-primary" (click)="submit()">
 		Submit
 		<i class="far fa-arrow-alt-circle-right"></i>
+	</button>
+	<button *ngIf="!newExpense" class="btn btn-danger" (click)="delete()">
+		Delete
+		<i class="fas fa-trash-alt"></i>
 	</button>
 </div>
