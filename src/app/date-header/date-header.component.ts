@@ -2,7 +2,6 @@ import { Component, OnInit, Input } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BudgetPeriodSwitch, BudgetPeriod, BudgetPeriodSwitcher, DateExtractor } from '../budget.period';
 import { dashCaseToCamelCase } from '@angular/compiler/src/util';
-import * as $ from 'jquery'
 
 export interface ExpenseSearch {
 	search(text: string): void

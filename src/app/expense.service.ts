@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Expense, SubList, Pagination, Sort } from './model';
+import { Expense, SubList, Pagination, Sort, PaymentMethod } from './model';
 import { Observable } from 'rxjs/Observable';
 import { of } from 'rxjs/observable/of'
 import { HttpClient } from '@angular/common/http';
@@ -10,6 +10,8 @@ export class ExpenseService {
 	//TODO: Handling of errors!
 
 	private expenseUrl = "/api/v1/expenses"
+
+	private methodUrl = "/api/v1/paymentmethod"
 
 	constructor(private http: HttpClient) { }
 
@@ -47,6 +49,10 @@ export class ExpenseService {
 
 	updateExpense(expense: Expense): Observable<any> {
 		return this.http.put(this.expenseUrl, expense)
+	}
+
+	getPaymentMethods(): Observable<PaymentMethod[]> {
+		return this.http.get<PaymentMethod[]>(this.methodUrl)
 	}
 
 	private getSearchUrl(filter?: string, body?: any) {

@@ -1,14 +1,15 @@
 import { Component, OnInit, ChangeDetectorRef, AfterViewChecked, Injectable } from '@angular/core';
-import { Expense, Category } from '../model';
+import { Expense, Category, PaymentMethod } from '../model';
 import { ExpenseService } from '../expense.service';
 import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 import { ModelUtil } from '../model.util';
 import { Observable } from 'rxjs/Observable';
-import * as Materialize from 'materialize-css'
-import * as $ from 'jquery'
 import { BudgetService } from '../budget.service';
 import { NgbDateStruct, NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/debounceTime';
+import 'rxjs/add/operator/distinctUntilChanged';
 
 @Injectable()
 export class NgbDateTimestampAdapter extends NgbDateAdapter<number> {
@@ -49,6 +50,13 @@ export class EditExpenseComponent implements OnInit {
 
 	initialized = false
 
+	paymentMethods: string[] = []
+	methodTypeahead = (text$: Observable<string>) =>
+		text$
+			.debounceTime(200)
+			.distinctUntilChanged()
+			.map(term => this.paymentMethods.filter(v => v.indexOf(term) > -1));
+
 	constructor(
 		private expenseService: ExpenseService,
 		private budgetService: BudgetService,
@@ -68,6 +76,8 @@ export class EditExpenseComponent implements OnInit {
 		}
 		this.budgetService.getCategories()
 			.subscribe(categories => this.categories = categories.values);
+		this.expenseService.getPaymentMethods()
+			.subscribe(methods => this.paymentMethods = methods.map(m => m.name));
 	}
 
 	back() {

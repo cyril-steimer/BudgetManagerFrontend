@@ -5,7 +5,6 @@ import { ExpenseService } from '../expense.service';
 import { BudgetService } from '../budget.service';
 import { PeriodQuery } from '../query.util';
 import { ModelUtil, CategoryExpensesCalculator } from '../model.util';
-import * as $ from 'jquery'
 import { BeforeEdit } from '../expenses-table/expenses-table.component';
 import { BudgetPeriod, BudgetPeriodSwitch, BudgetPeriodSwitcher, DateExtractor } from '../budget.period';
 import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';

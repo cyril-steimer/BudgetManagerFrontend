@@ -25,10 +25,11 @@ export class ModelUtil {
 	static emptyExpense(): Expense {
 		return {
 			id: 0,
-			category: { name: null },
-			amount: { amount: null },
-			date: { timestamp: null },
-			name: { name: null }
+			category: { name: "" },
+			amount: { amount: 0 },
+			date: { timestamp: new Date().getTime() },
+			name: { name: "" },
+			method: { name: "" }
 		}
 	}
 
