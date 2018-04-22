@@ -1,9 +1,10 @@
 <app-date-header [date]="date" [urlPrefix]="urlPrefix" [switcher]="switcher" [search]="this">
 </app-date-header>
 
-<div class="example-loading-shade" *ngIf="isLoadingResults">
+<!-- TODO Replace with bootstrap spinner -->
+<!--<div class="example-loading-shade" *ngIf="isLoadingResults">
 	<mat-spinner></mat-spinner>
-</div>
+</div>-->
 
 <app-expenses-table [expenses]="expenses" [sorter]="sorter">
 </app-expenses-table>
