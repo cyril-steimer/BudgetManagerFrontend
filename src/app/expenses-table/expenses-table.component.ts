@@ -1,18 +1,21 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, AfterContentChecked } from '@angular/core';
 import { Expense, Sort, SubList } from '../model';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
+import { ModelUtil } from '../model.util';
 
 @Component({
 	selector: 'app-expenses-table',
 	templateUrl: './expenses-table.component.html',
 	styleUrls: ['./expenses-table.component.css']
 })
-export class ExpensesTableComponent {
+export class ExpensesTableComponent implements AfterContentChecked {
 
 	@Input() expenses: Expense[] = []
 	@Input() beforeEdit: BeforeEdit
 	@Input() sorter: ExpenseSorter
+
+	total = ModelUtil.emptyExpense();
 
 	private directions: SortDirection[] = [
 		{ dir: "asc" },
@@ -27,6 +30,12 @@ export class ExpensesTableComponent {
 	]
 
 	constructor(private router: Router) { }
+
+	ngAfterContentChecked() {
+		this.total.amount.amount = this.expenses
+			.map(e => e.amount.amount)
+			.reduce((a1, a2) => a1 + a2, 0);
+	}
 
 	edit(expense: Expense) {
 		if (this.beforeEdit) {
