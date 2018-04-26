@@ -6,6 +6,7 @@ export class Expense {
   amount: Amount
   category: Category
   date: Timestamp
+  method?: PaymentMethod
 }
 
 export class Budget {
@@ -19,6 +20,10 @@ export class CategoryExpenses {
   amount: Amount
   budget: Amount
   expenses: Expense[]
+}
+
+export class PaymentMethod {
+  name: string
 }
 
 export class Amount {

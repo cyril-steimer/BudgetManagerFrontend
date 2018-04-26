@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Expense, SubList, Pagination, Sort } from './model';
+import { Expense, SubList, Pagination, Sort, PaymentMethod } from './model';
 import { Observable } from 'rxjs/Observable';
 import { of } from 'rxjs/observable/of'
 import { HttpClient } from '@angular/common/http';
@@ -7,72 +7,83 @@ import { HttpClient } from '@angular/common/http';
 @Injectable()
 export class ExpenseService {
 
-  //TODO: Handling of errors!
+	//TODO: Handling of errors!
 
-  private expenseUrl = "/api/v1/expenses"
+	private expenseUrl = "/api/v1/expenses"
 
-  constructor(private http: HttpClient) { }
+	private methodUrl = "/api/v1/paymentmethod"
 
-  getExpenses(
-    filter?: string, 
-    searchBody?: any, 
-    sort?: Sort, 
-    pagination?: Pagination): Observable<SubList<Expense>> {
+	constructor(private http: HttpClient) { }
 
-    //TODO there is duplicate code..
-    let url = this.getSearchUrl(filter, searchBody)
-    let options = this.createOptions(sort, pagination)
-    if (searchBody == null) {
-      return this.http.get<SubList<Expense>>(url, options)
-    }
-    return this.http.post<SubList<Expense>>(url, searchBody, options)
-  }
+	getExpenses(
+		filter?: string, 
+		searchBody?: any, 
+		sort?: Sort, 
+		pagination?: Pagination): Observable<SubList<Expense>> {
 
-  getExpenseById(id: number | string): Observable<Expense> {
-    let url = `${this.expenseUrl}/field/id/${id}`
-    let options = {
-      params: { "single": "true" }
-    }
-    return this.http.get<Expense>(url, options)
-  }
+		//TODO there is duplicate code..
+		let url = this.getSearchUrl(filter, searchBody)
+		let options = this.createOptions(sort, pagination)
+		if (searchBody == null) {
+			return this.http.get<SubList<Expense>>(url, options)
+		}
+		return this.http.post<SubList<Expense>>(url, searchBody, options)
+	}
 
-  addExpense(expense: Expense): Observable<any> {
-    return this.http.post(this.expenseUrl, expense)
-  }
+	getExpenseById(id: number | string): Observable<Expense> {
+		let url = `${this.expenseUrl}/field/id/${id}`
+		let options = {
+			params: { "single": "true" }
+		}
+		return this.http.get<Expense>(url, options)
+	}
 
-  updateExpense(expense: Expense): Observable<any> {
-    return this.http.put(this.expenseUrl, expense)
-  }
+	deleteExpense(expense: Expense): Observable<any> {
+		let params = {"id": "" + expense.id};
+		return this.http.delete(this.expenseUrl, { params: params })
+	}
 
-  private getSearchUrl(filter?: string, body?: any) {
-    if (filter) {
-      return `${this.expenseUrl}/search/${filter}`
-    } else if (body) {
-      return `${this.expenseUrl}/search`
-    }
-    return this.expenseUrl
-  }
+	addExpense(expense: Expense): Observable<any> {
+		return this.http.post(this.expenseUrl, expense)
+	}
 
-  private createOptions(sort?: Sort, pagination?: Pagination): { params: { [param: string]: string;} } {
-    let params = {}
-    this.addSortParams(params, sort)
-    this.addPaginationParams(params, pagination)
-    return {
-      params: params
-    }
-  }
+	updateExpense(expense: Expense): Observable<any> {
+		return this.http.put(this.expenseUrl, expense)
+	}
 
-  private addSortParams(params: {}, sort?: Sort) {
-    if (sort != null) {
-      params["sort"] = sort.field
-      params["dir"] = sort.direction
-    }
-  }
+	getPaymentMethods(): Observable<PaymentMethod[]> {
+		return this.http.get<PaymentMethod[]>(this.methodUrl)
+	}
 
-  private addPaginationParams(params: {}, pagination?: Pagination) {
-    if (pagination != null) {
-      params["from"] = pagination.from
-      params["count"] = pagination.count
-    }
-  }
+	private getSearchUrl(filter?: string, body?: any) {
+		if (filter) {
+			return `${this.expenseUrl}/search/${filter}`
+		} else if (body) {
+			return `${this.expenseUrl}/search`
+		}
+		return this.expenseUrl
+	}
+
+	private createOptions(sort?: Sort, pagination?: Pagination): { params: { [param: string]: string;} } {
+		let params = {}
+		this.addSortParams(params, sort)
+		this.addPaginationParams(params, pagination)
+		return {
+			params: params
+		}
+	}
+
+	private addSortParams(params: {}, sort?: Sort) {
+		if (sort != null) {
+			params["sort"] = sort.field
+			params["dir"] = sort.direction
+		}
+	}
+
+	private addPaginationParams(params: {}, pagination?: Pagination) {
+		if (pagination != null) {
+			params["from"] = pagination.from
+			params["count"] = pagination.count
+		}
+	}
 }

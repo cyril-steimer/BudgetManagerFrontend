@@ -1,32 +1,48 @@
-<div class="nav-wrapper">
-  <ul class="left">
-    <li>
-      <a class="waves-effect waves-light btn"
-      routerLink="/{{urlPrefix}}/{{prevDateLink.urlSuffix}}" >
-        <i class="material-icons left">arrow_back</i>
-        {{ prevDateLink.label }}
-      </a>
-    </li>
-  </ul>
-
-  <ul class="left" *ngIf="upDateLink">
-    <li>
-      <a class="waves-effect waves-light btn"
-      routerLink="/{{urlPrefix}}/{{upDateLink.urlSuffix}}" >
-        <i class="material-icons left">arrow_upward</i>
-        {{ upDateLink.label }}
-      </a>
-    </li>
-  </ul>
-
-  <a class="brand-logo center">{{ dateLink.label }}</a>
-  <ul class="right">
-    <li>
-      <a class="waves-effect waves-light btn"
-      routerLink="/{{urlPrefix}}/{{nextDateLink.urlSuffix}}" >
-        <i class="material-icons right">arrow_forward</i>
-        {{ nextDateLink.label }}
-      </a>
-    </li>
-  </ul>
-</div>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+	<a class="navbar-brand" routerLink="/">Dashboard</a>
+	<div class="collapse navbar-collapse">
+		<div class="navbar-nav mr-auto">
+			<ul *ngIf="date" class="navbar-nav mr-auto">
+				<li class="nav-item active">
+					<a class="nav-link">{{dateLink.label}}</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" 
+					routerLink="/{{urlPrefix}}/{{prevDateLink.urlSuffix}}">
+						<i class="fas fa-arrow-left"></i>
+						{{prevDateLink.label}}
+					</a>
+				</li>
+				<li *ngIf="parent" class="nav-item">
+					<a class="nav-link"
+					routerLink="/{{urlPrefix}}/{{parent.urlSuffix}}">
+						{{parent.label}}
+						<i class="fas fa-arrow-up"></i>
+					</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link"
+					routerLink="/{{urlPrefix}}/{{nextDateLink.urlSuffix}}" >
+						{{nextDateLink.label}}
+						<i class="fas fa-arrow-right"></i>
+					</a>
+				</li>
+				<li *ngIf="children" ngbDropdown class="nav-item dropdown">
+					<a class="nav-link" role="button" ngbDropdownToggle>
+						<i class="fas fa-arrow-down"></i>
+					</a>
+					<div ngbDropdownMenu class="dropdown-menu">
+						<a *ngFor="let child of children" class="dropdown-item"
+						routerLink="/{{urlPrefix}}/{{child.urlSuffix}}">
+						{{child.label}}
+						</a>
+					</div>
+				</li>
+			</ul>
+		</div>
+		<form *ngIf="search" class="form-inline">
+			<input class="form-control mr-sm-2" #searchBox type="search" 
+			placeholder="Search" (keyup)="doSearch(searchBox.value)">
+		</form>
+	</div>
+</nav>

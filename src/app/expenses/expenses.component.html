@@ -1,24 +1,5 @@
-<nav class="nav-extended">
-
-  <app-date-header *ngIf="date" [date]="date" [urlPrefix]="urlPrefix" [switcher]="switcher">
-  </app-date-header>
-
-  <div class="nav-wrapper">
-    <form>
-      <div class="input-field">
-        <input #searchBox id="search_box" type="search" (keyup)="search(searchBox.value)"/>
-        <label class="label-icon" for="search_box"><i class="material-icons">search</i></label>
-        <i class="material-icons" (click)="searchBox.value=''; search('')">close</i>
-      </div>
-    </form>
-  </div>
-
-</nav>
-
-
-<div class="example-loading-shade" *ngIf="isLoadingResults">
-  <mat-spinner></mat-spinner>
-</div>
+<app-date-header [date]="date" [urlPrefix]="urlPrefix" [switcher]="switcher" [search]="this">
+</app-date-header>
 
 <app-expenses-table [expenses]="expenses" [sorter]="sorter">
 </app-expenses-table>

@@ -21,7 +21,7 @@ export class BudgetPeriodSwitcher {
     } else if (this.period == BudgetPeriod.YEARLY) {
       return mySwitch.caseYearly(arg)
     }
-    throw Error("The budget period is invalid")
+    throw Error("The budget period '" + this.period + "' is invalid")
   }
 
   getPeriod() {
@@ -41,11 +41,11 @@ export class DateExtractor implements BudgetPeriodSwitch<{[key: string]: string}
   }
 
   caseMonthly(params: { [key: string]: string; }): Date {
-    return new Date(+params.year, +params.month)
+    return new Date(+params.year, +params.month);
   }
 
   caseYearly(params: { [key: string]: string; }): Date {
-    return new Date(+params.year, 0)
+    return new Date(+params.year, 0);
   }
 }
 
