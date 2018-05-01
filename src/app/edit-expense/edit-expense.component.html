@@ -2,7 +2,8 @@
 </app-date-header>
 
 <h3>{{newExpense ? 'Add Expense' : 'Edit Expense'}}</h3>
-<form *ngIf="expense" #expenseForm="ngForm" (ngSubmit)="submit()">
+<form *ngIf="expense" #expenseForm="ngForm" (ngSubmit)="submit($event)" 
+(keydown.enter)="$event.preventDefault()">
 	<div class="form-group">
 		<label for="name">Name</label>
 		<input class="form-control" type="text" id="name" name="name" 
@@ -43,6 +44,17 @@
 		<input class="form-control" type="text" id="method" name="method"
 		[(ngModel)]="expense.method.name"
 		[ngbTypeahead]="methodTypeahead">
+	</div>
+	<div class="form-group">
+		<label for="tag">Tags</label>
+		<div class="chip-list">
+			<span *ngFor="let tag of expense.tags" class="chip">
+				{{tag.name}}
+				<i class="fas fa-times-circle" (click)="removeTag(tag.name)"></i>
+			</span>
+		</div>
+		<input class="form-control" type="text" id="tag" name="tag" #tag
+		(keydown.enter)="addTag(tag.value); tag.value=''">
 	</div>
 	<button class="btn btn-secondary" (click)="back()">
 		<i class="far fa-arrow-alt-circle-left"></i>

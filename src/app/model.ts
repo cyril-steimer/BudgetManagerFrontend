@@ -7,6 +7,11 @@ export class Expense {
   category: Category
   date: Timestamp
   method?: PaymentMethod
+  tags: Tag[]
+}
+
+export class Tag {
+  name: string
 }
 
 export class Budget {

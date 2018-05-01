@@ -81,17 +81,28 @@ export class EditExpenseComponent implements OnInit {
 	}
 
 	back() {
-		this.location.back()
+		this.location.back();
 	}
 
-	submit() {
+	submit(event: any) {
 		this.doSubmit()
-			.subscribe(() => this.back())
+			.subscribe(() => this.back());
 	}
 
 	delete() {
 		this.expenseService.deleteExpense(this.expense)
 			.subscribe(() => this.back());
+	}
+
+	removeTag(tag: string) {
+		this.expense.tags = this.expense.tags.filter(t => t.name != tag);
+	}
+
+	addTag(tag: string) {
+		if (tag.length > 0 
+			&& this.expense.tags.findIndex(t => t.name == tag) == -1) {
+			this.expense.tags.push({"name": tag});
+		}
 	}
 
 	private doSubmit(): Observable<any> {
