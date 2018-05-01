@@ -2,25 +2,35 @@
 </app-date-header>
 
 <h3>{{newExpense ? 'Add Expense' : 'Edit Expense'}}</h3>
-<div *ngIf="expense">
+<form *ngIf="expense" #expenseForm="ngForm" (ngSubmit)="submit()">
 	<div class="form-group">
 		<label for="name">Name</label>
-		<input class="form-control" type="text" id="name" [(ngModel)]="expense.name.name">
+		<input class="form-control" type="text" id="name" name="name" 
+		[(ngModel)]="expense.name.name" required #name="ngModel">
+	</div>
+	<div [hidden]="name.valid || name.pristine" class="alert alert-danger">
+		Name is required
 	</div>
 	<div class="form-group">
 		<label for="name">Amount</label>
-		<input class="form-control" type="number" id="amount" [(ngModel)]="expense.amount.amount">
+		<input class="form-control" type="number" id="amount" name="amount"
+		[(ngModel)]="expense.amount.amount" required min="0.01" #amount="ngModel">
+	</div>
+	<div [hidden]="amount.valid || amount.pristine" class="alert alert-danger">
+		Amount is required and must be greater than zero
 	</div>
 	<div class="form-group">
 		<label for="category">Category</label>
-		<select class="form-control" id="category" [(ngModel)]="expense.category.name">
+		<select class="form-control" id="category" name="category"
+		[(ngModel)]="expense.category.name" required>
 			<option *ngFor="let category of categories" value="{{category.name}}">{{category.name}}</option>
 		</select>
 	</div>
 	<div class="form-group">
 		<label for="date">Date</label>
 		<div class="input-group">
-			<input class="form-control" id="date" [(ngModel)]="expense.date.timestamp" ngbDatepicker #d="ngbDatepicker">
+			<input class="form-control" id="date"  name="date"
+			[(ngModel)]="expense.date.timestamp" required ngbDatepicker #d="ngbDatepicker">
 			<div class="input-group-append">
 				<button class="btn btn-outline-secondary" (click)="d.toggle()" type="button">
 					<i class="fas fa-calendar-alt"></i>
@@ -30,14 +40,15 @@
 	</div>
 	<div class="form-group">
 		<label for="method">Payment Method</label>
-		<input class="form-control" type="text" id="method" [(ngModel)]="expense.method.name"
+		<input class="form-control" type="text" id="method" name="method"
+		[(ngModel)]="expense.method.name"
 		[ngbTypeahead]="methodTypeahead">
 	</div>
 	<button class="btn btn-secondary" (click)="back()">
 		<i class="far fa-arrow-alt-circle-left"></i>
 		Back
 	</button>
-	<button class="btn btn-primary" (click)="submit()">
+	<button class="btn btn-primary" type="submit" [disabled]="!expenseForm.form.valid">
 		Submit
 		<i class="far fa-arrow-alt-circle-right"></i>
 	</button>
@@ -45,4 +56,4 @@
 		Delete
 		<i class="fas fa-trash-alt"></i>
 	</button>
-</div>
+</form>

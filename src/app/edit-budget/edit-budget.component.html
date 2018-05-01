@@ -1,16 +1,22 @@
 <h3>Edit Budget</h3>
-<div *ngIf="budget">
+<form *ngIf="budget" #budgetForm="ngForm" (ngSubmit)="submit()">
 	<div class="form-group">
 		<label for="category">Category</label>
-		<input class="form-control" type="text" id="category" [(ngModel)]="budget.category.name">
+		<input class="form-control" type="text" id="category" name="category"
+		[(ngModel)]="budget.category.name" required #category="ngModel">
+	</div>
+	<div [hidden]="category.valid || category.pristine" class="alert alert-danger">
+		Category is required
 	</div>
 	<div class="form-group">
 		<label for="name">Amount</label>
-		<input class="form-control" type="number" id="amount" [(ngModel)]="budget.amount.amount">
+		<input class="form-control" type="number" id="amount" name="amount"
+		required min="0.01" [(ngModel)]="budget.amount.amount">
 	</div>
 	<div class="form-group">
 		<label for="period">Period</label>
-		<select class="form-control" id="category" [(ngModel)]="budget.period">
+		<select class="form-control" id="category" name="period"
+		required [(ngModel)]="budget.period">
 			<option *ngFor="let period of periods" value="{{period}}">{{period}}</option>
 		</select>
 	</div>
@@ -18,8 +24,8 @@
 		<i class="far fa-arrow-alt-circle-left"></i>
 		Back
 	</button>
-	<button class="btn btn-primary" (click)="submit()">
+	<button class="btn btn-primary" type="submit" [disabled]="!budgetForm.form.valid">
 		Submit
 		<i class="far fa-arrow-alt-circle-right"></i>
 	</button>
-</div>
+</form>

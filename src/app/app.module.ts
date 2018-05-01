@@ -19,6 +19,7 @@ import { DateHeaderComponent } from './date-header/date-header.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { EditBudgetComponent } from './edit-budget/edit-budget.component';
+import { MinValidatorDirective } from './validators.directive';
 
 @NgModule({
   declarations: [
@@ -29,7 +30,8 @@ import { EditBudgetComponent } from './edit-budget/edit-budget.component';
     ExpensesTableComponent,
     EditExpenseComponent,
     DashboardComponent,
-    EditBudgetComponent
+    EditBudgetComponent,
+    MinValidatorDirective
   ],
   imports: [
     BrowserModule,
@@ -39,7 +41,7 @@ import { EditBudgetComponent } from './edit-budget/edit-budget.component';
     ReactiveFormsModule,
     BrowserAnimationsModule,
     ChartsModule,
-    AppRoutingModule
+    AppRoutingModule,
   ],
   providers: [
     ExpenseService,
