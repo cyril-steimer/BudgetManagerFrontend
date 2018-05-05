@@ -54,9 +54,10 @@
 			</span>
 		</div>
 		<input class="form-control" type="text" id="tag" name="tag" #tag
-		(keydown.enter)="addTag(tag.value); tag.value=''">
+		(keydown.enter)="addTag($event, tag.value); tag.value=''"
+		[ngbTypeahead]="tagTypeahead">
 	</div>
-	<button class="btn btn-secondary" (click)="back()">
+	<button class="btn btn-secondary" (click)="back()" type="button">
 		<i class="far fa-arrow-alt-circle-left"></i>
 		Back
 	</button>
@@ -64,7 +65,7 @@
 		Submit
 		<i class="far fa-arrow-alt-circle-right"></i>
 	</button>
-	<button *ngIf="!newExpense" class="btn btn-danger" (click)="delete()">
+	<button *ngIf="!newExpense" class="btn btn-danger" (click)="delete()" type="button">
 		Delete
 		<i class="fas fa-trash-alt"></i>
 	</button>
