@@ -85,7 +85,7 @@ export class BudgetConverter {
 	}
 }
 
-export class NumberOfDays implements BudgetPeriodSwitch<Date, number> {
+export class DaysInPeriod implements BudgetPeriodSwitch<Date, number> {
 
 	caseMonthly(arg: Date): number {
 		// https://stackoverflow.com/a/1184359
@@ -97,21 +97,62 @@ export class NumberOfDays implements BudgetPeriodSwitch<Date, number> {
 		let startCurrentYear = new Date(arg.getFullYear(), 0);
 		let startNextYear = new Date(arg.getFullYear() + 1, 0);
 		return daysBetween(startCurrentYear, startNextYear);
-		return (startNextYear.getTime() - startCurrentYear.getTime())
-			/ (1000 * 60 * 60 * 24)
 	}
 }
 
 export class DaysSinceStart implements BudgetPeriodSwitch<Date, number> {
 
+	//Careful: We must make sure to count the current day in both cases.
 	caseMonthly(arg: Date): number {
-		return arg.getDate() - 1;
+		return arg.getDate();
 	}
 
 	caseYearly(arg: Date): number {
 		let startCurrentYear = new Date(arg.getFullYear(), 0);
-		return daysBetween(startCurrentYear, arg);
+		let argDay = new Date(arg.getFullYear(), arg.getMonth(), arg.getDate() + 1);
+		return daysBetween(startCurrentYear, argDay);
 	}
+}
+
+export class NextPeriod implements BudgetPeriodSwitch<Date, Date> {
+	
+	caseMonthly(arg: Date): Date {
+		return new Date(arg.getFullYear(), arg.getMonth() + 1)
+	}
+
+	caseYearly(arg: Date): Date {
+		return new Date(arg.getFullYear() + 1, 0)
+	}
+}
+
+export class PreviousPeriod implements BudgetPeriodSwitch<Date, Date> {
+
+	caseMonthly(arg: Date): Date {
+		return new Date(arg.getFullYear(), arg.getMonth() - 1)
+	}
+
+	caseYearly(arg: Date): Date {
+		return new Date(arg.getFullYear() - 1, 0)
+	}
+}
+
+export class EndOfPeriod implements BudgetPeriodSwitch<Date, Date> {
+
+	caseMonthly(arg: Date): Date {
+		// https://stackoverflow.com/a/1184359
+		return new Date(arg.getFullYear(), arg.getMonth() + 1, 0);
+	}
+
+	caseYearly(arg: Date): Date {
+		return new Date(arg.getFullYear() + 1, 0, 0);
+	}
+}
+
+export function isInPeriod(switcher: BudgetPeriodSwitcher, periodStart: Date, date: Date) {
+	let end = switcher.switch(new EndOfPeriod(), periodStart);
+	end = new Date(end.getFullYear(), end.getMonth(), end.getDate() + 1);
+	return periodStart.getTime() <= date.getTime()
+		&& date.getTime() < end.getTime();
 }
 
 function daysBetween(start: Date, end: Date) {

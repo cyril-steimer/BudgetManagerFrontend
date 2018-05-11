@@ -6,7 +6,7 @@ import { BudgetService } from '../budget.service';
 import { PeriodQuery } from '../query.util';
 import { ModelUtil, CategoryExpensesCalculator } from '../model.util';
 import { BeforeLeave } from '../expenses-table/expenses-table.component';
-import { BudgetPeriod, BudgetPeriodSwitch, BudgetPeriodSwitcher, DateExtractor, NumberOfDays, DaysSinceStart } from '../budget.period';
+import { BudgetPeriod, BudgetPeriodSwitch, BudgetPeriodSwitcher, DateExtractor, DaysInPeriod, DaysSinceStart, EndOfPeriod, isInPeriod } from '../budget.period';
 import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap/modal/modal-ref';
 import { ChartDataSets } from 'chart.js';
@@ -114,7 +114,9 @@ export class BudgetComponent implements OnInit, BeforeLeave {
 
 const LINE_CONFIG: ChartDataSets = {
 	lineTension: 0, // No bezier curves, straight lines
-	pointRadius: 0 // Don't show points, just lines
+	pointRadius: 0, // Don't show points, just lines
+	pointHitRadius: 10, // Still want to hover over points
+	fill: false // Don't fill the area under the line
 };
 
 class CategoryExpensesLineChartData {
@@ -130,15 +132,14 @@ class CategoryExpensesLineChartData {
 	}
 
 	private getData(): ChartDataSets[] {
-		let days = this.numDays();
-		let res = [];
-		for (let i = 1; i <= days; i++) {
-			res.push((this.expenses.budget.amount * i) / days);
+		let res = [Object.assign({data: this.getBudgetData() , label: 'Budget'}, LINE_CONFIG)];
+		res.push(Object.assign({data: this.getExpenseData(), label: 'Expenses'}, LINE_CONFIG));
+		if (this.needsTrend()) {
+			res.push(Object.assign(
+				{data: this.getTrendData(), label: 'Trend', borderDash: [5, 5]},
+				LINE_CONFIG));
 		}
-		return [
-			Object.assign({ data: res , label: 'Budget'}, LINE_CONFIG),
-			Object.assign({ data: this.getExpenseData(), label: 'Expenses'}, LINE_CONFIG)
-		];
+		return res;
 	}
 
 	private getLabels(): string[] {
@@ -146,8 +147,13 @@ class CategoryExpensesLineChartData {
 		return range(1, days + 1).map((val) => "" + val);
 	}
 
-	private getExpenseData(): number[] {
+	private getBudgetData(): number[] {
 		let days = this.numDays();
+		return newFilledArray(days, 0).map((_, i) => (this.expenses.budget.amount * (i + 1)) / days);
+	}
+
+	private getExpenseData(): number[] {
+		let days = this.daysSinceStart();
 		let res = newFilledArray(days, 0);
 		for (let expense of this.expenses.expenses) {
 			let date = new Date(expense.date.timestamp);
@@ -159,7 +165,29 @@ class CategoryExpensesLineChartData {
 		return res;
 	}
 
+	private getTrendData(): number[] {
+		let days = this.switcher.switch(new DaysSinceStart(), new Date());
+		let total = this.expenses.amount.amount;
+		let averageSpend = total / days;
+		return newFilledArray(this.numDays(), 0).map((_, i) => (i + 1) * averageSpend);
+	}
+
+	private daysSinceStart(): number {
+		let curr = new Date();
+		if (isInPeriod(this.switcher, this.date, curr)) {
+			return this.switcher.switch(new DaysSinceStart(), new Date());
+		} else if (curr.getTime() < this.date.getTime()) {
+			return 0;
+		}
+		return this.numDays();
+	}
+
+	private needsTrend(): boolean {
+		let days = this.daysSinceStart();
+		return days > 0 && days < this.numDays();
+	}
+
 	private numDays() {
-		return this.switcher.switch(new NumberOfDays(), this.date);
+		return this.switcher.switch(new DaysInPeriod(), this.date);
 	}
 }
