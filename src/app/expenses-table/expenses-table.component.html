@@ -14,7 +14,11 @@
 		<tr *ngFor="let expense of expenses">
 			<td>{{expense.name.name}}</td>
 			<td>{{expense.amount.amount | currency:'CHF'}}</td>
-			<td>{{expense.category.name}}</td>
+			<td>
+				<a href="#" (click)="searchByCategory($event, expense.category.name)">
+					{{expense.category.name}}
+				</a>
+			</td>
 			<td>{{expense.date.timestamp | date:'dd.MM.yyyy'}}</td>
 			<td>
 				<a href="#" (click)="searchByMethod($event, expense.method.name)">

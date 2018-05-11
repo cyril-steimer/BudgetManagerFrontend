@@ -1,4 +1,5 @@
 import { BudgetPeriodSwitcher, BudgetPeriodSwitch } from "./budget.period";
+import { Category } from "./model";
 
 export class PeriodQuery implements BudgetPeriodSwitch<Date, {}> {
  
@@ -34,6 +35,12 @@ export class QueryUtil {
 	static methodQuery(paymentMethod: string) {
 		return {
 			method: paymentMethod
+		};
+	}
+
+	static categoryQuery(category: string) {
+		return {
+			category: category
 		};
 	}
 

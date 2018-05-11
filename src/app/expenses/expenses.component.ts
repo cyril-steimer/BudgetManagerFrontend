@@ -27,6 +27,7 @@ export class ExpensesComponent implements OnInit, ExpenseSorter, ExpenseSearch {
 
 	tag: string = null
 	method: string = null
+	category: string = null
 
 	sorter = this
 
@@ -69,6 +70,7 @@ export class ExpensesComponent implements OnInit, ExpenseSorter, ExpenseSearch {
 		}
 		this.tag = params.tag
 		this.method = params.method;
+		this.category = params.category;
 		this.getExpenses()
 	}
 
@@ -79,6 +81,8 @@ export class ExpensesComponent implements OnInit, ExpenseSorter, ExpenseSearch {
 			return QueryUtil.tagQuery(this.tag);
 		} else if (this.method) {
 			return QueryUtil.methodQuery(this.method);
+		} else if (this.category) {
+			return QueryUtil.categoryQuery(this.category);
 		}
 		return null
 	}
