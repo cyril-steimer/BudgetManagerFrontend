@@ -44,17 +44,17 @@ export class ExpensesTableComponent implements AfterContentChecked {
 
 	searchByTag(event: MouseEvent, tag: string) {
 		this.prepareToLeave(event);
-		this.router.navigate(["expenses", "tag", tag]);
+		this.router.navigate(["expenses", "field", "tag", tag]);
 	}
 
 	searchByMethod(event: MouseEvent, method: string) {
 		this.prepareToLeave(event);
-		this.router.navigate(["expenses", "method", method]);
+		this.router.navigate(["expenses", "field", "method", method]);
 	}
 
 	searchByCategory(event: MouseEvent, category: string) {
 		this.prepareToLeave(event);
-		this.router.navigate(["expenses", "category", category]);
+		this.router.navigate(["expenses", "field", "category", category]);
 	}
 
 	private prepareToLeave(event?: MouseEvent) {

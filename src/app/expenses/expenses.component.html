@@ -1,10 +1,8 @@
 <app-date-header [date]="date" [urlPrefix]="urlPrefix" [switcher]="switcher" [search]="this">
 </app-date-header>
 
-<span *ngIf="tag || method || category" class="chip mb-2">
-    {{tag}}
-    {{method}}
-    {{category}}
+<span *ngIf="field" class="chip mb-2">
+    {{field}} = {{value}}
     <i class="fas fa-times-circle" routerLink="/expenses"></i>
 </span>
 

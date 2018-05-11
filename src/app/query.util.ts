@@ -26,24 +26,12 @@ export class QueryUtil {
 		return QueryUtil.betweenDateQuery(start, end)
 	}
 
-	static tagQuery(tag: string) {
-		return {
-			tag: tag
-		};
+	static fieldQuery(field: string, value: string | {[key: string]: any}) {
+		let res = {};
+		res[field] = value;
+		return res;
 	}
-
-	static methodQuery(paymentMethod: string) {
-		return {
-			method: paymentMethod
-		};
-	}
-
-	static categoryQuery(category: string) {
-		return {
-			category: category
-		};
-	}
-
+	
 	private static betweenDateQuery(start: number, end: number) {
 		return {
 			and: [

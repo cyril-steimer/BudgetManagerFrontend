@@ -25,9 +25,8 @@ export class ExpensesComponent implements OnInit, ExpenseSorter, ExpenseSearch {
 	switcher: BudgetPeriodSwitcher
 	urlPrefix = "expenses"
 
-	tag: string = null
-	method: string = null
-	category: string = null
+	field: string = null
+	value: string = null
 
 	sorter = this
 
@@ -68,21 +67,16 @@ export class ExpensesComponent implements OnInit, ExpenseSorter, ExpenseSearch {
 			this.switcher = null
 			this.date = null
 		}
-		this.tag = params.tag
-		this.method = params.method;
-		this.category = params.category;
+		this.field = params.field;
+		this.value = params.value;
 		this.getExpenses()
 	}
 
 	private getSearchBody() {
 		if (this.date) {
 			return this.switcher.switch(new PeriodQuery(), this.date)
-		} else if (this.tag) {
-			return QueryUtil.tagQuery(this.tag);
-		} else if (this.method) {
-			return QueryUtil.methodQuery(this.method);
-		} else if (this.category) {
-			return QueryUtil.categoryQuery(this.category);
+		} else if (this.field) {
+			return QueryUtil.fieldQuery(this.field, this.value);
 		}
 		return null
 	}
