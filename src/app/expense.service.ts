@@ -21,7 +21,6 @@ export class ExpenseService {
 		sort?: Sort, 
 		pagination?: Pagination): Observable<SubList<Expense>> {
 
-		//TODO there is duplicate code..
 		let url = this.getSearchUrl(filter, searchBody);
 		let options = this.createOptions(sort, pagination);
 		if (searchBody == null) {

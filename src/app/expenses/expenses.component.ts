@@ -7,7 +7,7 @@ import { DelayedSearch } from '../delayed.search';
 import { ActivatedRoute } from '@angular/router';
 import { ExpenseSorter, SortDirection, SortField } from '../expenses-table/expenses-table.component';
 import { BudgetPeriodSwitcher, BudgetPeriod, DateExtractor } from '../budget.period';
-import { PeriodQuery } from '../query.util';
+import { PeriodQuery, QueryUtil } from '../query.util';
 import { ExpenseSearch } from '../date-header/date-header.component';
 
 @Component({
@@ -24,6 +24,7 @@ export class ExpensesComponent implements OnInit, ExpenseSorter, ExpenseSearch {
 	date: Date
 	switcher: BudgetPeriodSwitcher
 	urlPrefix = "expenses"
+	tag: string = null
 
 	sorter = this
 
@@ -55,7 +56,7 @@ export class ExpensesComponent implements OnInit, ExpenseSorter, ExpenseSearch {
 		this.delayedSearch.set(term)
 	}
 
-	private update(params: any) {
+	private update(params: {[key: string]: any}) {
 		let period = DateExtractor.getBudgetPeriod(params)
 		if (period) {
 			this.switcher = new BudgetPeriodSwitcher(period)
@@ -63,13 +64,16 @@ export class ExpensesComponent implements OnInit, ExpenseSorter, ExpenseSearch {
 		} else {
 			this.switcher = null
 			this.date = null
-		}      
+		}
+		this.tag = params.tag
 		this.getExpenses()
 	}
 
 	private getSearchBody() {
 		if (this.date) {
 			return this.switcher.switch(new PeriodQuery(), this.date)
+		} else if (this.tag) {
+			return QueryUtil.tagQuery(this.tag);
 		}
 		return null
 	}

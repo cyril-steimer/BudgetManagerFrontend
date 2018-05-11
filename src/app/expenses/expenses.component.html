@@ -1,5 +1,10 @@
 <app-date-header [date]="date" [urlPrefix]="urlPrefix" [switcher]="switcher" [search]="this">
 </app-date-header>
 
-<app-expenses-table [expenses]="expenses" [sorter]="sorter">
+<span *ngIf="tag" class="chip mb-2">
+    {{tag}}
+    <i class="fas fa-times-circle" routerLink="/expenses"></i>
+</span>
+
+<app-expenses-table [expenses]="expenses" [sorter]="sorter" class="mt-2">
 </app-expenses-table>

@@ -5,7 +5,7 @@ import { ExpenseService } from '../expense.service';
 import { BudgetService } from '../budget.service';
 import { PeriodQuery } from '../query.util';
 import { ModelUtil, CategoryExpensesCalculator } from '../model.util';
-import { BeforeEdit } from '../expenses-table/expenses-table.component';
+import { BeforeLeave } from '../expenses-table/expenses-table.component';
 import { BudgetPeriod, BudgetPeriodSwitch, BudgetPeriodSwitcher, DateExtractor } from '../budget.period';
 import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap/modal/modal-ref';
@@ -15,7 +15,7 @@ import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap/modal/modal-ref';
 	templateUrl: './budget.component.html',
 	styleUrls: ['./budget.component.css']
 })
-export class BudgetComponent implements OnInit, BeforeEdit {
+export class BudgetComponent implements OnInit, BeforeLeave {
 
 	modalOptions: NgbModalOptions = {
 		size: 'lg',
@@ -48,7 +48,7 @@ export class BudgetComponent implements OnInit, BeforeEdit {
 		this.getBudgets()
 	}
 
-	beforeEdit(expense: Expense) {
+	beforeLeave() {
 		//The modal would not close correctly on changing the URL
 		//due to the background not being contained in the 'app-root' tag
 		this.modal.close()

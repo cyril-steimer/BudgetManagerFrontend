@@ -37,7 +37,7 @@
 		<h4 class="modal-title">{{detail.category.name}}</h4>
 	</div>
 	<div class="modal-body">
-		<app-expenses-table [expenses]="detail.expenses" [beforeEdit]="callback">
+		<app-expenses-table [expenses]="detail.expenses" [beforeLeave]="callback">
 		</app-expenses-table>
 	</div>
 </ng-template>
