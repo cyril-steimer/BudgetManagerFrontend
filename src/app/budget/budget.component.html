@@ -26,7 +26,13 @@
 	</ngb-tab>
 	<ngb-tab title="Expense Distribution">
 		<ng-template ngbTabContent>
-			<canvas baseChart [data]="pieChartData" [labels]="pieChartLabels" [chartType]="pieChartType">
+			<canvas baseChart [data]="pieChartData" [labels]="pieChartLabels" [chartType]="'pie'">
+			</canvas>
+		</ng-template>
+	</ngb-tab>
+	<ngb-tab title="Burndown">
+		<ng-template ngbTabContent>
+			<canvas baseChart [datasets]="lineChartData" [labels]="lineChartLabels" [chartType]="'line'">
 			</canvas>
 		</ng-template>
 	</ngb-tab>

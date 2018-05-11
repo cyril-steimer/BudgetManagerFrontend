@@ -6,9 +6,10 @@ import { BudgetService } from '../budget.service';
 import { PeriodQuery } from '../query.util';
 import { ModelUtil, CategoryExpensesCalculator } from '../model.util';
 import { BeforeLeave } from '../expenses-table/expenses-table.component';
-import { BudgetPeriod, BudgetPeriodSwitch, BudgetPeriodSwitcher, DateExtractor } from '../budget.period';
+import { BudgetPeriod, BudgetPeriodSwitch, BudgetPeriodSwitcher, DateExtractor, NumberOfDays } from '../budget.period';
 import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap/modal/modal-ref';
+import { ChartDataSets } from 'chart.js';
 
 @Component({
 	selector: 'app-budget',
@@ -31,7 +32,9 @@ export class BudgetComponent implements OnInit, BeforeLeave {
 
 	pieChartData: number[]
 	pieChartLabels: string[]
-	pieChartType = "pie"
+
+	lineChartData: ChartDataSets[]
+	lineChartLabels: string[]
 
 	date: Date
 	switcher: BudgetPeriodSwitcher
@@ -61,21 +64,38 @@ export class BudgetComponent implements OnInit, BeforeLeave {
 		}  
 	}
 
-	private plotData(calc: CategoryExpensesCalculator) {
+	private numDays() {
+		return this.switcher.switch(new NumberOfDays(), this.date);
+	}
+
+	private linePlotData(calc: CategoryExpensesCalculator) {
+		let expenses = calc.calculateTotalExpenses();
+		let days = this.numDays();
+		let res = [];
+		for (let i = 1; i <= days; i++) {
+			res.push((expenses.budget.amount * i) / days);
+		}
+		return [{ data: res , label: 'Total'}];
+	}
+
+	private linePlotLabels() {
+		let days = this.numDays();
+		// https://stackoverflow.com/a/10050831
+		return Array.apply(null, Array(days)).map((_, i) => "" + (i + 1));
+	}
+
+	private piePlotData(calc: CategoryExpensesCalculator) {
 		let expenses = this.getExpensesSortedByExpensesWithoutTotal(calc)
 		return expenses.map(e => e.amount.amount)
 	}
 
-	private plotLabels(calc: CategoryExpensesCalculator) {
+	private piePlotLabels(calc: CategoryExpensesCalculator) {
 		let expenses = this.getExpensesSortedByExpensesWithoutTotal(calc)
 		return expenses.map(e => e.category.name)
 	}
 
 	private getExpensesSortedByExpensesWithoutTotal(calc: CategoryExpensesCalculator) {
-		let calculator = calc.sortByExpenses()
-		let res = calculator.calculateBudgetedExpenses()
-		res.push(calculator.calculateNotBudgetedExpenses())
-		return res
+		return calc.sortByExpenses().calculateExpenses();
 	}
 
 	private update(params: any) {
@@ -98,9 +118,12 @@ export class BudgetComponent implements OnInit, BeforeLeave {
 	}
 
 	private init(expenses: Expense[], budgets: Budget[]) {
-		let calc = new CategoryExpensesCalculator(expenses, budgets, this.switcher.getPeriod())
-		this.expensesForTable = calc.sortByBudget().calculateAllExpenses()
-		this.pieChartData = this.plotData(calc)
-		this.pieChartLabels = this.plotLabels(calc)
+		let calc = new CategoryExpensesCalculator(expenses, budgets, this.switcher.getPeriod());
+		this.expensesForTable = calc.sortByBudget().calculateExpenses();
+		this.expensesForTable.push(calc.calculateTotalExpenses());
+		this.pieChartData = this.piePlotData(calc);
+		this.pieChartLabels = this.piePlotLabels(calc);
+		this.lineChartData = this.linePlotData(calc);
+		this.lineChartLabels = this.linePlotLabels();
 	}
 }
