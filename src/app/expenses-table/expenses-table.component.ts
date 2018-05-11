@@ -45,7 +45,13 @@ export class ExpensesTableComponent implements AfterContentChecked {
 	searchByTag(event: MouseEvent, tag: string) {
 		event.preventDefault(); // Don't follow the href. Href necessary for style.
 		this.prepareToLeave();
-		this.router.navigate(["expenses", "tag", tag])
+		this.router.navigate(["expenses", "tag", tag]);
+	}
+
+	searchByMethod(event: MouseEvent, method: string) {
+		event.preventDefault(); // Don't follow the href. Href necessary for style.
+		this.prepareToLeave();
+		this.router.navigate(["expenses", "method", method]);
 	}
 
 	prepareToLeave() {

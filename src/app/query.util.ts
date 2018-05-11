@@ -31,6 +31,12 @@ export class QueryUtil {
 		};
 	}
 
+	static methodQuery(paymentMethod: string) {
+		return {
+			method: paymentMethod
+		};
+	}
+
 	private static betweenDateQuery(start: number, end: number) {
 		return {
 			and: [

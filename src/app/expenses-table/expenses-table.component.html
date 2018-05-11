@@ -16,7 +16,11 @@
 			<td>{{expense.amount.amount | currency:'CHF'}}</td>
 			<td>{{expense.category.name}}</td>
 			<td>{{expense.date.timestamp | date:'dd.MM.yyyy'}}</td>
-			<td>{{expense.method.name}}</td>
+			<td>
+				<a href="#" (click)="searchByMethod($event, expense.method.name)">
+					{{expense.method.name}}
+				</a>
+			</td>
 			<td class="chip-list">
 				<a *ngFor="let tag of expense.tags" class="chip" 
 				href="#" (click)="searchByTag($event, tag.name)">

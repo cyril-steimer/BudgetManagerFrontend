@@ -15,6 +15,7 @@ const routes: Routes = [
   { path: 'expenses/year/:year', component: ExpensesComponent },
   { path: 'expenses/year/:year/month/:month', component: ExpensesComponent },
   { path: 'expenses/tag/:tag', component: ExpensesComponent },
+  { path: 'expenses/method/:method', component: ExpensesComponent },
   { path: 'budget/year/:year', component: BudgetComponent },
   { path: 'budget/year/:year/month/:month', component: BudgetComponent },
   { path: 'edit/expense/:id', component: EditExpenseComponent }
