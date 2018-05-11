@@ -9,7 +9,7 @@ import { BeforeLeave } from '../expenses-table/expenses-table.component';
 import { BudgetPeriod, BudgetPeriodSwitch, BudgetPeriodSwitcher, DateExtractor, DaysInPeriod, DaysSinceStart, EndOfPeriod, isInPeriod } from '../budget.period';
 import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap/modal/modal-ref';
-import { ChartDataSets } from 'chart.js';
+import { ChartDataSets, ChartOptions, ChartTooltipItem, ChartData } from 'chart.js';
 import { range, newFilledArray } from '../util';
 
 @Component({
@@ -33,6 +33,16 @@ export class BudgetComponent implements OnInit, BeforeLeave {
 
 	pieChartData: number[]
 	pieChartLabels: string[]
+	chartOptions: ChartOptions = {
+		tooltips: {
+			callbacks: {
+				label: function(tooltipItem: ChartTooltipItem, data: ChartData) {
+					let label = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+					return 'CHF' + (<Number> label).toFixed(2);
+				}
+			}
+		}
+	};
 
 	lineCharts: CategoryExpensesLineChartData[] = [];
 
