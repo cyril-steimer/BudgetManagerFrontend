@@ -96,7 +96,26 @@ export class NumberOfDays implements BudgetPeriodSwitch<Date, number> {
 		// https://stackoverflow.com/a/8619946
 		let startCurrentYear = new Date(arg.getFullYear(), 0);
 		let startNextYear = new Date(arg.getFullYear() + 1, 0);
+		return daysBetween(startCurrentYear, startNextYear);
 		return (startNextYear.getTime() - startCurrentYear.getTime())
 			/ (1000 * 60 * 60 * 24)
 	}
+}
+
+export class DaysSinceStart implements BudgetPeriodSwitch<Date, number> {
+
+	caseMonthly(arg: Date): number {
+		return arg.getDate() - 1;
+	}
+
+	caseYearly(arg: Date): number {
+		let startCurrentYear = new Date(arg.getFullYear(), 0);
+		return daysBetween(startCurrentYear, arg);
+	}
+}
+
+function daysBetween(start: Date, end: Date) {
+	// https://stackoverflow.com/a/543152
+	let day = 1000 * 60 * 60 * 24;
+	return Math.round((end.getTime() - start.getTime()) / day)
 }

@@ -6,10 +6,11 @@ import { BudgetService } from '../budget.service';
 import { PeriodQuery } from '../query.util';
 import { ModelUtil, CategoryExpensesCalculator } from '../model.util';
 import { BeforeLeave } from '../expenses-table/expenses-table.component';
-import { BudgetPeriod, BudgetPeriodSwitch, BudgetPeriodSwitcher, DateExtractor, NumberOfDays } from '../budget.period';
+import { BudgetPeriod, BudgetPeriodSwitch, BudgetPeriodSwitcher, DateExtractor, NumberOfDays, DaysSinceStart } from '../budget.period';
 import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap/modal/modal-ref';
 import { ChartDataSets } from 'chart.js';
+import { range, newFilledArray } from '../util';
 
 @Component({
 	selector: 'app-budget',
@@ -33,8 +34,7 @@ export class BudgetComponent implements OnInit, BeforeLeave {
 	pieChartData: number[]
 	pieChartLabels: string[]
 
-	lineChartData: ChartDataSets[]
-	lineChartLabels: string[]
+	lineCharts: CategoryExpensesLineChartData[] = [];
 
 	date: Date
 	switcher: BudgetPeriodSwitcher
@@ -62,26 +62,6 @@ export class BudgetComponent implements OnInit, BeforeLeave {
 			this.detail = expense
 			this.modal = this.modalService.open(content, this.modalOptions);
 		}  
-	}
-
-	private numDays() {
-		return this.switcher.switch(new NumberOfDays(), this.date);
-	}
-
-	private linePlotData(calc: CategoryExpensesCalculator) {
-		let expenses = calc.calculateTotalExpenses();
-		let days = this.numDays();
-		let res = [];
-		for (let i = 1; i <= days; i++) {
-			res.push((expenses.budget.amount * i) / days);
-		}
-		return [{ data: res , label: 'Total'}];
-	}
-
-	private linePlotLabels() {
-		let days = this.numDays();
-		// https://stackoverflow.com/a/10050831
-		return Array.apply(null, Array(days)).map((_, i) => "" + (i + 1));
 	}
 
 	private piePlotData(calc: CategoryExpensesCalculator) {
@@ -123,7 +103,57 @@ export class BudgetComponent implements OnInit, BeforeLeave {
 		this.expensesForTable.push(calc.calculateTotalExpenses());
 		this.pieChartData = this.piePlotData(calc);
 		this.pieChartLabels = this.piePlotLabels(calc);
-		this.lineChartData = this.linePlotData(calc);
-		this.lineChartLabels = this.linePlotLabels();
+		this.lineCharts = [ this.newLineChartData(calc.calculateTotalExpenses()) ];
+	}
+
+	private newLineChartData(expenses: CategoryExpenses) {
+		return new CategoryExpensesLineChartData(this.date, this.switcher, expenses);
+	}
+}
+
+class CategoryExpensesLineChartData {
+
+	category: string
+	data: ChartDataSets[]
+	labels: string[]
+
+	constructor(private date: Date, private switcher: BudgetPeriodSwitcher, private expenses: CategoryExpenses) {
+		this.category = expenses.category.name;
+		this.data = this.getData();
+		this.labels = this.getLabels();
+	}
+
+	private getData(): ChartDataSets[] {
+		let days = this.numDays();
+		let res = [];
+		for (let i = 1; i <= days; i++) {
+			res.push((this.expenses.budget.amount * i) / days);
+		}
+		return [
+			{ data: res , label: 'Budget', lineTension: 0},
+			{ data: this.getExpenseData(), label: 'Expenses', lineTension: 0}
+		];
+	}
+
+	private getLabels(): string[] {
+		let days = this.numDays();
+		return range(1, days + 1).map((val) => "" + val);
+	}
+
+	private getExpenseData(): number[] {
+		let days = this.numDays();
+		let res = newFilledArray(days, 0);
+		for (let expense of this.expenses.expenses) {
+			let date = new Date(expense.date.timestamp);
+			let offset = this.switcher.switch(new DaysSinceStart(), date);
+			for (let i = offset; i <= days; i++) {
+				res[i] = res[i] + expense.amount.amount;
+			} 
+		}
+		return res;
+	}
+
+	private numDays() {
+		return this.switcher.switch(new NumberOfDays(), this.date);
 	}
 }

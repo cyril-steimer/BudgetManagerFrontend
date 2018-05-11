@@ -32,8 +32,11 @@
 	</ngb-tab>
 	<ngb-tab title="Burndown">
 		<ng-template ngbTabContent>
-			<canvas baseChart [datasets]="lineChartData" [labels]="lineChartLabels" [chartType]="'line'">
-			</canvas>
+			<div *ngFor="let chart of lineCharts" class="mt-2">
+					<h5>{{chart.category}}</h5>
+				<canvas baseChart [datasets]="chart.data" [labels]="chart.labels" [chartType]="'line'">
+				</canvas>
+			</div>
 		</ng-template>
 	</ngb-tab>
 </ngb-tabset>
