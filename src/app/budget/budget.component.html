@@ -14,7 +14,7 @@
 				</thead>
 				<tbody>
 					<tr *ngFor="let expense of expensesForTable" 
-					[ngClass]="{'red-text': expense.amount.amount > expense.budget.amount}"
+					[ngClass]="{'text-danger': expense.amount.amount > expense.budget.amount}"
 					(click)="showDetails(expense, content)">
 						<td>{{expense.category.name}}</td>
 						<td>{{expense.amount.amount | currency:'CHF'}}</td>

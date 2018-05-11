@@ -75,7 +75,10 @@ export class CategoryExpensesCalculator {
 
 	calculateAllExpenses(): CategoryExpenses[] {
 		let result = this.calculateBudgetedExpenses()
-		result.push(this.calculateNotBudgetedExpenses())
+		let notBudgeted = this.calculateNotBudgetedExpenses();
+		if (notBudgeted.amount.amount > 0) {
+			result.push(notBudgeted);
+		}
 		result.push(this.calculateTotalExpenses())
 		return result
 	}

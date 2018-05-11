@@ -50,7 +50,7 @@
 		<div class="chip-list">
 			<span *ngFor="let tag of expense.tags" class="chip">
 				{{tag.name}}
-				<i class="fas fa-times-circle" (click)="removeTag(tag.name)"></i>
+				<i class="fas fa-times-circle chip-close" (click)="removeTag(tag.name)"></i>
 			</span>
 		</div>
 		<input class="form-control" type="text" id="tag" name="tag" #tag

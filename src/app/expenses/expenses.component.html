@@ -3,7 +3,7 @@
 
 <span *ngIf="field" class="chip mb-2">
     {{field}} = {{value}}
-    <i class="fas fa-times-circle" routerLink="/expenses"></i>
+    <i class="fas fa-times-circle chip-close" routerLink="/expenses"></i>
 </span>
 
 <app-expenses-table [expenses]="expenses" [sorter]="sorter" class="mt-2">
