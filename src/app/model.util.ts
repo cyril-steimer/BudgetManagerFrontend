@@ -29,7 +29,8 @@ export class ModelUtil {
 			amount: { amount: 0 },
 			date: { timestamp: new Date().getTime() },
 			name: { name: "" },
-			method: { name: "" }
+			method: { name: "" },
+			tags: []
 		}
 	}
 

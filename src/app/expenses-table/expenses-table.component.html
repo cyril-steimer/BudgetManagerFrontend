@@ -6,6 +6,7 @@
 			<th>Category</th>
 			<th>Date</th>
 			<th>Payment Method</th>
+			<th>Tags</th>
 			<th></th>
 		</tr>
 	</thead>
@@ -16,6 +17,11 @@
 			<td>{{expense.category.name}}</td>
 			<td>{{expense.date.timestamp | date:'dd.MM.yyyy'}}</td>
 			<td>{{expense.method.name}}</td>
+			<td class="chip-list">
+				<a *ngFor="let tag of expense.tags" class="chip" 
+				href="#" (click)="searchByTag($event, tag.name)">
+					{{tag.name}}
+				</a></td>
 			<td>
 				<i class="fas fa-edit" (click)="edit(expense)"></i>
 			</td>
@@ -23,6 +29,7 @@
 		<tr>
 			<th>Total</th>
 			<th>{{total.amount.amount | currency:'CHF'}}</th>
+			<th></th>
 			<th></th>
 			<th></th>
 			<th></th>

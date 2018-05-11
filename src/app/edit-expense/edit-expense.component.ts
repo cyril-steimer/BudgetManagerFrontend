@@ -57,6 +57,14 @@ export class EditExpenseComponent implements OnInit {
 			.distinctUntilChanged()
 			.map(term => this.paymentMethods.filter(v => v.indexOf(term) > -1));
 
+			
+	tags: string[] = [];
+	tagTypeahead = (text$: Observable<string>) =>
+		text$
+			.debounceTime(200)
+			.distinctUntilChanged()
+			.map(term => this.tags.filter(v => v.indexOf(term) > -1));
+
 	constructor(
 		private expenseService: ExpenseService,
 		private budgetService: BudgetService,
@@ -78,20 +86,38 @@ export class EditExpenseComponent implements OnInit {
 			.subscribe(categories => this.categories = categories.values);
 		this.expenseService.getPaymentMethods()
 			.subscribe(methods => this.paymentMethods = methods.map(m => m.name));
+		this.expenseService.getTags()
+			.subscribe(tags => this.tags = tags.map(t => t.name));
 	}
 
 	back() {
-		this.location.back()
+		this.location.back();
 	}
 
-	submit() {
+	submit(event: any) {
 		this.doSubmit()
-			.subscribe(() => this.back())
+			.subscribe(() => this.back());
 	}
 
 	delete() {
 		this.expenseService.deleteExpense(this.expense)
 			.subscribe(() => this.back());
+	}
+
+	removeTag(tag: string) {
+		this.expense.tags = this.expense.tags.filter(t => t.name != tag);
+	}
+
+	addTag(event: KeyboardEvent, tag: string) {
+		//Ensures that if the auto-complete window is open, enter
+		//is not wrongly interpreted to add a tag.
+		if ((<Element>event.currentTarget).className.indexOf("open") > -1) {
+			return;
+		}
+		if (tag.length > 0 
+			&& this.expense.tags.findIndex(t => t.name == tag) == -1) {
+			this.expense.tags.push({"name": tag});
+		}
 	}
 
 	private doSubmit(): Observable<any> {

@@ -12,7 +12,7 @@ import { ModelUtil } from '../model.util';
 export class ExpensesTableComponent implements AfterContentChecked {
 
 	@Input() expenses: Expense[] = []
-	@Input() beforeEdit: BeforeEdit
+	@Input() beforeLeave: BeforeLeave
 	@Input() sorter: ExpenseSorter
 
 	total = ModelUtil.emptyExpense();
@@ -38,15 +38,25 @@ export class ExpensesTableComponent implements AfterContentChecked {
 	}
 
 	edit(expense: Expense) {
-		if (this.beforeEdit) {
-			this.beforeEdit.beforeEdit(expense)
-		}
+		this.prepareToLeave();
 		this.router.navigate(["edit", "expense", expense.id])
+	}
+
+	searchByTag(event: MouseEvent, tag: string) {
+		event.preventDefault(); // Don't follow the href. Href necessary for style.
+		this.prepareToLeave();
+		this.router.navigate(["expenses", "tag", tag])
+	}
+
+	prepareToLeave() {
+		if (this.beforeLeave) {
+			this.beforeLeave.beforeLeave();
+		}
 	}
 }
 
-export interface BeforeEdit {
-	beforeEdit(expense: Expense)
+export interface BeforeLeave {
+	beforeLeave();
 }
 
 export class SortDirection {

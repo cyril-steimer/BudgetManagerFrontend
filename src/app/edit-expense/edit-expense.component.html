@@ -2,7 +2,8 @@
 </app-date-header>
 
 <h3>{{newExpense ? 'Add Expense' : 'Edit Expense'}}</h3>
-<form *ngIf="expense" #expenseForm="ngForm" (ngSubmit)="submit()">
+<form *ngIf="expense" #expenseForm="ngForm" (ngSubmit)="submit($event)" 
+(keydown.enter)="$event.preventDefault()">
 	<div class="form-group">
 		<label for="name">Name</label>
 		<input class="form-control" type="text" id="name" name="name" 
@@ -44,7 +45,19 @@
 		[(ngModel)]="expense.method.name"
 		[ngbTypeahead]="methodTypeahead">
 	</div>
-	<button class="btn btn-secondary" (click)="back()">
+	<div class="form-group">
+		<label for="tag">Tags</label>
+		<div class="chip-list">
+			<span *ngFor="let tag of expense.tags" class="chip">
+				{{tag.name}}
+				<i class="fas fa-times-circle" (click)="removeTag(tag.name)"></i>
+			</span>
+		</div>
+		<input class="form-control" type="text" id="tag" name="tag" #tag
+		(keydown.enter)="addTag($event, tag.value); tag.value=''"
+		[ngbTypeahead]="tagTypeahead">
+	</div>
+	<button class="btn btn-secondary" (click)="back()" type="button">
 		<i class="far fa-arrow-alt-circle-left"></i>
 		Back
 	</button>
@@ -52,7 +65,7 @@
 		Submit
 		<i class="far fa-arrow-alt-circle-right"></i>
 	</button>
-	<button *ngIf="!newExpense" class="btn btn-danger" (click)="delete()">
+	<button *ngIf="!newExpense" class="btn btn-danger" (click)="delete()" type="button">
 		Delete
 		<i class="fas fa-trash-alt"></i>
 	</button>
