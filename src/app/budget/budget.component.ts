@@ -103,13 +103,19 @@ export class BudgetComponent implements OnInit, BeforeLeave {
 		this.expensesForTable.push(calc.calculateTotalExpenses());
 		this.pieChartData = this.piePlotData(calc);
 		this.pieChartLabels = this.piePlotLabels(calc);
-		this.lineCharts = [ this.newLineChartData(calc.calculateTotalExpenses()) ];
-	}
+		this.lineCharts = this.expensesForTable
+			.map(e => this.newLineChartData(e));
+		}
 
 	private newLineChartData(expenses: CategoryExpenses) {
 		return new CategoryExpensesLineChartData(this.date, this.switcher, expenses);
 	}
 }
+
+const LINE_CONFIG: ChartDataSets = {
+	lineTension: 0, // No bezier curves, straight lines
+	pointRadius: 0 // Don't show points, just lines
+};
 
 class CategoryExpensesLineChartData {
 
@@ -130,8 +136,8 @@ class CategoryExpensesLineChartData {
 			res.push((this.expenses.budget.amount * i) / days);
 		}
 		return [
-			{ data: res , label: 'Budget', lineTension: 0},
-			{ data: this.getExpenseData(), label: 'Expenses', lineTension: 0}
+			Object.assign({ data: res , label: 'Budget'}, LINE_CONFIG),
+			Object.assign({ data: this.getExpenseData(), label: 'Expenses'}, LINE_CONFIG)
 		];
 	}
 

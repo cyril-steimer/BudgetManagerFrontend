@@ -32,11 +32,15 @@
 	</ngb-tab>
 	<ngb-tab title="Burndown">
 		<ng-template ngbTabContent>
-			<div *ngFor="let chart of lineCharts" class="mt-2">
-					<h5>{{chart.category}}</h5>
-				<canvas baseChart [datasets]="chart.data" [labels]="chart.labels" [chartType]="'line'">
-				</canvas>
-			</div>
+			<div class="mt-2"></div>
+			<ngb-accordion>
+				<ngb-panel *ngFor="let chart of lineCharts" title="{{chart.category}}">
+					<ng-template ngbPanelContent>
+						<canvas baseChart [datasets]="chart.data" [labels]="chart.labels" [chartType]="'line'">
+						</canvas>
+					</ng-template>
+				</ngb-panel>
+			</ngb-accordion>
 		</ng-template>
 	</ngb-tab>
 </ngb-tabset>
