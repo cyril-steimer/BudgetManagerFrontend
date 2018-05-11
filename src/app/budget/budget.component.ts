@@ -129,6 +129,20 @@ const LINE_CONFIG: ChartDataSets = {
 	fill: false // Don't fill the area under the line
 };
 
+class BurndownLabels implements BudgetPeriodSwitch<Date, string[]> {
+
+	caseMonthly(arg: Date): string[] {
+		let days = new DaysInPeriod().caseMonthly(arg);
+		return range(1, days + 1).map(v => "" + v);
+	}
+
+	caseYearly(arg: Date): string[] {
+		let days = new DaysInPeriod().caseYearly(arg);
+		return range(1, days + 1).map(d => new Date(arg.getFullYear(), 0, d))
+			.map(d => d.getMonthName() + " " + d.getDate());
+	}
+}
+
 class CategoryExpensesLineChartData {
 
 	category: string
@@ -153,8 +167,7 @@ class CategoryExpensesLineChartData {
 	}
 
 	private getLabels(): string[] {
-		let days = this.numDays();
-		return range(1, days + 1).map((val) => "" + val);
+		return this.switcher.switch(new BurndownLabels(), this.date);
 	}
 
 	private getBudgetData(): number[] {
