@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { BudgetPeriodSwitch, BudgetPeriod, BudgetPeriodSwitcher, DateExtractor } from '../budget.period';
+import { BudgetPeriodSwitch, BudgetPeriod, BudgetPeriodSwitcher, DateExtractor, NextPeriod, PreviousPeriod } from '../budget.period';
 import { dashCaseToCamelCase } from '@angular/compiler/src/util';
 
 export interface ExpenseSearch {
@@ -51,10 +51,10 @@ export class DateHeaderComponent implements OnInit {
 	private update(date: Date) {
 		this.dateLink = DateLink.create(this.switcher, date)
 
-		let nextDate = this.switcher.switch(new NextDate(), date)
+		let nextDate = this.switcher.switch(new NextPeriod(), date)
 		this.nextDateLink = DateLink.create(this.switcher, nextDate)
 
-		let prevDate = this.switcher.switch(new PreviousDate(), date)
+		let prevDate = this.switcher.switch(new PreviousPeriod(), date)
 		this.prevDateLink = DateLink.create(this.switcher, prevDate)
 
 		this.parent = this.switcher.switch(new ParentLink(), date)
@@ -116,27 +116,5 @@ class DateLinkFactory implements BudgetPeriodSwitch<Date, DateLink> {
 			label: `${arg.getFullYear()}`,
 			urlSuffix: `year/${arg.getFullYear()}`
 		}
-	}
-}
-
-class NextDate implements BudgetPeriodSwitch<Date, Date> {
-
-	caseMonthly(arg: Date): Date {
-		return new Date(arg.getFullYear(), arg.getMonth() + 1)
-	}
-
-	caseYearly(arg: Date): Date {
-		return new Date(arg.getFullYear() + 1, 0)
-	}
-}
-
-class PreviousDate implements BudgetPeriodSwitch<Date, Date> {
-
-	caseMonthly(arg: Date): Date {
-		return new Date(arg.getFullYear(), arg.getMonth() - 1)
-	}
-
-	caseYearly(arg: Date): Date {
-		return new Date(arg.getFullYear() - 1, 0)
 	}
 }

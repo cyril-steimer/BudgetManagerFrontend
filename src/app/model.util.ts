@@ -73,35 +73,13 @@ export class CategoryExpensesCalculator {
 		return res
 	}
 
-	calculateAllExpenses(): CategoryExpenses[] {
+	calculateExpenses(): CategoryExpenses[] {
 		let result = this.calculateBudgetedExpenses()
 		let notBudgeted = this.calculateNotBudgetedExpenses();
 		if (notBudgeted.amount.amount > 0) {
 			result.push(notBudgeted);
 		}
-		result.push(this.calculateTotalExpenses())
 		return result
-	}
-
-	calculateBudgetedExpenses(): CategoryExpenses[] {
-		let res = this.budgets
-			.map(b => this.calculateCategoryExpensesForBudget(b))
-		if (this.sorter) {
-			return res.sort(this.sorter)
-		}
-		return res
-	}
-
-	calculateNotBudgetedExpenses(): CategoryExpenses {
-		let other = this.expenses
-			.filter(e => this.budgets.filter(b => b.category.name === e.category.name).length == 0)
-		let sum = ModelUtil.sumExpenses(other)
-		return { 
-			category: { name: "Not Budgeted" }, 
-			amount: sum, 
-			budget: { amount: 0 }, 
-			expenses: other 
-		}
 	}
 
 	calculateTotalExpenses(): CategoryExpenses {
@@ -121,6 +99,27 @@ export class CategoryExpensesCalculator {
 			amount: sum, 
 			budget: budget.amount,
 			expenses: relevant
+		}
+	}
+
+	private calculateBudgetedExpenses(): CategoryExpenses[] {
+		let res = this.budgets
+			.map(b => this.calculateCategoryExpensesForBudget(b))
+		if (this.sorter) {
+			return res.sort(this.sorter)
+		}
+		return res
+	}
+
+	private calculateNotBudgetedExpenses(): CategoryExpenses {
+		let other = this.expenses
+			.filter(e => this.budgets.filter(b => b.category.name === e.category.name).length == 0)
+		let sum = ModelUtil.sumExpenses(other)
+		return { 
+			category: { name: "Not Budgeted" }, 
+			amount: sum, 
+			budget: { amount: 0 }, 
+			expenses: other 
 		}
 	}
 }
