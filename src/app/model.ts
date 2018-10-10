@@ -1,7 +1,7 @@
 import { BudgetPeriod } from "./budget.period";
 
 export class Expense {
-  id: number
+  id: string
   name: Name
   amount: Amount
   category: Category

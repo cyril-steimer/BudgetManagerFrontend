@@ -24,7 +24,7 @@ export class ModelUtil {
 
 	static emptyExpense(): Expense {
 		return {
-			id: 0,
+			id: "",
 			category: { name: "" },
 			amount: { amount: 0 },
 			date: { timestamp: new Date().getTime() },

@@ -38,7 +38,7 @@ export class ExpenseService {
 	}
 
 	deleteExpense(expense: Expense): Observable<any> {
-		let params = {"id": "" + expense.id};
+		let params = {"id": expense.id};
 		return this.http.delete(this.expenseUrl, { params: params });
 	}
 
