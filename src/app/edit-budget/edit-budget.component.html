@@ -9,18 +9,22 @@
 	<div [hidden]="category.valid || category.pristine" class="alert alert-danger">
 		Category is required
 	</div>
-	<div class="form-group">
-		<label for="name">Amount</label>
-		<input class="form-control" type="number" id="amount" name="amount"
-		required min="0.01" [(ngModel)]="budget.amount.amount">
+	<div *ngFor="let amount of budget.amounts; let i = index">
+
+		<div class="form-group">
+			<label for="amount{{i}}">Amount</label>
+			<input class="form-control" type="number" id="amount{{i}}" name="amount{{i}}"
+			required min="0.01" [(ngModel)]="amount.amount.amount">
+		</div>
+		<div class="form-group">
+			<label for="period">Period</label>
+			<select class="form-control" id="period{{i}}" name="period{{i}}"
+			required [(ngModel)]="amount.period">
+				<option *ngFor="let period of periods" value ="{{period}}">{{period}}</option>
+			</select>
+		</div>
 	</div>
-	<div class="form-group">
-		<label for="period">Period</label>
-		<select class="form-control" id="category" name="period"
-		required [(ngModel)]="budget.period">
-			<option *ngFor="let period of periods" value="{{period}}">{{period}}</option>
-		</select>
-	</div>
+
 	<button class="btn btn-secondary" (click)="back()">
 		<i class="far fa-arrow-alt-circle-left"></i>
 		Back

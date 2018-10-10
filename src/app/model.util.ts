@@ -35,9 +35,17 @@ export class ModelUtil {
 	}
 
 	static emptyBudget(): Budget {
+		let now = new Date()
 		return {
 			category: { name: null },
-			amounts: []
+			amounts: [
+				{
+					amount: { amount: 0 },
+					period: BudgetPeriod.MONTHLY,
+					from: { year: now.getFullYear(), month: 1 },
+					to: { year: now.getFullYear(), month: 12 }
+				}
+			]
 		}
 	}
 

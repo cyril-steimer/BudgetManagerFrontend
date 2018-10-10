@@ -24,6 +24,7 @@ export class EditBudgetComponent implements OnInit {
 	}
 
 	back() {
+		// TODO This currently adds an invalid budget! Why?
 		this.location.back();
 	}
 
