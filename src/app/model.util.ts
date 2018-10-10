@@ -1,5 +1,5 @@
-import { Expense, Category, Amount, Budget, CategoryExpenses } from "./model";
-import { BudgetPeriod, BudgetPeriodSwitcher, BudgetConverter } from "./budget.period";
+import { Expense, Category, Amount, Budget, CategoryExpenses, BudgetInPeriod } from "./model";
+import { BudgetPeriod } from "./budget.period";
 
 export class ModelUtil {
 
@@ -10,7 +10,7 @@ export class ModelUtil {
 		return { amount: sum }
 	}
 
-	static sumBudgets(budgets: Budget[]): Amount {
+	static sumBudgets(budgets: BudgetInPeriod[]): Amount {
 		let sum = budgets
 			.map(b => b.amount.amount)
 			.reduce((b1, b2) => b1 + b2, 0)
@@ -37,8 +37,7 @@ export class ModelUtil {
 	static emptyBudget(): Budget {
 		return {
 			category: { name: null },
-			amount: { amount: null },
-			period: null
+			amounts: []
 		}
 	}
 
@@ -53,12 +52,8 @@ export class CategoryExpensesCalculator {
 
 	constructor(
 		private expenses: Expense[], 
-		private budgets: Budget[],
-		private period: BudgetPeriod) {
-
-			let converter = new BudgetConverter()
-			this.budgets = this.budgets.map(b => converter.convert(b, this.period))
-	}
+		private budgets: BudgetInPeriod[],
+		private period: BudgetPeriod) { }
 
 	
 	sortByBudget(): CategoryExpensesCalculator {
@@ -91,7 +86,7 @@ export class CategoryExpensesCalculator {
 		}
 	}
 
-	private calculateCategoryExpensesForBudget(budget: Budget): CategoryExpenses {
+	private calculateCategoryExpensesForBudget(budget: BudgetInPeriod): CategoryExpenses {
 		let relevant = ModelUtil.getExpensesWithCategory(this.expenses, budget.category)
 		let sum = ModelUtil.sumExpenses(relevant)
 		return { 

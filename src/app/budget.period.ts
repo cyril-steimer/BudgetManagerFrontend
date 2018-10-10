@@ -1,4 +1,4 @@
-import { Budget } from "./model";
+import { Budget, BudgetInPeriod, MonthYearPeriod } from "./model";
 
 export enum BudgetPeriod {
 	MONTHLY = "monthly",
@@ -29,6 +29,38 @@ export class BudgetPeriodSwitcher {
 	}
 }
 
+export class MonthYearPeriodCalculator implements BudgetPeriodSwitch<Date, MonthYearPeriod> {
+
+	caseMonthly(arg: Date): MonthYearPeriod {
+		let month = arg.getMonth() + 1
+		let year = arg.getFullYear()
+		return {
+			from: {
+				month: month,
+				year: year
+			},
+			to: {
+				month: month,
+				year: year
+			}
+		}
+	}	
+	
+	caseYearly(arg: Date): MonthYearPeriod {
+		let year = arg.getFullYear()
+		return {
+			from: {
+				month: 1,
+				year: year
+			},
+			to: {
+				month: 12,
+				year: year
+			}
+		}
+	}
+}
+
 export class DateExtractor implements BudgetPeriodSwitch<{[key: string]: string}, Date> {
 	
 	static getBudgetPeriod(params: { [key: string]: string; }) {
@@ -46,42 +78,6 @@ export class DateExtractor implements BudgetPeriodSwitch<{[key: string]: string}
 
 	caseYearly(params: { [key: string]: string; }): Date {
 		return new Date(+params.year, 0);
-	}
-}
-
-class BudgetToYearly implements BudgetPeriodSwitch<Budget, Budget> {
-
-	caseMonthly(arg: Budget): Budget {
-		arg.amount.amount = arg.amount.amount * 12
-		return arg
-	}
-
-	caseYearly(arg: Budget): Budget {
-		return arg
-	}
-}
-
-class YearlyToPeriod implements BudgetPeriodSwitch<Budget, Budget> {
-
-	caseMonthly(arg: Budget): Budget {
-		arg.amount.amount = arg.amount.amount / 12
-		arg.period = BudgetPeriod.MONTHLY
-		return arg
-	}
-
-	caseYearly(arg: Budget): Budget {
-		arg.period = BudgetPeriod.YEARLY
-		return arg
-	}
-}
-
-export class BudgetConverter {
-
-	convert(budget: Budget, period: BudgetPeriod): Budget {
-		let yearly = new BudgetPeriodSwitcher(budget.period)
-			.switch(new BudgetToYearly(), budget)
-		return new BudgetPeriodSwitcher(period)
-			.switch(new YearlyToPeriod(), yearly)
 	}
 }
 
