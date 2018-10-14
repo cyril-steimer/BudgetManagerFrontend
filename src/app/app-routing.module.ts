@@ -17,7 +17,8 @@ const routes: Routes = [
   { path: 'expenses/field/:field/:value', component: ExpensesComponent },
   { path: 'budget/year/:year', component: BudgetComponent },
   { path: 'budget/year/:year/month/:month', component: BudgetComponent },
-  { path: 'edit/expense/:id', component: EditExpenseComponent }
+  { path: 'edit/expense/:id', component: EditExpenseComponent },
+  { path: 'edit/budget/:id', component: EditBudgetComponent }
 ]
 
 @NgModule({

@@ -2,7 +2,7 @@
 </app-date-header>
 
 <h3>{{newExpense ? 'Add Expense' : 'Edit Expense'}}</h3>
-<form *ngIf="expense" #expenseForm="ngForm" (ngSubmit)="submit($event)" 
+<form *ngIf="expense" #expenseForm="ngForm" (ngSubmit)="submit()" 
 (keydown.enter)="$event.preventDefault()">
 	<div class="form-group">
 		<label for="name">Name</label>

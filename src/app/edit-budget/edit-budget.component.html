@@ -1,4 +1,4 @@
-<h3>Edit Budget</h3>
+<h3>{{newBudget ? 'Add Budget' : 'Edit Budget'}}</h3>
 <form *ngIf="budget" #budgetForm="ngForm" (ngSubmit)="submit()"
 (keydown.enter)="$event.preventDefault()">
 	<div class="form-group">
@@ -9,18 +9,40 @@
 	<div [hidden]="category.valid || category.pristine" class="alert alert-danger">
 		Category is required
 	</div>
-	<div *ngFor="let amount of budget.amounts; let i = index">
+	<div class="form-group row" *ngFor="let amount of budget.amounts; let i = index">
 
-		<div class="form-group">
+		<div class="col-sm 10">
 			<label for="amount{{i}}">Amount</label>
 			<input class="form-control" type="number" id="amount{{i}}" name="amount{{i}}"
 			required min="0.01" [(ngModel)]="amount.amount.amount">
 		</div>
-		<div class="form-group">
-			<label for="period">Period</label>
+		<div class="col-sm 10">
+			<label for="period{{i}}">Period</label>
 			<select class="form-control" id="period{{i}}" name="period{{i}}"
 			required [(ngModel)]="amount.period">
 				<option *ngFor="let period of periods" value ="{{period}}">{{period}}</option>
+			</select>
+		</div>
+		<div class="col-sm 10">
+			<label>From</label>
+			<select class="form-control" id="from_month{{i}}" name="from_month{{i}}" 
+			required [(ngModel)]="amount.from.month">
+				<option *ngFor="let month of months; let m = index" value="{{m + 1}}">{{month}}</option>
+			</select>
+			<select class="form-control" id="from_year{{i}}" name="from_year{{i}}"
+			required [(ngModel)]="amount.from.year">
+				<option *ngFor="let year of years(amount)" value="{{year}}">{{year}}</option>
+			</select>
+		</div>
+		<div class="col-sm 10">
+			<label>To</label>
+			<select class="form-control" id="to_month{{i}}" name="to_month{{i}}" 
+			required [(ngModel)]="amount.to.month">
+				<option *ngFor="let month of months; let m = index" value="{{m + 1}}">{{month}}</option>
+			</select>
+			<select class="form-control" id="to_year{{i}}" name="to_year{{i}}"
+			required [(ngModel)]="amount.to.year">
+				<option *ngFor="let year of years(amount)" value="{{year}}">{{year}}</option>
 			</select>
 		</div>
 	</div>

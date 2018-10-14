@@ -69,8 +69,7 @@ export class EditExpenseComponent implements OnInit {
 		private expenseService: ExpenseService,
 		private budgetService: BudgetService,
 		private route: ActivatedRoute,
-		private location: Location,
-		private ref: ChangeDetectorRef) { }
+		private location: Location) { }
 
 	ngOnInit() {
 		let id = this.route.snapshot.paramMap.get("id")
@@ -94,7 +93,7 @@ export class EditExpenseComponent implements OnInit {
 		this.location.back();
 	}
 
-	submit(event: any) {
+	submit() {
 		this.doSubmit()
 			.subscribe(() => this.back());
 	}
