@@ -62,6 +62,14 @@ export class EditBudgetComponent implements OnInit {
 		this.doSubmit().subscribe(() => this.back());
 	}
 
+	removeBudget(index: number) {
+		this.budget.amounts.splice(index, 1);
+	}
+
+	addBudget() {
+		this.budget.amounts.push(ModelUtil.emptyBudgetAmount());
+	}
+
 	private doSubmit(): Observable<any> {
 		if (this.newBudget) {
 			return this.budgetService.addBudget(this.budget);

@@ -1,4 +1,4 @@
-import { Expense, Category, Amount, Budget, CategoryExpenses, BudgetInPeriod } from "./model";
+import { Expense, Category, Amount, Budget, CategoryExpenses, BudgetInPeriod, BudgetAmount } from "./model";
 import { BudgetPeriod } from "./budget.period";
 
 export class ModelUtil {
@@ -35,18 +35,20 @@ export class ModelUtil {
 	}
 
 	static emptyBudget(): Budget {
-		let now = new Date()
 		return {
 			category: { name: null },
-			amounts: [
-				{
-					amount: { amount: 0 },
-					period: BudgetPeriod.MONTHLY,
-					from: { year: now.getFullYear(), month: 1 },
-					to: { year: now.getFullYear(), month: 12 }
-				}
-			]
-		}
+			amounts: [ ModelUtil.emptyBudgetAmount() ]
+		};
+	}
+
+	static emptyBudgetAmount(): BudgetAmount {
+		let now = new Date()
+		return {
+			amount: { amount: 0 },
+			period: BudgetPeriod.MONTHLY,
+			from: { year: now.getFullYear(), month: 1 },
+			to: { year: now.getFullYear(), month: 12 }
+		};
 	}
 
 	static sum(a1: Amount, a2: Amount): Amount {

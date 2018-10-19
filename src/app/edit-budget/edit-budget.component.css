@@ -1,0 +1,17 @@
+.month,
+.year {
+    display: inline-block;
+}
+
+.month {
+    width: 55%;
+}
+
+.year {
+    width: 40%;
+}
+
+.fa-trash-alt {
+    cursor: pointer;
+    margin-top: 0.7em;
+}
