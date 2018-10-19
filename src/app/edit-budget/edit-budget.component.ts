@@ -5,6 +5,7 @@ import { ModelUtil } from '../model.util';
 import { Location } from '@angular/common';
 import { BudgetPeriod } from '../budget.period';
 import { ActivatedRoute } from '@angular/router';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
 	selector: 'app-edit-budget',
@@ -54,13 +55,18 @@ export class EditBudgetComponent implements OnInit {
 	}
 
 	back() {
-		// TODO This currently adds an invalid budget! Why?
 		this.location.back();
 	}
 
 	submit() {
-		this.budgetService.addBudget(this.budget)
-			.subscribe(a => this.back());
+		this.doSubmit().subscribe(() => this.back());
+	}
+
+	private doSubmit(): Observable<any> {
+		if (this.newBudget) {
+			return this.budgetService.addBudget(this.budget);
+		}
+		return this.budgetService.updateBudget(this.budget);
 	}
 
 	private findBudgetWithId(budgets: Budget[], id: string) {

@@ -94,8 +94,7 @@ export class EditExpenseComponent implements OnInit {
 	}
 
 	submit() {
-		this.doSubmit()
-			.subscribe(() => this.back());
+		this.doSubmit().subscribe(() => this.back());
 	}
 
 	delete() {
