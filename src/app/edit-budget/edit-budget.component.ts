@@ -38,9 +38,8 @@ export class EditBudgetComponent implements OnInit {
 			this.budget = ModelUtil.emptyBudget();
 		} else {
 			this.newBudget = false;
-			// TODO Add new method in DAO.
-			this.budgetService.getBudgets()
-				.subscribe(budgets => this.budget = this.findBudgetWithId(budgets.values, id));
+			this.budgetService.getBudgetByCategory(id)
+				.subscribe(budget => this.budget = budget);
 		}
 	}
 
@@ -60,6 +59,11 @@ export class EditBudgetComponent implements OnInit {
 
 	submit() {
 		this.doSubmit().subscribe(() => this.back());
+	}
+
+	delete() {
+		this.budgetService.deleteBudget(this.budget)
+			.subscribe(() => this.back());
 	}
 
 	removeBudget(index: number) {

@@ -67,7 +67,7 @@
 					</td>
 					<td>
 						<i *ngIf="budget.amounts.length > 1"
-						class="fas fa-trash-alt" (click)="removeBudget(i)"></i>
+						class="fas fa-trash-alt delete-amount" (click)="removeBudget(i)"></i>
 					</td>
 				</tr>
 			</tbody>
@@ -81,5 +81,9 @@
 	<button class="btn btn-primary" type="submit" [disabled]="!budgetForm.form.valid">
 		Submit
 		<i class="far fa-arrow-alt-circle-right"></i>
+	</button>
+	<button *ngIf="!newBudget" class="btn btn-danger" (click)="delete()" type="button">
+		Delete
+		<i class="fas fa-trash-alt"></i>
 	</button>
 </form>
