@@ -29,7 +29,7 @@ export class ExpenseService {
 		return this.http.post<SubList<Expense>>(url, searchBody, options);
 	}
 
-	getExpenseById(id: number | string): Observable<Expense> {
+	getExpenseById(id: string): Observable<Expense> {
 		let url = `${this.expenseUrl}/field/id/${id}`;
 		let options = {
 			params: { "single": "true" }
@@ -38,7 +38,7 @@ export class ExpenseService {
 	}
 
 	deleteExpense(expense: Expense): Observable<any> {
-		let params = {"id": expense.id};
+		let params = { "id": expense.id };
 		return this.http.delete(this.expenseUrl, { params: params });
 	}
 

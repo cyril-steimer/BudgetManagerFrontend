@@ -10,6 +10,7 @@
 						<th>Category</th>
 						<th>Spent</th>
 						<th>Budget</th>
+						<th></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -19,6 +20,11 @@
 						<td>{{expense.category.name}}</td>
 						<td>{{expense.amount.amount | currency:'CHF'}}</td>
 						<td>{{expense.budget.amount | currency:'CHF'}}</td>
+						<td>
+							<i class="fas fa-edit" routerLink="/edit/budget/{{expense.category.name}}"
+							[hidden]="expense.category.name == 'Total' || expense.category.name == 'Not Budgeted'">
+							</i>
+						</td>
 					</tr>
 				</tbody>
 			</table>

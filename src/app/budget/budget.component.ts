@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Expense, Budget, CategoryExpenses, Category } from '../model';
+import { Expense, Budget, CategoryExpenses, Category, BudgetInPeriod } from '../model';
 import { ExpenseService } from '../expense.service';
 import { BudgetService } from '../budget.service';
 import { PeriodQuery } from '../query.util';
 import { ModelUtil, CategoryExpensesCalculator } from '../model.util';
 import { BeforeLeave } from '../expenses-table/expenses-table.component';
-import { BudgetPeriod, BudgetPeriodSwitch, BudgetPeriodSwitcher, DateExtractor, DaysInPeriod, DaysSinceStart, EndOfPeriod, isInPeriod } from '../budget.period';
+import { BudgetPeriod, BudgetPeriodSwitch, BudgetPeriodSwitcher, DateExtractor, DaysInPeriod, DaysSinceStart, EndOfPeriod, isInPeriod, MonthYearPeriodCalculator } from '../budget.period';
 import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap/modal/modal-ref';
 import { ChartDataSets, ChartOptions, ChartTooltipItem, ChartData } from 'chart.js';
@@ -96,18 +96,19 @@ export class BudgetComponent implements OnInit, BeforeLeave {
 	}
 
 	private getBudgets() {
-		this.budgetService.getBudgets()
+		let period = this.switcher.switch(new MonthYearPeriodCalculator(), this.date)
+		this.budgetService.getBudgetsInPeriod(period)
 			.subscribe(budgets => this.getExpenses(budgets.values))
 	}
 
-	private getExpenses(budgets: Budget[]) {
+	private getExpenses(budgets: BudgetInPeriod[]) {
 		let query = this.switcher.switch(new PeriodQuery(), this.date)
 		let sort = { field: "date", direction: "desc" }
 		this.expenseService.getExpenses(null, query, sort, null)
 			.subscribe(expenses => this.init(expenses.values, budgets))
 	}
 
-	private init(expenses: Expense[], budgets: Budget[]) {
+	private init(expenses: Expense[], budgets: BudgetInPeriod[]) {
 		let calc = new CategoryExpensesCalculator(expenses, budgets, this.switcher.getPeriod());
 		this.expensesForTable = calc.sortByBudget().calculateExpenses();
 		this.expensesForTable.push(calc.calculateTotalExpenses());

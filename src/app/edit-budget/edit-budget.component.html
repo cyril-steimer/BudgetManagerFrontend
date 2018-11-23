@@ -1,4 +1,4 @@
-<h3>Edit Budget</h3>
+<h3>{{newBudget ? 'Add Budget' : 'Edit Budget'}}</h3>
 <form *ngIf="budget" #budgetForm="ngForm" (ngSubmit)="submit()"
 (keydown.enter)="$event.preventDefault()">
 	<div class="form-group">
@@ -9,24 +9,81 @@
 	<div [hidden]="category.valid || category.pristine" class="alert alert-danger">
 		Category is required
 	</div>
+
 	<div class="form-group">
-		<label for="name">Amount</label>
-		<input class="form-control" type="number" id="amount" name="amount"
-		required min="0.01" [(ngModel)]="budget.amount.amount">
+		<div>
+			<label class="mr-2">Budgets</label>
+			<button class="btn btn-sm btn-outline-primary" 
+			type="button" (click)="addBudget()">
+					<i class="fas fa-plus-circle"></i>
+				Add Budget
+			</button>
+		</div>
+		<table class="table">
+			<thead>
+				<tr>
+					<th style="width: 22%">Amount</th>
+					<th style="width: 22%">Period</th>
+					<th style="width: 25%">From</th>
+					<th style="width: 25%">To</th>
+					<th style="width: 6%"></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr *ngFor="let amount of budget.amounts; let i = index">
+					<td>
+						<input class="form-control" type="number" name="amount{{i}}"
+						required min="1" [(ngModel)]="amount.amount.amount">
+					</td>
+					<td>
+						<select class="form-control" name="period{{i}}"
+						required [(ngModel)]="amount.period">
+							<option *ngFor="let period of periods" value="{{period}}">{{period}}</option>
+						</select>
+					</td>
+					<td>
+						<select class="form-control month" name="from_month{{i}}"
+						required [(ngModel)]="amount.from.month">
+							<option *ngFor="let month of months; let m = index" value="{{m + 1}}">
+								{{month}}
+							</option>
+						</select>
+						<select class="form-control year" name="from_year{{i}}"
+						required [(ngModel)]="amount.from.year">
+							<option *ngFor="let year of years(amount)" value="{{year}}">{{year}}</option>
+						</select>
+					</td>
+					<td>
+						<select class="form-control month" name="to_month{{i}}"
+						required [(ngModel)]="amount.to.month">
+							<option *ngFor="let month of months; let m = index" value="{{m + 1}}">
+								{{month}}
+							</option>
+						</select>
+						<select class="form-control year" name="to_year{{i}}"
+						required [(ngModel)]="amount.to.year">
+							<option *ngFor="let year of years(amount)" value="{{year}}">{{year}}</option>
+						</select>
+					</td>
+					<td>
+						<i *ngIf="budget.amounts.length > 1"
+						class="fas fa-trash-alt delete-amount" (click)="removeBudget(i)"></i>
+					</td>
+				</tr>
+			</tbody>
+		</table>
 	</div>
-	<div class="form-group">
-		<label for="period">Period</label>
-		<select class="form-control" id="category" name="period"
-		required [(ngModel)]="budget.period">
-			<option *ngFor="let period of periods" value="{{period}}">{{period}}</option>
-		</select>
-	</div>
-	<button class="btn btn-secondary" (click)="back()">
+
+	<button class="btn btn-secondary" (click)="back()" type="button">
 		<i class="far fa-arrow-alt-circle-left"></i>
 		Back
 	</button>
 	<button class="btn btn-primary" type="submit" [disabled]="!budgetForm.form.valid">
 		Submit
 		<i class="far fa-arrow-alt-circle-right"></i>
+	</button>
+	<button *ngIf="!newBudget" class="btn btn-danger" (click)="delete()" type="button">
+		Delete
+		<i class="fas fa-trash-alt"></i>
 	</button>
 </form>
