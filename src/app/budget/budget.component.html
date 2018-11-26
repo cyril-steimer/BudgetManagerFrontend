@@ -51,6 +51,12 @@
 			</ngb-accordion>
 		</ng-template>
 	</ngb-tab>
+	<ngb-tab title="Report">
+		<ng-template ngbTabContent>
+			<app-report [expenses]="expensesForTable">
+			</app-report>
+		</ng-template>
+	</ngb-tab>
 </ngb-tabset>
 
 <ng-template #content>
