@@ -41,8 +41,18 @@ export class ReportComponent implements OnInit {
 
 	private createStyles(): any {
 		return {
-			header: {
+			h1: {
 				fontSize: 18,
+				bold: true,
+				margin: [0, 0, 0, 10]
+			},
+			h2: {
+				fontSize: 16,
+				bold: true,
+				margin: [0, 0, 0, 5]
+			},
+			tableHeader: {
+				fontSize: 14,
 				bold: true
 			}
 		};
@@ -52,12 +62,45 @@ export class ReportComponent implements OnInit {
 		let result = [];
 		result.push({
 			text: 'Report',
-			style: 'header'
+			style: 'h1'
 		});
-		for (let expense of this.expenses) {
-			result.push(`${expense.category.name} = ${this.toString(expense.amount)} / ${this.toString(expense.budget)}`);
-		}
+		result.push({
+			text: 'Summary',
+			style: 'h2'
+		});
+		result.push({
+			table: this.createSummaryTable()
+		});
 		return result;
+	}
+
+	private createSummaryTable(): any {
+		let body = [[this.th('Category'), this.th('Spent'), this.th('Budget'), this.th('%')]];
+		for (let expense of this.expenses) {
+			body.push([
+				expense.category.name, 
+				this.toString(expense.amount), 
+				this.toString(expense.budget),
+				this.fraction(expense.amount, expense.budget)
+			]);
+
+		}
+		return {
+			widths: [100, 100, 100, 100],
+			headerRows: 1,
+			body: body
+		};
+	}
+
+	private th(content: string): any {
+		return {
+			text: content,
+			style: 'tableHeader'
+		};
+	}
+
+	private fraction(amt1: Amount, amt2: Amount) {
+		return ((amt1.amount / amt2.amount) * 100).toFixed(2);
 	}
 
 	private toString(amount: Amount) {
