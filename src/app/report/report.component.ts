@@ -1,9 +1,34 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { CategoryExpenses, Amount } from '../model';
+import { CategoryExpenses, Amount, Category } from '../model';
 import * as pdfmake from 'pdfmake/build/pdfmake';
 import * as pdffonts from 'pdfmake/build/vfs_fonts';
 
 pdfmake.vfs = pdffonts.pdfMake.vfs;
+
+const H1 = {
+	fontSize: 18,
+	bold: true,
+	margin: [0, 0, 0, 10]
+};
+
+const H2 = {
+	fontSize: 16,
+	bold: true,
+	margin: [0, 0, 0, 5]
+};
+
+const TH = {
+	fontSize: 14,
+	bold: true
+};
+
+const RED = {
+	color: 'red'
+};
+
+const NONE = {};
+
+type Style = {[key: string]: any};
 
 @Component({
 	selector: 'app-report',
@@ -11,6 +36,8 @@ pdfmake.vfs = pdffonts.pdfMake.vfs;
 	styleUrls: ['./report.component.css']
 })
 export class ReportComponent implements OnInit {
+
+	
 
 	@Input()
 	expenses: CategoryExpenses[]
@@ -27,7 +54,6 @@ export class ReportComponent implements OnInit {
 	private createDocumentDefinition(): any {
 		return {
 			content: this.createContent(),
-			styles: this.createStyles(),
 			defaultStyle: this.createDefaultStyle()
 		};
 	}
@@ -39,35 +65,10 @@ export class ReportComponent implements OnInit {
 		};
 	}
 
-	private createStyles(): any {
-		return {
-			h1: {
-				fontSize: 18,
-				bold: true,
-				margin: [0, 0, 0, 10]
-			},
-			h2: {
-				fontSize: 16,
-				bold: true,
-				margin: [0, 0, 0, 5]
-			},
-			tableHeader: {
-				fontSize: 14,
-				bold: true
-			}
-		};
-	}
-
 	private createContent(): any {
 		let result = [];
-		result.push({
-			text: 'Report',
-			style: 'h1'
-		});
-		result.push({
-			text: 'Summary',
-			style: 'h2'
-		});
+		result.push(this.applyStyle('Report', H1));
+		result.push(this.applyStyle('Summary', H2));
 		result.push({
 			table: this.createSummaryTable()
 		});
@@ -75,31 +76,42 @@ export class ReportComponent implements OnInit {
 	}
 
 	private createSummaryTable(): any {
-		let body = [[this.th('Category'), this.th('Spent'), this.th('Budget'), this.th('%')]];
+		let body = [this.applyStyleToAll(['Category', 'Spent', 'Budget', '%'], TH)];
 		for (let expense of this.expenses) {
-			body.push([
+			// TODO Is there a better way to get the 'total' row?
+			let style = expense.category.name == 'Total' ? TH : NONE;
+			style = this.mergeStyles(style, expense.amount.amount > expense.budget.amount ? RED : NONE);
+			body.push(this.applyStyleToAll([
 				expense.category.name, 
 				this.toString(expense.amount), 
 				this.toString(expense.budget),
-				this.fraction(expense.amount, expense.budget)
-			]);
-
+				this.fraction(expense.amount, expense.budget)], style));
 		}
 		return {
-			widths: [100, 100, 100, 100],
-			headerRows: 1,
+			widths: ['*', '*', '*', '*'],
 			body: body
 		};
 	}
 
-	private th(content: string): any {
-		return {
-			text: content,
-			style: 'tableHeader'
-		};
+	private applyStyleToAll(contents: string[], style: Style) {
+		return contents.map((val) => this.applyStyle(val, style));
+	}
+
+	private applyStyle(content: string, style: Style) {
+		let res = Object.assign({}, style);
+		res.text = content;
+		return res;
+	}
+
+	private mergeStyles(s1: Style, s2: Style): Style {
+		let res = Object.assign({}, s1);
+		return Object.assign(res, s2);
 	}
 
 	private fraction(amt1: Amount, amt2: Amount) {
+		if (amt2.amount == 0) {
+			return '-';
+		}
 		return ((amt1.amount / amt2.amount) * 100).toFixed(2);
 	}
 
