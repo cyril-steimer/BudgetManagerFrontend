@@ -1,20 +1,27 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { CategoryExpenses, Amount, Category } from '../model';
+import { CategoryExpenses, Amount, Category, Timestamp } from '../model';
 import * as pdfmake from 'pdfmake/build/pdfmake';
 import * as pdffonts from 'pdfmake/build/vfs_fonts';
+import { DatePipe } from '@angular/common';
 
 pdfmake.vfs = pdffonts.pdfMake.vfs;
 
 const H1 = {
 	fontSize: 18,
 	bold: true,
-	margin: [0, 0, 0, 10]
+	margin: [0, 10, 0, 10]
 };
 
 const H2 = {
 	fontSize: 16,
 	bold: true,
-	margin: [0, 0, 0, 5]
+	margin: [0, 5, 0, 5]
+};
+
+const H3 = {
+	fontSize: 14,
+	bold: true,
+	margin: [0, 3, 0, 3]
 };
 
 const TH = {
@@ -37,10 +44,10 @@ type Style = {[key: string]: any};
 })
 export class ReportComponent implements OnInit {
 
-	
-
 	@Input()
 	expenses: CategoryExpenses[]
+
+	private datePipe = new DatePipe('en-US');
 
 	constructor() { }
 
@@ -72,6 +79,13 @@ export class ReportComponent implements OnInit {
 		result.push({
 			table: this.createSummaryTable()
 		});
+		result.push(this.applyStyle('Details', H2));
+		for (let category of this.expenses) {
+			result.push(this.applyStyle(category.category.name, H3));
+			result.push({
+				table: this.createDetailsTable(category)
+			});
+		}
 		return result;
 	}
 
@@ -93,11 +107,26 @@ export class ReportComponent implements OnInit {
 		};
 	}
 
-	private applyStyleToAll(contents: string[], style: Style) {
+	private createDetailsTable(expenses: CategoryExpenses): any {
+		let body = [this.applyStyleToAll(['Name', 'Amount', 'Date'], TH)];
+		for (let expense of expenses.expenses) {
+			body.push([
+				expense.name.name, 
+				this.toString(expense.amount), 
+				this.format(expense.date)
+			]);
+		}
+		return {
+			widths: ['*', '*', '*'],
+			body: body
+		};
+	}
+
+	private applyStyleToAll(contents: string[], style: Style): any[] {
 		return contents.map((val) => this.applyStyle(val, style));
 	}
 
-	private applyStyle(content: string, style: Style) {
+	private applyStyle(content: string, style: Style): any {
 		let res = Object.assign({}, style);
 		res.text = content;
 		return res;
@@ -113,6 +142,10 @@ export class ReportComponent implements OnInit {
 			return '-';
 		}
 		return ((amt1.amount / amt2.amount) * 100).toFixed(2);
+	}
+
+	private format(date: Timestamp) {
+		return this.datePipe.transform(date.timestamp, 'dd.MM.yyyy');
 	}
 
 	private toString(amount: Amount) {
