@@ -3,6 +3,7 @@ import { CategoryExpenses, Amount, Category, Timestamp } from '../model';
 import * as pdfmake from 'pdfmake/build/pdfmake';
 import * as pdffonts from 'pdfmake/build/vfs_fonts';
 import { DatePipe } from '@angular/common';
+import { ExpensesPerCategory } from '../model.util';
 
 pdfmake.vfs = pdffonts.pdfMake.vfs;
 
@@ -45,7 +46,7 @@ type Style = {[key: string]: any};
 export class ReportComponent implements OnInit {
 
 	@Input()
-	expenses: CategoryExpenses[]
+	expenses: ExpensesPerCategory
 
 	private datePipe = new DatePipe('en-US');
 
@@ -80,7 +81,7 @@ export class ReportComponent implements OnInit {
 			table: this.createSummaryTable()
 		});
 		result.push(this.applyStyle('Details', H2));
-		for (let category of this.expenses) {
+		for (let category of this.expenses.getAllExpenses()) {
 			result.push(this.applyStyle(category.category.name, H3));
 			result.push({
 				table: this.createDetailsTable(category)
@@ -91,33 +92,40 @@ export class ReportComponent implements OnInit {
 
 	private createSummaryTable(): any {
 		let body = [this.applyStyleToAll(['Category', 'Spent', 'Budget', '%'], TH)];
-		for (let expense of this.expenses) {
-			// TODO Is there a better way to get the 'total' row?
-			let style = expense.category.name == 'Total' ? TH : NONE;
-			style = this.mergeStyles(style, expense.amount.amount > expense.budget.amount ? RED : NONE);
-			body.push(this.applyStyleToAll([
-				expense.category.name, 
-				this.toString(expense.amount), 
-				this.toString(expense.budget),
-				this.fraction(expense.amount, expense.budget)], style));
+		for (let expense of this.expenses.getAllExpenses()) {
+			body.push(this.createSummaryRow(expense, NONE));
 		}
+		body.push(this.createSummaryRow(this.expenses.getTotal(), TH));
 		return {
 			widths: ['*', '*', '*', '*'],
 			body: body
 		};
 	}
 
+	private createSummaryRow(row: CategoryExpenses, style: Style): any[] {
+		style = this.mergeStyles(style, row.amount.amount > row.budget.amount ? RED : NONE);
+		return this.applyStyleToAll([
+			row.category.name,
+			this.toString(row.amount), 
+			this.toString(row.budget),
+			this.fraction(row.amount, row.budget)], style);
+	}
+
 	private createDetailsTable(expenses: CategoryExpenses): any {
-		let body = [this.applyStyleToAll(['Name', 'Amount', 'Date'], TH)];
+		let body = [this.applyStyleToAll(['Name', 'Amount', 'Date', 'Payment Method', 'Tags'], TH)];
 		for (let expense of expenses.expenses) {
+			let method = expense.method == null ? '' : expense.method.name;
+			let tags = expense.tags.map((tag) => tag.name).join(', ');
 			body.push([
 				expense.name.name, 
 				this.toString(expense.amount), 
-				this.format(expense.date)
+				this.format(expense.date),
+				method,
+				tags
 			]);
 		}
 		return {
-			widths: ['*', '*', '*'],
+			widths: ['*', '*', '*', '*', '*'],
 			body: body
 		};
 	}

@@ -56,6 +56,43 @@ export class ModelUtil {
 	}
 }
 
+export class ExpensesPerCategory {
+	
+	constructor(
+		private budgeted: CategoryExpenses[],
+		private notBudgeted: CategoryExpenses,
+		private total: CategoryExpenses) { }
+
+	getBudgetedExpenses() {
+		return this.budgeted
+	}
+
+	getNotBudgetedExpenses() {
+		return this.notBudgeted;
+	}
+
+	getTotal() {
+		return this.total;
+	}
+
+	getAllExpenses() {
+		let res: CategoryExpenses[] = []
+		for (let expense of this.budgeted) {
+			res.push(expense)
+		}
+		if (this.notBudgeted.amount.amount > 0) {
+			res.push(this.notBudgeted)
+		}
+		return res;
+	}
+
+	getAllExpensesWithTotal() {
+		let res = this.getAllExpenses()
+		res.push(this.total)
+		return res
+	}
+}
+
 export class CategoryExpensesCalculator {
 
 	private sorter: (e1: CategoryExpenses, e2: CategoryExpenses) => number = null
@@ -78,16 +115,14 @@ export class CategoryExpensesCalculator {
 		return res
 	}
 
-	calculateExpenses(): CategoryExpenses[] {
-		let result = this.calculateBudgetedExpenses()
-		let notBudgeted = this.calculateNotBudgetedExpenses();
-		if (notBudgeted.amount.amount > 0) {
-			result.push(notBudgeted);
-		}
-		return result
+	calculateExpenses(): ExpensesPerCategory {
+		let budgeted = this.calculateBudgetedExpenses()
+		let notBudgeted = this.calculateNotBudgetedExpenses()
+		let total = this.calculateTotalExpenses()
+		return new ExpensesPerCategory(budgeted, notBudgeted, total)
 	}
 
-	calculateTotalExpenses(): CategoryExpenses {
+	private calculateTotalExpenses(): CategoryExpenses {
 		return { 
 			category: { name: "Total"}, 
 			amount: ModelUtil.sumExpenses(this.expenses),
