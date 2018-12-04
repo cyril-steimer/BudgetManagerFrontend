@@ -1,9 +1,10 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { CategoryExpenses, Amount, Category, Timestamp } from '../model';
+import { CategoryExpenses, Amount, Category, Timestamp, Expense } from '../model';
 import * as pdfmake from 'pdfmake/build/pdfmake';
 import * as pdffonts from 'pdfmake/build/vfs_fonts';
 import { DatePipe } from '@angular/common';
 import { ExpensesPerCategory } from '../model.util';
+import { runInThisContext } from 'vm';
 
 pdfmake.vfs = pdffonts.pdfMake.vfs;
 
@@ -38,6 +39,45 @@ const NONE = {};
 
 type Style = {[key: string]: any};
 
+abstract class Config {
+	
+	constructor(
+		readonly name: string,
+		public selected: boolean) { }
+
+	static filterSelected<T extends Config>(configs: T[]): T[] {
+		return configs.filter((c) => c.selected);
+	}
+}
+
+class ContentConfig extends Config {
+	
+	constructor(
+		name: string,
+		selected: boolean,
+		private content: CategoryExpenses) {
+			super(name, selected)
+	}
+
+	getContent() {
+		return this.content
+	}
+}
+
+class ColumnConfig<T> extends Config {
+
+	constructor(
+		name: string,
+		selected: boolean,
+		private column: (val: T) => string) {
+			super(name, selected);
+	}
+
+	getColumnValue(val: T) {
+		return this.column(val)
+	}
+}
+
 @Component({
 	selector: 'app-report',
 	templateUrl: './report.component.html',
@@ -48,15 +88,57 @@ export class ReportComponent implements OnInit {
 	@Input()
 	expenses: ExpensesPerCategory
 
+	summaryRows: ContentConfig[]
+	summaryColumns: ColumnConfig<CategoryExpenses>[]
+
+	detailTables: ContentConfig[]
+	detailColumns: ColumnConfig<Expense>[]
+
 	private datePipe = new DatePipe('en-US');
 
 	constructor() { }
 
 	ngOnInit() {
+		// Content Configs
+		this.summaryRows = this.createContentConfig(true)
+		this.detailTables = this.createContentConfig(false)
+
+		// Column Configs
+		this.summaryColumns = this.createSummaryColumns()
+		this.detailColumns = this.createDetailColumns()
 	}
 
 	createReport() {
 		pdfmake.createPdf(this.createDocumentDefinition()).download('report.pdf');
+	}
+
+	private createSummaryColumns() {
+		return [
+			new ColumnConfig<CategoryExpenses>('Category', true, (val) => val.category.name),
+			new ColumnConfig<CategoryExpenses>('Spent', true, (val) => this.toString(val.amount)),
+			new ColumnConfig<CategoryExpenses>('Budget', true, (val) => this.toString(val.budget)),
+			new ColumnConfig<CategoryExpenses>('%', true, (val) => this.fraction(val.amount, val.budget))
+		]
+	}
+
+	private createDetailColumns() {
+		return [
+			new ColumnConfig<Expense>('Name', true, (val) => val.name.name),
+			new ColumnConfig<Expense>('Amount', true, (val) => this.toString(val.amount)),
+			new ColumnConfig<Expense>('Date', true, (val) => this.format(val.date)),
+			new ColumnConfig<Expense>('Payment Method', true, (val) => val.method == null ? '' : val.method.name),
+			new ColumnConfig<Expense>('Tags', true, (val) => val.tags.map((tag) => tag.name).join(', '))
+		]
+	}
+
+	private createContentConfig(includeTotal: boolean) {
+		let res = []
+		for (let expense of this.expenses.getAllExpenses()) {
+			res.push(new ContentConfig(expense.category.name, true, expense))
+		}
+		let total = this.expenses.getTotal()
+		res.push(new ContentConfig(total.category.name, includeTotal, total))
+		return res
 	}
 
 	private createDocumentDefinition(): any {
@@ -74,28 +156,35 @@ export class ReportComponent implements OnInit {
 	}
 
 	private createContent(): any {
-		let result = [];
-		result.push(this.applyStyle('Report', H1));
-		result.push(this.applyStyle('Summary', H2));
-		result.push({
-			table: this.createSummaryTable()
-		});
-		result.push(this.applyStyle('Details', H2));
-		for (let category of this.expenses.getAllExpenses()) {
-			result.push(this.applyStyle(category.category.name, H3));
+		let result = []
+		result.push(this.applyStyle('Report', H1))
+		let summaryRows = Config.filterSelected(this.summaryRows)
+		if (summaryRows.length > 0) {
+			result.push(this.applyStyle('Summary', H2));
 			result.push({
-				table: this.createDetailsTable(category)
+				table: this.createSummaryTable(summaryRows)
 			});
 		}
-		return result;
+		let detailTables = Config.filterSelected(this.detailTables)
+		if (detailTables.length > 0) {
+			result.push(this.applyStyle('Details', H2))
+			for (let table of detailTables) {
+				result.push(this.applyStyle(table.getContent().category.name, H3));
+				result.push({
+					table: this.createDetailsTable(table.getContent())
+				})
+			}
+		}
+		return result
 	}
 
-	private createSummaryTable(): any {
-		let body = [this.applyStyleToAll(['Category', 'Spent', 'Budget', '%'], TH)];
-		for (let expense of this.expenses.getAllExpenses()) {
-			body.push(this.createSummaryRow(expense, NONE));
+	private createSummaryTable(rows: ContentConfig[]): any {
+		let columns = Config.filterSelected(this.summaryColumns)
+		let body = [this.applyStyleToAll(columns.map((col) => col.name), TH)];
+		for (let row of rows) {
+			// TODO Style 'Total' row differently again...
+			body.push(this.createSummaryRow(row.getContent(), NONE));
 		}
-		body.push(this.createSummaryRow(this.expenses.getTotal(), TH));
 		return {
 			widths: ['*', '*', '*', '*'],
 			body: body
@@ -104,25 +193,17 @@ export class ReportComponent implements OnInit {
 
 	private createSummaryRow(row: CategoryExpenses, style: Style): any[] {
 		style = this.mergeStyles(style, row.amount.amount > row.budget.amount ? RED : NONE);
-		return this.applyStyleToAll([
-			row.category.name,
-			this.toString(row.amount), 
-			this.toString(row.budget),
-			this.fraction(row.amount, row.budget)], style);
+		return this.applyStyleToAll(
+			Config.filterSelected(this.summaryColumns).map((col) => col.getColumnValue(row)),
+			style);
 	}
 
 	private createDetailsTable(expenses: CategoryExpenses): any {
-		let body = [this.applyStyleToAll(['Name', 'Amount', 'Date', 'Payment Method', 'Tags'], TH)];
+		let columns = Config.filterSelected(this.detailColumns)
+		let body = [this.applyStyleToAll(columns.map((col) => col.name), TH)];
 		for (let expense of expenses.expenses) {
-			let method = expense.method == null ? '' : expense.method.name;
-			let tags = expense.tags.map((tag) => tag.name).join(', ');
-			body.push([
-				expense.name.name, 
-				this.toString(expense.amount), 
-				this.format(expense.date),
-				method,
-				tags
-			]);
+			let content = columns.map((col) => col.getColumnValue(expense))
+			body.push(content)
 		}
 		return {
 			widths: ['*', '*', '*', '*', '*'],
