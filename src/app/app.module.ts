@@ -20,6 +20,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { EditBudgetComponent } from './edit-budget/edit-budget.component';
 import { MinValidatorDirective } from './validators.directive';
+import { ReportComponent } from './report/report.component';
 
 @NgModule({
   declarations: [
@@ -31,7 +32,8 @@ import { MinValidatorDirective } from './validators.directive';
     EditExpenseComponent,
     DashboardComponent,
     EditBudgetComponent,
-    MinValidatorDirective
+    MinValidatorDirective,
+    ReportComponent
   ],
   imports: [
     BrowserModule,

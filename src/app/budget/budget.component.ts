@@ -4,7 +4,7 @@ import { Expense, Budget, CategoryExpenses, Category, BudgetInPeriod } from '../
 import { ExpenseService } from '../expense.service';
 import { BudgetService } from '../budget.service';
 import { PeriodQuery } from '../query.util';
-import { ModelUtil, CategoryExpensesCalculator } from '../model.util';
+import { ModelUtil, CategoryExpensesCalculator, ExpensesPerCategory } from '../model.util';
 import { BeforeLeave } from '../expenses-table/expenses-table.component';
 import { BudgetPeriod, BudgetPeriodSwitch, BudgetPeriodSwitcher, DateExtractor, DaysInPeriod, DaysSinceStart, EndOfPeriod, isInPeriod, MonthYearPeriodCalculator } from '../budget.period';
 import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
@@ -25,6 +25,7 @@ export class BudgetComponent implements OnInit, BeforeLeave {
 	};
 	modal: NgbModalRef
 
+	expensesPerCategory: ExpensesPerCategory
 	expensesForTable: CategoryExpenses[]
 
 	detail: CategoryExpenses
@@ -85,7 +86,8 @@ export class BudgetComponent implements OnInit, BeforeLeave {
 	}
 
 	private getExpensesSortedByExpensesWithoutTotal(calc: CategoryExpensesCalculator) {
-		return calc.sortByExpenses().calculateExpenses();
+		let res = calc.sortByExpenses().calculateExpenses()
+		return res.getAllExpenses()
 	}
 
 	private update(params: any) {
@@ -109,13 +111,13 @@ export class BudgetComponent implements OnInit, BeforeLeave {
 	}
 
 	private init(expenses: Expense[], budgets: BudgetInPeriod[]) {
-		let calc = new CategoryExpensesCalculator(expenses, budgets, this.switcher.getPeriod());
-		this.expensesForTable = calc.sortByBudget().calculateExpenses();
-		this.expensesForTable.push(calc.calculateTotalExpenses());
-		this.pieChartData = this.piePlotData(calc);
-		this.pieChartLabels = this.piePlotLabels(calc);
+		let calc = new CategoryExpensesCalculator(expenses, budgets, this.switcher.getPeriod())
+		this.expensesPerCategory = calc.sortByBudget().calculateExpenses()
+		this.expensesForTable = this.expensesPerCategory.getAllExpensesWithTotal()
+		this.pieChartData = this.piePlotData(calc)
+		this.pieChartLabels = this.piePlotLabels(calc)
 		this.lineCharts = this.expensesForTable
-			.map(e => this.newLineChartData(e));
+			.map(e => this.newLineChartData(e))
 		}
 
 	private newLineChartData(expenses: CategoryExpenses) {
