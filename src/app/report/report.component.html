@@ -1,3 +1,53 @@
+<h6>Rows to include in Summary</h6>
+<table class="table">
+	<thead>
+		<th *ngFor="let row of summaryRows">
+			{{row.name}}
+		</th>
+	</thead>
+	<tbody>
+		<td *ngFor="let row of summaryRows">
+			<input type="checkbox" [(ngModel)]="row.selected" id="{{row.name}}-summary-row">
+		</td>
+	</tbody>
+</table>
+
+<label for="addDetail">
+	<h6>Include Details?</h6>
+</label>
+<input type="checkbox" [(ngModel)]="addDetail" id="addDetail"/>
+
+<div *ngIf="addDetail">
+	<h6>Expenses to include in Details</h6>
+	<table class="table">
+		<thead>
+			<th *ngFor="let table of detailTables">
+				{{table.name}}
+			</th>
+		</thead>
+		<tbody>
+			<td *ngFor="let table of detailTables">
+				<input type="checkbox" [(ngModel)]="table.selected" id="{{table.name}}-detail-table">
+			</td>
+		</tbody>
+	</table>
+	<h6>Columns to include in Details</h6>
+	<table class="table">
+		<thead>
+			<th *ngFor="let col of detailColumns">
+				{{col.name}}
+			</th>
+		</thead>
+		<tbody>
+			<td *ngFor="let col of detailColumns">
+				<input type="checkbox" [(ngModel)]="col.selected" id="{{col.name}}-detail-col">
+			</td>
+		</tbody>
+	</table>
+</div>
+
+<br>
+
 <button class="btn btn-primary" (click)="createReport()">
 	Create Report
 </button>

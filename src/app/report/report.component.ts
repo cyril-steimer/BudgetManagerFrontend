@@ -4,7 +4,6 @@ import * as pdfmake from 'pdfmake/build/pdfmake';
 import * as pdffonts from 'pdfmake/build/vfs_fonts';
 import { DatePipe } from '@angular/common';
 import { ExpensesPerCategory } from '../model.util';
-import { runInThisContext } from 'vm';
 
 pdfmake.vfs = pdffonts.pdfMake.vfs;
 
@@ -55,7 +54,8 @@ class ContentConfig extends Config {
 	constructor(
 		name: string,
 		selected: boolean,
-		private content: CategoryExpenses) {
+		private content: CategoryExpenses,
+		public readonly total: boolean) {
 			super(name, selected)
 	}
 
@@ -91,6 +91,7 @@ export class ReportComponent implements OnInit {
 	summaryRows: ContentConfig[]
 	summaryColumns: ColumnConfig<CategoryExpenses>[]
 
+	addDetail = false;
 	detailTables: ContentConfig[]
 	detailColumns: ColumnConfig<Expense>[]
 
@@ -134,10 +135,10 @@ export class ReportComponent implements OnInit {
 	private createContentConfig(includeTotal: boolean) {
 		let res = []
 		for (let expense of this.expenses.getAllExpenses()) {
-			res.push(new ContentConfig(expense.category.name, true, expense))
+			res.push(new ContentConfig(expense.category.name, true, expense, false))
 		}
 		let total = this.expenses.getTotal()
-		res.push(new ContentConfig(total.category.name, includeTotal, total))
+		res.push(new ContentConfig(total.category.name, includeTotal, total, true))
 		return res
 	}
 
@@ -166,7 +167,7 @@ export class ReportComponent implements OnInit {
 			});
 		}
 		let detailTables = Config.filterSelected(this.detailTables)
-		if (detailTables.length > 0) {
+		if (this.addDetail && detailTables.length > 0) {
 			result.push(this.applyStyle('Details', H2))
 			for (let table of detailTables) {
 				result.push(this.applyStyle(table.getContent().category.name, H3));
@@ -182,8 +183,8 @@ export class ReportComponent implements OnInit {
 		let columns = Config.filterSelected(this.summaryColumns)
 		let body = [this.applyStyleToAll(columns.map((col) => col.name), TH)];
 		for (let row of rows) {
-			// TODO Style 'Total' row differently again...
-			body.push(this.createSummaryRow(row.getContent(), NONE));
+			let style = row.total ? TH : NONE;
+			body.push(this.createSummaryRow(row.getContent(), style));
 		}
 		return {
 			widths: ['*', '*', '*', '*'],
