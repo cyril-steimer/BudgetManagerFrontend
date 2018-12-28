@@ -22,6 +22,7 @@ import { EditBudgetComponent } from './edit-budget/edit-budget.component';
 import { MinValidatorDirective } from './validators.directive';
 import { ReportComponent } from './report/report.component';
 import { ImportExportComponent } from './import-export/import-export.component';
+import { ImportExportService } from './import-export.service';
 
 @NgModule({
   declarations: [
@@ -49,7 +50,8 @@ import { ImportExportComponent } from './import-export/import-export.component';
   ],
   providers: [
     ExpenseService,
-    BudgetService
+    BudgetService,
+    ImportExportService
   ],
   bootstrap: [AppComponent]
 })
