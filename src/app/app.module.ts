@@ -21,6 +21,7 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { EditBudgetComponent } from './edit-budget/edit-budget.component';
 import { MinValidatorDirective } from './validators.directive';
 import { ReportComponent } from './report/report.component';
+import { ImportExportComponent } from './import-export/import-export.component';
 
 @NgModule({
   declarations: [
@@ -33,7 +34,8 @@ import { ReportComponent } from './report/report.component';
     DashboardComponent,
     EditBudgetComponent,
     MinValidatorDirective,
-    ReportComponent
+    ReportComponent,
+    ImportExportComponent
   ],
   imports: [
     BrowserModule,

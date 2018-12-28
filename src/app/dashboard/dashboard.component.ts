@@ -33,6 +33,7 @@ export class DashboardComponent {
 		this.cards.push(this.budget(date));
 		this.cards.push(this.newExpense());
 		this.cards.push(this.newBudget());
+		this.cards.push(this.importExport());
 	}
 
 	private expenses(date: Date): Card {
@@ -97,6 +98,19 @@ export class DashboardComponent {
 				}
 			]
 		};
+	}
+
+	private importExport(): Card {
+		return {
+			title: 'Import/Export',
+			content: 'Import or export all expende/budget data. The data can then be used in another instance of the budget manager',
+			links: [
+				{
+					name: 'Import/Export',
+					url: '/importexport'
+				}
+			]
+		}
 	}
 }
 

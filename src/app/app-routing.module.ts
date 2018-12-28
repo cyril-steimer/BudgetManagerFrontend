@@ -1,11 +1,11 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router'
 import { ExpensesComponent } from './expenses/expenses.component';
 import { BudgetComponent } from './budget/budget.component';
 import { EditExpenseComponent } from './edit-expense/edit-expense.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { EditBudgetComponent } from './edit-budget/edit-budget.component';
+import { ImportExportComponent } from './import-export/import-export.component';
 
 const routes: Routes = [
   { path: '', component: DashboardComponent },
@@ -18,7 +18,8 @@ const routes: Routes = [
   { path: 'budget/year/:year', component: BudgetComponent },
   { path: 'budget/year/:year/month/:month', component: BudgetComponent },
   { path: 'edit/expense/:id', component: EditExpenseComponent },
-  { path: 'edit/budget/:id', component: EditBudgetComponent }
+  { path: 'edit/budget/:id', component: EditBudgetComponent },
+  { path: 'importexport', component: ImportExportComponent }
 ]
 
 @NgModule({

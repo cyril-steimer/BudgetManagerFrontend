@@ -1,0 +1,14 @@
+<app-date-header></app-date-header>
+
+<div>
+	<ngb-accordion>
+		<ngb-panel title="Export">
+			<ng-template ngbPanelContent>
+				<p>
+					Export all the data from a budget manager as a JSON file. The file can be used for importing into another instance or for any other activities.
+				</p>
+				<button class="btn btn-primary" (click)="export()">Export</button>
+			</ng-template>
+		</ngb-panel>
+	</ngb-accordion>
+</div>
