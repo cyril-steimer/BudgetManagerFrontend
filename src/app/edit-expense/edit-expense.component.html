@@ -48,7 +48,8 @@
 	<div class="form-group">
 		<label for="author">Author</label>
 		<input class="form-control" type="text" id="author" name="author"
-		[(ngModel)]="expense.author.name">
+		[(ngModel)]="expense.author.name"
+		[ngbTypeahead]="authorTypeahead">
 	</div>
 	<div class="form-group">
 		<label for="tag">Tags</label>
