@@ -50,7 +50,7 @@ export class EditExpenseComponent implements OnInit {
 
 	initialized = false
 
-	paymentMethods: string[] = []
+	private paymentMethods: string[] = []
 	methodTypeahead = (text$: Observable<string>) =>
 		text$
 			.debounceTime(200)
@@ -58,7 +58,7 @@ export class EditExpenseComponent implements OnInit {
 			.map(term => this.paymentMethods.filter(v => v.indexOf(term) > -1));
 
 			
-	tags: string[] = [];
+	private tags: string[] = [];
 	tagTypeahead = (text$: Observable<string>) =>
 		text$
 			.debounceTime(200)

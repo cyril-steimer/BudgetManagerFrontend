@@ -30,6 +30,7 @@ export class ModelUtil {
 			date: { timestamp: new Date().getTime() },
 			name: { name: "" },
 			method: { name: "" },
+			author: { name: "" },
 			tags: []
 		}
 	}

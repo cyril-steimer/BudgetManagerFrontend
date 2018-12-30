@@ -6,6 +6,7 @@
 			<th>Category</th>
 			<th>Date</th>
 			<th>Payment Method</th>
+			<th>Author</th>
 			<th>Tags</th>
 			<th></th>
 		</tr>
@@ -23,6 +24,11 @@
 			<td>
 				<a href="#" (click)="searchByMethod($event, expense.method.name)">
 					{{expense.method.name}}
+				</a>
+			</td>
+			<td>
+				<a href="#" (click)="searchByAuthor($event, expense.author.name)">
+					{{expense.author.name}}
 				</a>
 			</td>
 			<td class="chip-list">

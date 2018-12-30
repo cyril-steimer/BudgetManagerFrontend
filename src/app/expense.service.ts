@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Expense, SubList, Pagination, Sort, PaymentMethod, Tag } from './model';
+import { Expense, SubList, Pagination, Sort, PaymentMethod, Tag, Author } from './model';
 import { Observable } from 'rxjs/Observable';
 import { of } from 'rxjs/observable/of'
 import { HttpClient } from '@angular/common/http';
