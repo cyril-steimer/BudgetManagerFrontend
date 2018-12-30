@@ -6,12 +6,9 @@ export class Expense {
 	amount: Amount
 	category: Category
 	date: Timestamp
-	method?: PaymentMethod
+	method: PaymentMethod
+	author: Author
 	tags: Tag[]
-}
-
-export class Tag {
-	name: string
 }
 
 export class Budget {
@@ -49,6 +46,14 @@ export class CategoryExpenses {
 }
 
 export class PaymentMethod {
+	name: string
+}
+
+export class Tag {
+	name: string
+}
+
+export class Author {
 	name: string
 }
 

@@ -17,18 +17,6 @@ export class ExpensesTableComponent implements AfterContentChecked {
 
 	total = ModelUtil.emptyExpense();
 
-	private directions: SortDirection[] = [
-		{ dir: "asc" },
-		{ dir: "desc" }
-	]
-
-	private fields: SortField[] = [
-		{ field: "name" },
-		{ field: "category" },
-		{ field: "date" },
-		{ field: "amount" }
-	]
-
 	constructor(private router: Router) { }
 
 	ngAfterContentChecked() {
@@ -55,6 +43,11 @@ export class ExpensesTableComponent implements AfterContentChecked {
 	searchByCategory(event: MouseEvent, category: string) {
 		this.prepareToLeave(event);
 		this.router.navigate(["expenses", "field", "category", category]);
+	}
+
+	searchByAuthor(event: MouseEvent, author: string) {
+		this.prepareToLeave(event);
+		this.router.navigate(["expenses", "field", "author", author]);
 	}
 
 	private prepareToLeave(event?: MouseEvent) {

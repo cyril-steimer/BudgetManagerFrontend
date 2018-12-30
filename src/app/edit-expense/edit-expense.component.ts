@@ -50,7 +50,7 @@ export class EditExpenseComponent implements OnInit {
 
 	initialized = false
 
-	paymentMethods: string[] = []
+	private paymentMethods: string[] = []
 	methodTypeahead = (text$: Observable<string>) =>
 		text$
 			.debounceTime(200)
@@ -58,12 +58,19 @@ export class EditExpenseComponent implements OnInit {
 			.map(term => this.paymentMethods.filter(v => v.indexOf(term) > -1));
 
 			
-	tags: string[] = [];
+	private tags: string[] = [];
 	tagTypeahead = (text$: Observable<string>) =>
 		text$
 			.debounceTime(200)
 			.distinctUntilChanged()
 			.map(term => this.tags.filter(v => v.indexOf(term) > -1));
+
+	private authors: string[] = [];
+	authorTypeahead = (text$: Observable<string>) =>
+		text$
+			.debounceTime(200)
+			.distinctUntilChanged()
+			.map(term => this.authors.filter(v => v.indexOf(term) > -1));
 
 	constructor(
 		private expenseService: ExpenseService,
@@ -87,6 +94,8 @@ export class EditExpenseComponent implements OnInit {
 			.subscribe(methods => this.paymentMethods = methods.map(m => m.name));
 		this.expenseService.getTags()
 			.subscribe(tags => this.tags = tags.map(t => t.name));
+		this.expenseService.getAuthors()
+			.subscribe(authors => this.authors = authors.map(t => t.name));
 	}
 
 	back() {

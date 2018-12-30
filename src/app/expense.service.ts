@@ -1,17 +1,17 @@
 import { Injectable } from '@angular/core';
-import { Expense, SubList, Pagination, Sort, PaymentMethod, Tag } from './model';
+import { Expense, SubList, Pagination, Sort, PaymentMethod, Tag, Author } from './model';
 import { Observable } from 'rxjs/Observable';
-import { of } from 'rxjs/observable/of'
 import { HttpClient } from '@angular/common/http';
+
+const EXPENSE_URL = "/api/v1/expenses";
+const METHOD_URL = "/api/v1/paymentmethod";
+const TAG_URL = "/api/v1/tag";
+const AUTHOR_URL = "/api/v1/author";
 
 @Injectable()
 export class ExpenseService {
 
 	//TODO: Handling of errors!
-
-	private expenseUrl = "/api/v1/expenses";
-	private methodUrl = "/api/v1/paymentmethod";
-	private tagUrl = "/api/v1/tag";
 
 	constructor(private http: HttpClient) { }
 
@@ -30,7 +30,7 @@ export class ExpenseService {
 	}
 
 	getExpenseById(id: string): Observable<Expense> {
-		let url = `${this.expenseUrl}/field/id/${id}`;
+		let url = `${EXPENSE_URL}/field/id/${id}`;
 		let options = {
 			params: { "single": "true" }
 		};
@@ -39,32 +39,36 @@ export class ExpenseService {
 
 	deleteExpense(expense: Expense): Observable<any> {
 		let params = { "id": expense.id };
-		return this.http.delete(this.expenseUrl, { params: params });
+		return this.http.delete(EXPENSE_URL, { params: params });
 	}
 
 	addExpense(expense: Expense): Observable<any> {
-		return this.http.post(this.expenseUrl, expense);
+		return this.http.post(EXPENSE_URL, expense);
 	}
 
 	updateExpense(expense: Expense): Observable<any> {
-		return this.http.put(this.expenseUrl, expense);
+		return this.http.put(EXPENSE_URL, expense);
 	}
 
 	getPaymentMethods(): Observable<PaymentMethod[]> {
-		return this.http.get<PaymentMethod[]>(this.methodUrl);
+		return this.http.get<PaymentMethod[]>(METHOD_URL);
 	}
 
 	getTags(): Observable<Tag[]> {
-		return this.http.get<Tag[]>(this.tagUrl);
+		return this.http.get<Tag[]>(TAG_URL);
+	}
+
+	getAuthors(): Observable<Author[]> {
+		return this.http.get<Author[]>(AUTHOR_URL);
 	}
 
 	private getSearchUrl(filter?: string, body?: any) {
 		if (filter) {
-			return `${this.expenseUrl}/search/${filter}`;
+			return `${EXPENSE_URL}/search/${filter}`;
 		} else if (body) {
-			return `${this.expenseUrl}/search`;
+			return `${EXPENSE_URL}/search`;
 		}
-		return this.expenseUrl;
+		return EXPENSE_URL;
 	}
 
 	private createOptions(sort?: Sort, pagination?: Pagination): { params: { [param: string]: string;} } {
