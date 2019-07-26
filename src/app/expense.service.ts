@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Expense, SubList, Pagination, Sort, PaymentMethod, Tag, Author } from './model';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 
 const EXPENSE_URL = "/api/v1/expenses";

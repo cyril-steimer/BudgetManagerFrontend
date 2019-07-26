@@ -42,7 +42,7 @@ import { ImportExportService } from './import-export.service';
     BrowserModule,
     HttpClientModule,
     FormsModule,
-    NgbModule.forRoot(),
+    NgbModule,
     ReactiveFormsModule,
     BrowserAnimationsModule,
     ChartsModule,

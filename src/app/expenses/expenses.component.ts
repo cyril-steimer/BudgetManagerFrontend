@@ -1,12 +1,11 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { SubList, Expense, Sort } from '../model';
 import { ExpenseService } from '../expense.service';
-import { MatTableDataSource, MatSort, MatSortable } from '@angular/material';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { DelayedSearch } from '../delayed.search';
 import { ActivatedRoute } from '@angular/router';
 import { ExpenseSorter, SortDirection, SortField } from '../expenses-table/expenses-table.component';
-import { BudgetPeriodSwitcher, BudgetPeriod, DateExtractor } from '../budget.period';
+import { BudgetPeriodSwitcher, DateExtractor } from '../budget.period';
 import { PeriodQuery, QueryUtil } from '../query.util';
 import { ExpenseSearch } from '../date-header/date-header.component';
 

@@ -4,12 +4,10 @@ import { ExpenseService } from '../expense.service';
 import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 import { ModelUtil } from '../model.util';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { BudgetService } from '../budget.service';
 import { NgbDateStruct, NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/debounceTime';
-import 'rxjs/add/operator/distinctUntilChanged';
+import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
 
 @Injectable()
 export class NgbDateTimestampAdapter extends NgbDateAdapter<number> {
@@ -52,25 +50,25 @@ export class EditExpenseComponent implements OnInit {
 
 	private paymentMethods: string[] = []
 	methodTypeahead = (text$: Observable<string>) =>
-		text$
-			.debounceTime(200)
-			.distinctUntilChanged()
-			.map(term => this.paymentMethods.filter(v => v.indexOf(term) > -1));
+		text$.pipe(
+			debounceTime(200),
+			distinctUntilChanged(),
+			map(term => this.paymentMethods.filter(v => v.indexOf(term) > -1)));
 
 			
 	private tags: string[] = [];
 	tagTypeahead = (text$: Observable<string>) =>
-		text$
-			.debounceTime(200)
-			.distinctUntilChanged()
-			.map(term => this.tags.filter(v => v.indexOf(term) > -1));
+		text$.pipe(
+			debounceTime(200),
+			distinctUntilChanged(),
+			map(term => this.tags.filter(v => v.indexOf(term) > -1)));
 
 	private authors: string[] = [];
 	authorTypeahead = (text$: Observable<string>) =>
-		text$
-			.debounceTime(200)
-			.distinctUntilChanged()
-			.map(term => this.authors.filter(v => v.indexOf(term) > -1));
+		text$.pipe(
+			debounceTime(200),
+			distinctUntilChanged(),
+			map(term => this.authors.filter(v => v.indexOf(term) > -1)));
 
 	constructor(
 		private expenseService: ExpenseService,

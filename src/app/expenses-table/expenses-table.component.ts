@@ -1,7 +1,6 @@
-import { Component, OnInit, Input, AfterContentChecked } from '@angular/core';
-import { Expense, Sort, SubList } from '../model';
+import { Component, Input, AfterContentChecked } from '@angular/core';
+import { Expense } from '../model';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs/Observable';
 import { ModelUtil } from '../model.util';
 
 @Component({
