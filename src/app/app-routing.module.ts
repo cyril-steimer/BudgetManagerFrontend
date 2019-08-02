@@ -9,7 +9,6 @@ import { ImportExportComponent } from './import-export/import-export.component';
 
 const routes: Routes = [
   { path: '', component: DashboardComponent },
-  { path: 'add', component: EditExpenseComponent },
   { path: 'expense/add', component: EditExpenseComponent },
   { path: 'template/add', component: EditExpenseComponent },
   { path: 'budget/add', component: EditBudgetComponent },

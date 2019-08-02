@@ -30,8 +30,6 @@ export class DashboardComponent {
 		let date = new Date();
 		this.cards.push(this.expenses(date));
 		this.cards.push(this.budget(date));
-		this.cards.push(this.newExpense());
-		this.cards.push(this.newBudget());
 		this.cards.push(this.importExport());
 		this.cards.push(this.templates());
 	}
@@ -39,15 +37,11 @@ export class DashboardComponent {
 	private templates(): Card {
 		return {
 			title: 'Templates',
-			content: 'View all templates or add a new template',
+			content: 'View the list of templates',
 			links: [
 				{
 					name: 'All Templates',
 					url: '/templates'
-				},
-				{
-					name: 'Add Template',
-					url: '/template/add'
 				}
 			]
 		}
@@ -86,32 +80,6 @@ export class DashboardComponent {
 				{
 					name: 'This Year',
 					url: `/budget/year/${date.getFullYear()}`
-				}
-			]
-		};
-	}
-
-	private newExpense(): Card {
-		return {
-			title: 'New Expense',
-			content: 'Input a new expense to the budget manager',
-			links: [
-				{
-					name: 'Add Expense',
-					url: '/add'
-				}
-			]
-		};
-	}
-
-	private newBudget(): Card {
-		return {
-			title: 'New Budget',
-			content: 'Add a new budget to the budget manager',
-			links: [
-				{
-					name: 'Add Budget',
-					url: '/budget/add'
 				}
 			]
 		};
