@@ -1,19 +1,12 @@
 import { Injectable } from '@angular/core';
-import { Expense, SubList, Pagination, Sort, PaymentMethod, Tag, Author } from './model';
+import { Expense, SubList, Pagination, Sort } from './model';
 import { Observable } from 'rxjs/Observable';
 import { HttpClient } from '@angular/common/http';
+import { ActivatedRoute } from '@angular/router';
 
-const EXPENSE_URL = "/api/v1/expenses";
-const METHOD_URL = "/api/v1/paymentmethod";
-const TAG_URL = "/api/v1/tag";
-const AUTHOR_URL = "/api/v1/author";
+export abstract class AbstractExpenseService {
 
-@Injectable()
-export class ExpenseService {
-
-	//TODO: Handling of errors!
-
-	constructor(private http: HttpClient) { }
+	constructor(private http: HttpClient, private url: string) { }
 
 	getExpenses(
 		filter?: string, 
@@ -30,7 +23,7 @@ export class ExpenseService {
 	}
 
 	getExpenseById(id: string): Observable<Expense> {
-		let url = `${EXPENSE_URL}/field/id/${id}`;
+		let url = `${this.url}/field/id/${id}`;
 		let options = {
 			params: { "single": "true" }
 		};
@@ -39,36 +32,24 @@ export class ExpenseService {
 
 	deleteExpense(expense: Expense): Observable<any> {
 		let params = { "id": expense.id };
-		return this.http.delete(EXPENSE_URL, { params: params });
+		return this.http.delete(this.url, { params: params });
 	}
 
 	addExpense(expense: Expense): Observable<any> {
-		return this.http.post(EXPENSE_URL, expense);
+		return this.http.post(this.url, expense);
 	}
 
 	updateExpense(expense: Expense): Observable<any> {
-		return this.http.put(EXPENSE_URL, expense);
-	}
-
-	getPaymentMethods(): Observable<PaymentMethod[]> {
-		return this.http.get<PaymentMethod[]>(METHOD_URL);
-	}
-
-	getTags(): Observable<Tag[]> {
-		return this.http.get<Tag[]>(TAG_URL);
-	}
-
-	getAuthors(): Observable<Author[]> {
-		return this.http.get<Author[]>(AUTHOR_URL);
+		return this.http.put(this.url, expense);
 	}
 
 	private getSearchUrl(filter?: string, body?: any) {
 		if (filter) {
-			return `${EXPENSE_URL}/search/${filter}`;
+			return `${this.url}/search/${filter}`;
 		} else if (body) {
-			return `${EXPENSE_URL}/search`;
+			return `${this.url}/search`;
 		}
-		return EXPENSE_URL;
+		return this.url;
 	}
 
 	private createOptions(sort?: Sort, pagination?: Pagination): { params: { [param: string]: string;} } {
@@ -92,5 +73,44 @@ export class ExpenseService {
 			params["from"] = pagination.from;
 			params["count"] = pagination.count;
 		}
+	}
+}
+
+@Injectable()
+export class ExpenseService extends AbstractExpenseService {
+
+	constructor(http: HttpClient) {
+		super(http, '/api/v1/expenses');
+	}
+}
+
+@Injectable()
+export class TemplateService extends AbstractExpenseService {
+
+	constructor(http: HttpClient) {
+		super(http, '/api/v1/templates');
+	}
+}
+
+@Injectable()
+export class ExpenseServiceProvider {
+
+	//TODO: Handling of errors!
+
+	constructor(private http: HttpClient) { }
+
+	getExpenseService(): ExpenseService {
+		return new ExpenseService(this.http);
+	}
+
+	getTemplateService(): TemplateService {
+		return new TemplateService(this.http);
+	}
+
+	getServiceByUrl(route: ActivatedRoute): AbstractExpenseService {
+		if (route.snapshot.toString().indexOf('template') >= 0) {
+			return this.getTemplateService();
+		}
+		return this.getExpenseService();
 	}
 }

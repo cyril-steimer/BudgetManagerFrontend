@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef, AfterViewChecked, Injectable } from '@angular/core';
 import { Expense, Category, PaymentMethod } from '../model';
-import { ExpenseService } from '../expense.service';
+import { ExpenseService, ExpenseServiceProvider, AbstractExpenseService } from '../expense.service';
 import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 import { ModelUtil } from '../model.util';
@@ -10,6 +10,7 @@ import { NgbDateStruct, NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/debounceTime';
 import 'rxjs/add/operator/distinctUntilChanged';
+import { AutocompleteService } from '../autocomplete.service';
 
 @Injectable()
 export class NgbDateTimestampAdapter extends NgbDateAdapter<number> {
@@ -72,13 +73,17 @@ export class EditExpenseComponent implements OnInit {
 			.distinctUntilChanged()
 			.map(term => this.authors.filter(v => v.indexOf(term) > -1));
 
+	private expenseService: AbstractExpenseService;
+
 	constructor(
-		private expenseService: ExpenseService,
+		private expenseServiceProvider: ExpenseServiceProvider,
+		private autocompleteService: AutocompleteService,
 		private budgetService: BudgetService,
 		private route: ActivatedRoute,
 		private location: Location) { }
 
 	ngOnInit() {
+		this.expenseService = this.expenseServiceProvider.getServiceByUrl(this.route);
 		let id = this.route.snapshot.paramMap.get("id")
 		if (id == null) {
 			this.expense = ModelUtil.emptyExpense();
@@ -90,11 +95,11 @@ export class EditExpenseComponent implements OnInit {
 		}
 		this.budgetService.getCategories()
 			.subscribe(categories => this.categories = categories.values);
-		this.expenseService.getPaymentMethods()
+		this.autocompleteService.getPaymentMethods()
 			.subscribe(methods => this.paymentMethods = methods.map(m => m.name));
-		this.expenseService.getTags()
+		this.autocompleteService.getTags()
 			.subscribe(tags => this.tags = tags.map(t => t.name));
-		this.expenseService.getAuthors()
+		this.autocompleteService.getAuthors()
 			.subscribe(authors => this.authors = authors.map(t => t.name));
 	}
 
