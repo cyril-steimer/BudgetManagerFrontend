@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Expense, SubList, Pagination, Sort } from './model';
 import { Observable } from 'rxjs/Observable';
 import { HttpClient } from '@angular/common/http';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Resolve, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 
 export abstract class AbstractExpenseService {
 
@@ -92,12 +92,15 @@ export class TemplateService extends AbstractExpenseService {
 	}
 }
 
+const TYPE_TEMPLATE = 'template';
+export const DATA_TEMPLATE = {'type': TYPE_TEMPLATE};
+
 export class ExpenseType {
 
 	private constructor (private singular: string, private plural: string) { }
 
 	public getAddUrl(): string {
-		return `/${this.singular}/add`;
+		return `/add/${this.singular}`;
 	}
 
 	public getEditUrl(expense: Expense): string {
@@ -124,8 +127,9 @@ export class ExpenseType {
 
 	public static EXPENSE = new ExpenseType('expense', 'expenses');
 
-	public static forUrl(route: ActivatedRoute): ExpenseType {
-		if (route.snapshot.toString().indexOf('template') >= 0) {
+	public static forRoute(route: ActivatedRoute): ExpenseType {
+		let data = route.snapshot.data;
+		if (data.type == TYPE_TEMPLATE) {
 			return ExpenseType.TEMPLATE;
 		}
 		return ExpenseType.EXPENSE;
@@ -154,5 +158,18 @@ export class ExpenseServiceProvider {
 			return this.getExpenseService();
 		}
 		throw new Error('Unknown expense type');
+	}
+}
+
+@Injectable()
+export class ExpenseResolverService implements Resolve<Expense> {
+
+	constructor(private provider: ExpenseServiceProvider) { }
+
+	resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Expense> {
+		if (route.paramMap.has('templateid')) {
+			return this.provider.getTemplateService().getExpenseById(route.paramMap.get('templateid'));
+		}
+		return this.provider.getExpenseService().getExpenseById(route.paramMap.get('id'));
 	}
 }

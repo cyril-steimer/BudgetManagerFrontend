@@ -84,17 +84,16 @@ export class EditExpenseComponent implements OnInit {
 		private location: Location) { }
 
 	ngOnInit() {
-		this.expenseType = ExpenseType.forUrl(this.route);
+		this.expenseType = ExpenseType.forRoute(this.route);
 		this.expenseService = this.expenseServiceProvider.getService(this.expenseType);
-		let id = this.route.snapshot.paramMap.get("id")
-		if (id == null) {
-			this.expense = ModelUtil.emptyExpense();
-			this.expense.date.timestamp = new Date().getTime();
-		} else {
-			this.newExpense = false
-			this.expenseService.getExpenseById(id)
-				.subscribe(expense => this.expense = expense);
-		}
+		this.route.data.subscribe((data: {expense: Expense, template: Expense}) => {
+			this.newExpense = data.expense == null;
+			this.expense = data.expense;
+			if (data.expense == null) {
+				this.expense = ModelUtil.emptyExpense();
+				this.expense.date.timestamp = new Date().getTime();
+			}
+		});
 		this.budgetService.getCategories()
 			.subscribe(categories => this.categories = categories.values);
 		this.autocompleteService.getPaymentMethods()

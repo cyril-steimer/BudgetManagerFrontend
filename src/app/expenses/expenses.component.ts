@@ -42,7 +42,7 @@ export class ExpensesComponent implements OnInit, ExpenseSorter, ExpenseSearch {
 		private route: ActivatedRoute) { }
 
 	ngOnInit() {
-		this.expenseType = ExpenseType.forUrl(this.route);
+		this.expenseType = ExpenseType.forRoute(this.route);
 		this.expenseService = this.expenseServiceProvider.getService(this.expenseType);
 		this.route.params.subscribe(params => this.update(params));
 		this.getExpenses()

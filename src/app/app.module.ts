@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 
 import { AppComponent } from './app.component';
 import { ExpensesComponent } from './expenses/expenses.component';
-import { ExpenseServiceProvider, ExpenseService, TemplateService } from './expense.service';
+import { ExpenseServiceProvider, ExpenseService, TemplateService, ExpenseResolverService } from './expense.service';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -55,7 +55,8 @@ import { AutocompleteService } from './autocomplete.service';
     TemplateService,
     BudgetService,
     ImportExportService,
-    AutocompleteService
+    AutocompleteService,
+    ExpenseResolverService
   ],
   bootstrap: [AppComponent]
 })
