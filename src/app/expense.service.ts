@@ -130,6 +130,10 @@ export class ExpenseType {
 		return this == ExpenseType.EXPENSE;
 	}
 
+	public canSaveAsTemplate(): boolean {
+		return this == ExpenseType.EXPENSE;
+	}
+
 	public static TEMPLATE = new ExpenseType('template', 'templates');
 
 	public static EXPENSE = new ExpenseType('expense', 'expenses');

@@ -31,6 +31,11 @@ export class ExpensesTableComponent implements AfterContentChecked {
 		this.router.navigateByUrl(this.expenseType.getEditUrl(expense));
 	}
 
+	clone(expense: Expense) {
+		this.prepareToLeave();
+		this.router.navigateByUrl(this.expenseType.getCloneUrl(expense));
+	}
+
 	searchByTag(event: MouseEvent, tag: string) {
 		this.prepareToLeave(event);
 		this.router.navigateByUrl(this.expenseType.getFilterByFieldUrl('tag', tag));

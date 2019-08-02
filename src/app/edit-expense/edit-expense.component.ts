@@ -1,16 +1,18 @@
-import { Component, OnInit, ChangeDetectorRef, AfterViewChecked, Injectable } from '@angular/core';
-import { Expense, Category, PaymentMethod } from '../model';
-import { ExpenseService, ExpenseServiceProvider, AbstractExpenseService, ExpenseType } from '../expense.service';
+import { Component, OnInit, Injectable } from '@angular/core';
+import { Expense, Category } from '../model';
+import { ExpenseServiceProvider, AbstractExpenseService, ExpenseType } from '../expense.service';
 import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 import { ModelUtil } from '../model.util';
 import { Observable } from 'rxjs/Observable';
 import { BudgetService } from '../budget.service';
 import { NgbDateStruct, NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap';
+import 'rxjs/add/observable/of';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/debounceTime';
 import 'rxjs/add/operator/distinctUntilChanged';
 import { AutocompleteService } from '../autocomplete.service';
+import { of } from 'rxjs/observable/of';
 
 @Injectable()
 export class NgbDateTimestampAdapter extends NgbDateAdapter<number> {
@@ -75,6 +77,7 @@ export class EditExpenseComponent implements OnInit {
 
 	private expenseService: AbstractExpenseService;
 	expenseType: ExpenseType;
+	saveAsTemplate: boolean = false;
 
 	constructor(
 		private expenseServiceProvider: ExpenseServiceProvider,
@@ -109,7 +112,7 @@ export class EditExpenseComponent implements OnInit {
 	}
 
 	submit() {
-		this.doSubmit().subscribe(() => this.back());
+		this.doSubmit().then(() => this.back());
 	}
 
 	delete() {
@@ -133,10 +136,15 @@ export class EditExpenseComponent implements OnInit {
 		}
 	}
 
-	private doSubmit(): Observable<any> {
-		if (this.newExpense) {
-			return this.expenseService.addExpense(this.expense)
+	private async doSubmit(): Promise<any> {
+		let saveAsTemplate: Observable<any> = of();
+		if (this.saveAsTemplate) {
+			saveAsTemplate = this.expenseServiceProvider.getTemplateService().addExpense(this.expense);
 		}
-		return this.expenseService.updateExpense(this.expense)
+		await saveAsTemplate.toPromise();
+		if (this.newExpense) {
+			return this.expenseService.addExpense(this.expense).toPromise();
+		}
+		return this.expenseService.updateExpense(this.expense).toPromise();
 	}
 }
