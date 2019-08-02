@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef, AfterViewChecked, Injectable } from '@angular/core';
 import { Expense, Category, PaymentMethod } from '../model';
-import { ExpenseService, ExpenseServiceProvider, AbstractExpenseService } from '../expense.service';
+import { ExpenseService, ExpenseServiceProvider, AbstractExpenseService, ExpenseType } from '../expense.service';
 import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 import { ModelUtil } from '../model.util';
@@ -74,6 +74,7 @@ export class EditExpenseComponent implements OnInit {
 			.map(term => this.authors.filter(v => v.indexOf(term) > -1));
 
 	private expenseService: AbstractExpenseService;
+	expenseType: ExpenseType;
 
 	constructor(
 		private expenseServiceProvider: ExpenseServiceProvider,
@@ -83,7 +84,8 @@ export class EditExpenseComponent implements OnInit {
 		private location: Location) { }
 
 	ngOnInit() {
-		this.expenseService = this.expenseServiceProvider.getServiceByUrl(this.route);
+		this.expenseType = ExpenseType.forUrl(this.route);
+		this.expenseService = this.expenseServiceProvider.getService(this.expenseType);
 		let id = this.route.snapshot.paramMap.get("id")
 		if (id == null) {
 			this.expense = ModelUtil.emptyExpense();

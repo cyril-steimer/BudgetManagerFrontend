@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { SubList, Expense, Sort } from '../model';
-import { ExpenseServiceProvider, AbstractExpenseService } from '../expense.service';
+import { ExpenseServiceProvider, AbstractExpenseService, ExpenseType } from '../expense.service';
 import { Observable } from 'rxjs/Observable';
 import { DelayedSearch } from '../delayed.search';
 import { ActivatedRoute } from '@angular/router';
@@ -35,13 +35,15 @@ export class ExpensesComponent implements OnInit, ExpenseSorter, ExpenseSearch {
 	private activeSort: Sort = { field: "date", direction: "desc" }
 
 	private expenseService: AbstractExpenseService;
+	expenseType: ExpenseType
 
 	constructor(
 		private expenseServiceProvider: ExpenseServiceProvider,
 		private route: ActivatedRoute) { }
 
 	ngOnInit() {
-		this.expenseService = this.expenseServiceProvider.getServiceByUrl(this.route);
+		this.expenseType = ExpenseType.forUrl(this.route);
+		this.expenseService = this.expenseServiceProvider.getService(this.expenseType);
 		this.route.params.subscribe(params => this.update(params));
 		this.getExpenses()
 	}

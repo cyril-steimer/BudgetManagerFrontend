@@ -1,5 +1,4 @@
-import { Component, OnInit } from '@angular/core';
-import { Text } from '@angular/compiler';
+import { Component } from '@angular/core';
 import { Expense } from '../model';
 import { ExpenseService } from '../expense.service';
 
@@ -34,6 +33,24 @@ export class DashboardComponent {
 		this.cards.push(this.newExpense());
 		this.cards.push(this.newBudget());
 		this.cards.push(this.importExport());
+		this.cards.push(this.templates());
+	}
+
+	private templates(): Card {
+		return {
+			title: 'Templates',
+			content: 'View all templates or add a new template',
+			links: [
+				{
+					name: 'All Templates',
+					url: '/templates'
+				},
+				{
+					name: 'Add Template',
+					url: '/template/add'
+				}
+			]
+		}
 	}
 
 	private expenses(date: Date): Card {

@@ -92,6 +92,46 @@ export class TemplateService extends AbstractExpenseService {
 	}
 }
 
+export class ExpenseType {
+
+	private constructor (private singular: string, private plural: string) { }
+
+	public getAddUrl(): string {
+		return `/${this.singular}/add`;
+	}
+
+	public getEditUrl(expense: Expense): string {
+		return `/edit/${this.singular}/${expense.id}`;
+	}
+
+	public getViewAllUrl(): string {
+		return `/${this.plural}`;
+	}
+
+	public getFilterByFieldUrl(field: string, value: string): string {
+		return `/${this.plural}/field/${field}/${value}`;
+	}
+
+	public isDateFieldRelevant(): boolean {
+		return this == ExpenseType.EXPENSE;
+	}
+
+	public isSumRelevant(): boolean {
+		return this == ExpenseType.EXPENSE;
+	}
+
+	public static TEMPLATE = new ExpenseType('template', 'templates');
+
+	public static EXPENSE = new ExpenseType('expense', 'expenses');
+
+	public static forUrl(route: ActivatedRoute): ExpenseType {
+		if (route.snapshot.toString().indexOf('template') >= 0) {
+			return ExpenseType.TEMPLATE;
+		}
+		return ExpenseType.EXPENSE;
+	}
+}
+
 @Injectable()
 export class ExpenseServiceProvider {
 
@@ -107,10 +147,12 @@ export class ExpenseServiceProvider {
 		return new TemplateService(this.http);
 	}
 
-	getServiceByUrl(route: ActivatedRoute): AbstractExpenseService {
-		if (route.snapshot.toString().indexOf('template') >= 0) {
+	getService(type: ExpenseType): AbstractExpenseService {
+		if (type == ExpenseType.TEMPLATE) {
 			return this.getTemplateService();
+		} else if (type == ExpenseType.EXPENSE) {
+			return this.getExpenseService();
 		}
-		return this.getExpenseService();
+		throw new Error('Unknown expense type');
 	}
 }

@@ -10,14 +10,19 @@ import { ImportExportComponent } from './import-export/import-export.component';
 const routes: Routes = [
   { path: '', component: DashboardComponent },
   { path: 'add', component: EditExpenseComponent },
+  { path: 'expense/add', component: EditExpenseComponent },
+  { path: 'template/add', component: EditExpenseComponent },
   { path: 'budget/add', component: EditBudgetComponent },
   { path: 'expenses', component: ExpensesComponent },
+  { path: 'templates', component: ExpensesComponent },
   { path: 'expenses/year/:year', component: ExpensesComponent },
   { path: 'expenses/year/:year/month/:month', component: ExpensesComponent },
   { path: 'expenses/field/:field/:value', component: ExpensesComponent },
+  { path: 'templates/field/:field/:value', component: ExpensesComponent },
   { path: 'budget/year/:year', component: BudgetComponent },
   { path: 'budget/year/:year/month/:month', component: BudgetComponent },
   { path: 'edit/expense/:id', component: EditExpenseComponent },
+  { path: 'edit/template/:id', component: EditExpenseComponent },
   { path: 'edit/budget/:id', component: EditBudgetComponent },
   { path: 'importexport', component: ImportExportComponent }
 ]
