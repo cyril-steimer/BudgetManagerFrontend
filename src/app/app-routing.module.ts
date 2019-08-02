@@ -9,10 +9,13 @@ import { ImportExportComponent } from './import-export/import-export.component';
 import { DATA_TEMPLATE, ExpenseResolverService } from './expense.service';
 
 const EXPENSE_RESOLVER = {expense: ExpenseResolverService};
+const TEMPLATE_RESOLVER = {template: ExpenseResolverService};
 
 const routes: Routes = [
   { path: '', component: DashboardComponent },
   { path: 'add/expense', component: EditExpenseComponent },
+  { path: 'add/expense/template/:templateid', component: EditExpenseComponent, resolve: TEMPLATE_RESOLVER },
+  { path: 'add/expense/copy/:id', component: EditExpenseComponent, resolve: TEMPLATE_RESOLVER },
   { path: 'add/template', component: EditExpenseComponent, data: DATA_TEMPLATE },
   { path: 'add/budget', component: EditBudgetComponent },
   { path: 'expenses', component: ExpensesComponent },

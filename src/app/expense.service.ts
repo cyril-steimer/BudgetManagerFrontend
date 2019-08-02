@@ -103,6 +103,13 @@ export class ExpenseType {
 		return `/add/${this.singular}`;
 	}
 
+	public getCloneUrl(template: Expense): string {
+		if (this == ExpenseType.EXPENSE) {
+			return `/add/expense/copy/${template.id}`;
+		}
+		return `/add/expense/template/${template.id}`;
+	}
+
 	public getEditUrl(expense: Expense): string {
 		return `/edit/${this.singular}/${expense.id}`;
 	}

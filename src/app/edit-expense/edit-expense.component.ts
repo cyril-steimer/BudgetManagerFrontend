@@ -90,7 +90,7 @@ export class EditExpenseComponent implements OnInit {
 			this.newExpense = data.expense == null;
 			this.expense = data.expense;
 			if (data.expense == null) {
-				this.expense = ModelUtil.emptyExpense();
+				this.expense = data.template == null ? ModelUtil.emptyExpense() : data.template;
 				this.expense.date.timestamp = new Date().getTime();
 			}
 		});
