@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { CategoryExpenses, Amount, Category, Timestamp, Expense } from '../model';
+import { CategoryExpenses, Amount, Category, Timestamp, Expense, ActualExpense } from '../model';
 import * as pdfmake from 'pdfmake/build/pdfmake';
 import * as pdffonts from 'pdfmake/build/vfs_fonts';
 import { DatePipe } from '@angular/common';
@@ -93,7 +93,7 @@ export class ReportComponent implements OnInit {
 
 	addDetail = false;
 	detailTables: ContentConfig[]
-	detailColumns: ColumnConfig<Expense>[]
+	detailColumns: ColumnConfig<ActualExpense>[]
 
 	private datePipe = new DatePipe('en-US');
 
@@ -124,11 +124,11 @@ export class ReportComponent implements OnInit {
 
 	private createDetailColumns() {
 		return [
-			new ColumnConfig<Expense>('Name', true, (val) => val.name.name),
-			new ColumnConfig<Expense>('Amount', true, (val) => this.toString(val.amount)),
-			new ColumnConfig<Expense>('Date', true, (val) => this.format(val.date)),
-			new ColumnConfig<Expense>('Payment Method', true, (val) => val.method == null ? '' : val.method.name),
-			new ColumnConfig<Expense>('Tags', true, (val) => val.tags.map((tag) => tag.name).join(', '))
+			new ColumnConfig<ActualExpense>('Name', true, (val) => val.name.name),
+			new ColumnConfig<ActualExpense>('Amount', true, (val) => this.toString(val.amount)),
+			new ColumnConfig<ActualExpense>('Date', true, (val) => this.format(val.date)),
+			new ColumnConfig<ActualExpense>('Payment Method', true, (val) => val.method == null ? '' : val.method.name),
+			new ColumnConfig<ActualExpense>('Tags', true, (val) => val.tags.map((tag) => tag.name).join(', '))
 		]
 	}
 

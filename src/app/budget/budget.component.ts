@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Expense, Budget, CategoryExpenses, Category, BudgetInPeriod } from '../model';
+import { Expense, Budget, CategoryExpenses, Category, BudgetInPeriod, ActualExpense } from '../model';
 import { ExpenseService } from '../expense.service';
 import { BudgetService } from '../budget.service';
 import { PeriodQuery } from '../query.util';
@@ -110,7 +110,7 @@ export class BudgetComponent implements OnInit, BeforeLeave {
 			.subscribe(expenses => this.init(expenses.values, budgets))
 	}
 
-	private init(expenses: Expense[], budgets: BudgetInPeriod[]) {
+	private init(expenses: ActualExpense[], budgets: BudgetInPeriod[]) {
 		let calc = new CategoryExpensesCalculator(expenses, budgets, this.switcher.getPeriod())
 		this.expensesPerCategory = calc.sortByBudget().calculateExpenses()
 		this.expensesForTable = this.expensesPerCategory.getAllExpensesWithTotal()

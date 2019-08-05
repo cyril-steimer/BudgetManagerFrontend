@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import { Expense, SubList, Pagination, Sort } from './model';
+import { Expense, SubList, Pagination, Sort, ActualExpense, ExpenseTemplate } from './model';
 import { Observable } from 'rxjs/Observable';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Resolve, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 
-export abstract class AbstractExpenseService {
+export abstract class AbstractExpenseService<T extends Expense> {
 
 	constructor(private http: HttpClient, private url: string) { }
 
@@ -12,34 +12,34 @@ export abstract class AbstractExpenseService {
 		filter?: string, 
 		searchBody?: any, 
 		sort?: Sort, 
-		pagination?: Pagination): Observable<SubList<Expense>> {
+		pagination?: Pagination): Observable<SubList<T>> {
 
 		let url = this.getSearchUrl(filter, searchBody);
 		let options = this.createOptions(sort, pagination);
 		if (searchBody == null) {
-			return this.http.get<SubList<Expense>>(url, options);
+			return this.http.get<SubList<T>>(url, options);
 		}
-		return this.http.post<SubList<Expense>>(url, searchBody, options);
+		return this.http.post<SubList<T>>(url, searchBody, options);
 	}
 
-	getExpenseById(id: string): Observable<Expense> {
+	getExpenseById(id: string): Observable<T> {
 		let url = `${this.url}/field/id/${id}`;
 		let options = {
 			params: { "single": "true" }
 		};
-		return this.http.get<Expense>(url, options);
+		return this.http.get<T>(url, options);
 	}
 
-	deleteExpense(expense: Expense): Observable<any> {
+	deleteExpense(expense: T): Observable<any> {
 		let params = { "id": expense.id };
 		return this.http.delete(this.url, { params: params });
 	}
 
-	addExpense(expense: Expense): Observable<any> {
+	addExpense(expense: T): Observable<any> {
 		return this.http.post(this.url, expense);
 	}
 
-	updateExpense(expense: Expense): Observable<any> {
+	updateExpense(expense: T): Observable<any> {
 		return this.http.put(this.url, expense);
 	}
 
@@ -77,7 +77,7 @@ export abstract class AbstractExpenseService {
 }
 
 @Injectable()
-export class ExpenseService extends AbstractExpenseService {
+export class ExpenseService extends AbstractExpenseService<ActualExpense> {
 
 	constructor(http: HttpClient) {
 		super(http, '/api/v1/expenses');
@@ -85,7 +85,7 @@ export class ExpenseService extends AbstractExpenseService {
 }
 
 @Injectable()
-export class TemplateService extends AbstractExpenseService {
+export class TemplateService extends AbstractExpenseService<ExpenseTemplate> {
 
 	constructor(http: HttpClient) {
 		super(http, '/api/v1/templates');
@@ -95,7 +95,7 @@ export class TemplateService extends AbstractExpenseService {
 const TYPE_TEMPLATE = 'template';
 export const DATA_TEMPLATE = {'type': TYPE_TEMPLATE};
 
-export class ExpenseType {
+export class ExpenseType<T extends Expense> {
 
 	private constructor (private singular: string, private plural: string) { }
 
@@ -134,11 +134,11 @@ export class ExpenseType {
 		return this == ExpenseType.EXPENSE;
 	}
 
-	public static TEMPLATE = new ExpenseType('template', 'templates');
+	public static TEMPLATE = new ExpenseType<ExpenseTemplate>('template', 'templates');
 
-	public static EXPENSE = new ExpenseType('expense', 'expenses');
+	public static EXPENSE = new ExpenseType<ActualExpense>('expense', 'expenses');
 
-	public static forRoute(route: ActivatedRoute): ExpenseType {
+	public static forRoute(route: ActivatedRoute): ExpenseType<Expense> {
 		let data = route.snapshot.data;
 		if (data.type == TYPE_TEMPLATE) {
 			return ExpenseType.TEMPLATE;
@@ -162,11 +162,11 @@ export class ExpenseServiceProvider {
 		return new TemplateService(this.http);
 	}
 
-	getService(type: ExpenseType): AbstractExpenseService {
+	getService<T extends Expense>(type: ExpenseType<T>): AbstractExpenseService<T> {
 		if (type == ExpenseType.TEMPLATE) {
-			return this.getTemplateService();
+			return this.getTemplateService() as AbstractExpenseService<any>;
 		} else if (type == ExpenseType.EXPENSE) {
-			return this.getExpenseService();
+			return this.getExpenseService() as AbstractExpenseService<any>;
 		}
 		throw new Error('Unknown expense type');
 	}

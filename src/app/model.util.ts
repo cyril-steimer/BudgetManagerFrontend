@@ -1,4 +1,4 @@
-import { Expense, Category, Amount, Budget, CategoryExpenses, BudgetInPeriod, BudgetAmount } from "./model";
+import { Expense, Category, Amount, Budget, CategoryExpenses, BudgetInPeriod, BudgetAmount, ActualExpense } from "./model";
 import { BudgetPeriod } from "./budget.period";
 
 export class ModelUtil {
@@ -17,12 +17,12 @@ export class ModelUtil {
 		return { amount: sum }
 	}
 
-	static getExpensesWithCategory(expenses: Expense[], category: Category): Expense[] {
+	static getExpensesWithCategory<T extends Expense>(expenses: T[], category: Category): T[] {
 		return expenses
 			.filter(e => e.category.name === category.name)
 	}
 
-	static emptyExpense(): Expense {
+	static emptyExpense(): ActualExpense {
 		return {
 			id: "",
 			category: { name: "" },
@@ -33,6 +33,21 @@ export class ModelUtil {
 			author: { name: "" },
 			tags: []
 		}
+	}
+
+	static toActualExpense(expense: Expense): ActualExpense {
+		if (ModelUtil.isActualExpense(expense)) {
+			return expense;
+		} else if (expense != null) {
+			let res = expense as ActualExpense;
+			res.date = { timestamp: new Date().getTime() };
+			return res;
+		}
+		return null;
+	}
+
+	static isActualExpense(expense: Expense): expense is ActualExpense {
+		return expense != null && (expense as ActualExpense).date != null;
 	}
 
 	static emptyBudget(): Budget {
@@ -99,7 +114,7 @@ export class CategoryExpensesCalculator {
 	private sorter: (e1: CategoryExpenses, e2: CategoryExpenses) => number = null
 
 	constructor(
-		private expenses: Expense[], 
+		private expenses: ActualExpense[], 
 		private budgets: BudgetInPeriod[],
 		private period: BudgetPeriod) { }
 

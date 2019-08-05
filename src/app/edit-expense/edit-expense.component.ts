@@ -1,5 +1,5 @@
 import { Component, OnInit, Injectable } from '@angular/core';
-import { Expense, Category } from '../model';
+import { Expense, Category, ActualExpense, ExpenseTemplate } from '../model';
 import { ExpenseServiceProvider, AbstractExpenseService, ExpenseType } from '../expense.service';
 import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
@@ -46,7 +46,7 @@ export class NgbDateTimestampAdapter extends NgbDateAdapter<number> {
 })
 export class EditExpenseComponent implements OnInit {
 
-	expense: Expense = null
+	expense: ActualExpense = null
 	newExpense: boolean = true
 
 	categories: Category[] = []
@@ -75,8 +75,8 @@ export class EditExpenseComponent implements OnInit {
 			.distinctUntilChanged()
 			.map(term => this.authors.filter(v => v.indexOf(term) > -1));
 
-	private expenseService: AbstractExpenseService;
-	expenseType: ExpenseType;
+	private expenseService: AbstractExpenseService<Expense>;
+	expenseType: ExpenseType<Expense>;
 	saveAsTemplate: boolean = false;
 
 	constructor(
@@ -89,11 +89,11 @@ export class EditExpenseComponent implements OnInit {
 	ngOnInit() {
 		this.expenseType = ExpenseType.forRoute(this.route);
 		this.expenseService = this.expenseServiceProvider.getService(this.expenseType);
-		this.route.data.subscribe((data: {expense: Expense, template: Expense}) => {
+		this.route.data.subscribe((data: {expense: ActualExpense, template: Expense}) => {
 			this.newExpense = data.expense == null;
-			this.expense = data.expense;
-			if (data.expense == null) {
-				this.expense = data.template == null ? ModelUtil.emptyExpense() : data.template;
+			this.expense = ModelUtil.toActualExpense(data.expense);
+			if (this.expense == null) {
+				this.expense = data.template == null ? ModelUtil.emptyExpense() : ModelUtil.toActualExpense(data.template);
 				this.expense.date.timestamp = new Date().getTime();
 			}
 		});

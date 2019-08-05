@@ -5,10 +5,15 @@ export class Expense {
 	name: Name
 	amount: Amount
 	category: Category
-	date: Timestamp
 	method: PaymentMethod
 	author: Author
 	tags: Tag[]
+}
+
+export class ExpenseTemplate extends Expense {}
+
+export class ActualExpense extends Expense {
+	date: Timestamp
 }
 
 export class Budget {
@@ -42,7 +47,7 @@ export class CategoryExpenses {
 	category: Category
 	amount: Amount
 	budget: Amount
-	expenses: Expense[]
+	expenses: ActualExpense[]
 }
 
 export class PaymentMethod {
