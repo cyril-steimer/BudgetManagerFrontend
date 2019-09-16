@@ -1,5 +1,5 @@
 import { Component, Input, AfterContentChecked } from '@angular/core';
-import { Expense } from '../model';
+import { Expense, Timestamp } from '../model';
 import { Router } from '@angular/router';
 import { ModelUtil } from '../model.util';
 import { ExpenseType } from '../expense.service';
@@ -54,6 +54,10 @@ export class ExpensesTableComponent implements AfterContentChecked {
 	searchByAuthor(event: MouseEvent, author: string) {
 		this.prepareToLeave(event);
 		this.router.navigateByUrl(this.expenseType.getFilterByFieldUrl('author', author));
+	}
+
+	formatTimestamp(ts: Timestamp) {
+		return `${ts.day}.${ts.month}.${ts.year}`;
 	}
 
 	private prepareToLeave(event?: MouseEvent) {

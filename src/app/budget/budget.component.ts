@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Expense, Budget, CategoryExpenses, Category, BudgetInPeriod, ActualExpense } from '../model';
+import { CategoryExpenses, BudgetInPeriod, ActualExpense } from '../model';
 import { ExpenseService } from '../expense.service';
 import { BudgetService } from '../budget.service';
 import { PeriodQuery } from '../query.util';
-import { ModelUtil, CategoryExpensesCalculator, ExpensesPerCategory } from '../model.util';
+import { CategoryExpensesCalculator, ExpensesPerCategory, TimestampUtil } from '../model.util';
 import { BeforeLeave } from '../expenses-table/expenses-table.component';
-import { BudgetPeriod, BudgetPeriodSwitch, BudgetPeriodSwitcher, DateExtractor, DaysInPeriod, DaysSinceStart, EndOfPeriod, isInPeriod, MonthYearPeriodCalculator } from '../budget.period';
+import { BudgetPeriodSwitch, BudgetPeriodSwitcher, DateExtractor, DaysInPeriod, DaysSinceStart, isInPeriod, MonthYearPeriodCalculator } from '../budget.period';
 import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap/modal/modal-ref';
 import { ChartDataSets, ChartOptions, ChartTooltipItem, ChartData } from 'chart.js';
@@ -182,7 +182,7 @@ class CategoryExpensesLineChartData {
 		let days = this.daysSinceStart();
 		let res = newFilledArray(days, 0);
 		for (let expense of this.expenses.expenses) {
-			let date = new Date(expense.date.timestamp);
+			let date = TimestampUtil.toDate(expense.date);
 			let offset = this.switcher.switch(new DaysSinceStart(), date);
 			for (let i = offset; i <= days; i++) {
 				res[i] = res[i] + expense.amount.amount;

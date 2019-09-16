@@ -3,7 +3,7 @@ import { CategoryExpenses, Amount, Category, Timestamp, Expense, ActualExpense }
 import * as pdfmake from 'pdfmake/build/pdfmake';
 import * as pdffonts from 'pdfmake/build/vfs_fonts';
 import { DatePipe } from '@angular/common';
-import { ExpensesPerCategory } from '../model.util';
+import { ExpensesPerCategory, TimestampUtil } from '../model.util';
 
 pdfmake.vfs = pdffonts.pdfMake.vfs;
 
@@ -235,7 +235,7 @@ export class ReportComponent implements OnInit {
 	}
 
 	private format(date: Timestamp) {
-		return this.datePipe.transform(date.timestamp, 'dd.MM.yyyy');
+		return this.datePipe.transform(TimestampUtil.toDate(date), 'dd.MM.yyyy');
 	}
 
 	private toString(amount: Amount) {

@@ -1,9 +1,9 @@
 import { Component, OnInit, Injectable } from '@angular/core';
-import { Expense, Category, ActualExpense, ExpenseTemplate } from '../model';
+import { Expense, Category, ActualExpense, Timestamp } from '../model';
 import { ExpenseServiceProvider, AbstractExpenseService, ExpenseType } from '../expense.service';
 import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
-import { ModelUtil } from '../model.util';
+import { ModelUtil, TimestampUtil } from '../model.util';
 import { Observable } from 'rxjs/Observable';
 import { BudgetService } from '../budget.service';
 import { NgbDateStruct, NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap';
@@ -15,26 +15,14 @@ import { AutocompleteService } from '../autocomplete.service';
 import { of } from 'rxjs/observable/of';
 
 @Injectable()
-export class NgbDateTimestampAdapter extends NgbDateAdapter<number> {
+export class NgbDateTimestampAdapter extends NgbDateAdapter<Timestamp> {
 
-	fromModel(value: number): NgbDateStruct {
-		if (value) {
-			let date = new Date(value);
-			return {
-				year: date.getFullYear(),
-				month: date.getMonth() + 1,
-				day: date.getDate()
-			};
-		}
-		return null;
+	fromModel(value: Timestamp): NgbDateStruct {
+		return value;
 	}
 	
-	toModel(date: NgbDateStruct): number {
-		if (date) {
-			let res = new Date(date.year, date.month - 1, date.day);
-			return res.getTime();
-		}
-		return null;
+	toModel(date: NgbDateStruct): Timestamp {
+		return date;
 	}
 }
 
@@ -94,7 +82,7 @@ export class EditExpenseComponent implements OnInit {
 			this.expense = ModelUtil.toActualExpense(data.expense);
 			if (this.expense == null) {
 				this.expense = data.template == null ? ModelUtil.emptyExpense() : ModelUtil.toActualExpense(data.template);
-				this.expense.date.timestamp = new Date().getTime();
+				this.expense.date = TimestampUtil.fromDate(new Date());
 			}
 		});
 		this.budgetService.getCategories()

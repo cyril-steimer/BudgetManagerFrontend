@@ -75,7 +75,9 @@ export class Category {
 }
 
 export class Timestamp {
-	timestamp: number
+	year: number
+	month: number
+	day: number
 }
 
 export class SubList<T> {

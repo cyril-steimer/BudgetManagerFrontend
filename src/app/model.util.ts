@@ -1,4 +1,4 @@
-import { Expense, Category, Amount, Budget, CategoryExpenses, BudgetInPeriod, BudgetAmount, ActualExpense } from "./model";
+import { Expense, Category, Amount, Budget, CategoryExpenses, BudgetInPeriod, BudgetAmount, ActualExpense, Timestamp } from "./model";
 import { BudgetPeriod } from "./budget.period";
 
 export class ModelUtil {
@@ -27,7 +27,7 @@ export class ModelUtil {
 			id: "",
 			category: { name: "" },
 			amount: { amount: 0 },
-			date: { timestamp: new Date().getTime() },
+			date: TimestampUtil.fromDate(new Date()),
 			name: { name: "" },
 			method: { name: "" },
 			author: { name: "" },
@@ -40,7 +40,7 @@ export class ModelUtil {
 			return expense;
 		} else if (expense != null) {
 			let res = expense as ActualExpense;
-			res.date = { timestamp: new Date().getTime() };
+			res.date = TimestampUtil.fromDate(new Date());
 			return res;
 		}
 		return null;
@@ -177,5 +177,19 @@ export class CategoryExpensesCalculator {
 			budget: { amount: 0 }, 
 			expenses: other 
 		}
+	}
+}
+
+export class TimestampUtil {
+	static fromDate(date: Date): Timestamp {
+		return {
+			year: date.getFullYear(),
+			month: date.getMonth() + 1,
+			day: date.getDate()
+		};
+	}
+
+	static toDate(ts: Timestamp): Date {
+		return new Date(ts.year, ts.month - 1, ts.day);
 	}
 }
