@@ -32,6 +32,7 @@ export class DashboardComponent {
 		this.cards.push(this.budget(date));
 		this.cards.push(this.importExport());
 		this.cards.push(this.templates());
+		this.cards.push(this.scheduledExpenses());
 	}
 
 	private templates(): Card {
@@ -42,6 +43,19 @@ export class DashboardComponent {
 				{
 					name: 'All Templates',
 					url: '/templates'
+				}
+			]
+		}
+	}
+
+	private scheduledExpenses(): Card {
+		return {
+			title: 'Scheduled Expenses',
+			content: 'View the list of scheduled expenses',
+			links: [
+				{
+					name: 'All Scheduled Expenses',
+					url: '/schedules'
 				}
 			]
 		}

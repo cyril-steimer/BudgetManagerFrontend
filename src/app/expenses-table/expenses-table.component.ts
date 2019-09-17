@@ -56,7 +56,10 @@ export class ExpensesTableComponent implements AfterContentChecked {
 		this.router.navigateByUrl(this.expenseType.getFilterByFieldUrl('author', author));
 	}
 
-	formatTimestamp(ts: Timestamp) {
+	formatTimestamp(ts: Timestamp): string {
+		if (ts == null) {
+			return '-';
+		}
 		return `${ts.day}.${ts.month}.${ts.year}`;
 	}
 

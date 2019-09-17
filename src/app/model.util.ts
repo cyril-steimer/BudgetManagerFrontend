@@ -1,4 +1,4 @@
-import { Expense, Category, Amount, Budget, CategoryExpenses, BudgetInPeriod, BudgetAmount, ActualExpense, Timestamp } from "./model";
+import { Expense, Category, Amount, Budget, CategoryExpenses, BudgetInPeriod, BudgetAmount, ActualExpense, Timestamp, ScheduledExpense } from "./model";
 import { BudgetPeriod } from "./budget.period";
 
 export class ModelUtil {
@@ -28,6 +28,23 @@ export class ModelUtil {
 			category: { name: "" },
 			amount: { amount: 0 },
 			date: TimestampUtil.fromDate(new Date()),
+			name: { name: "" },
+			method: { name: "" },
+			author: { name: "" },
+			tags: []
+		}
+	}
+
+	static emptyScheduledExpense(): ScheduledExpense {
+		return {
+			id: "",
+			category: { name: "" },
+			amount: { amount: 0 },
+			startDate: TimestampUtil.fromDate(new Date()),
+			endDate: null,
+			schedule: {
+				dayOfMonth: 1
+			},
 			name: { name: "" },
 			method: { name: "" },
 			author: { name: "" },

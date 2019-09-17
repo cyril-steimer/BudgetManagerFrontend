@@ -35,7 +35,7 @@ export class ExpensesComponent implements OnInit, ExpenseSorter, ExpenseSearch {
 	private activeSort: Sort = { field: "date", direction: "desc" }
 
 	private expenseService: AbstractExpenseService<Expense>;
-	expenseType: ExpenseType<Expense>;
+	expenseType: ExpenseType;
 
 	constructor(
 		private expenseServiceProvider: ExpenseServiceProvider,

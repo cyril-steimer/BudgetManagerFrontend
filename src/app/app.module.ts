@@ -24,6 +24,7 @@ import { ReportComponent } from './report/report.component';
 import { ImportExportComponent } from './import-export/import-export.component';
 import { ImportExportService } from './import-export.service';
 import { AutocompleteService } from './autocomplete.service';
+import { OrdinalPipe, WeekdayPipe } from './pipes';
 
 @NgModule({
   declarations: [
@@ -37,7 +38,9 @@ import { AutocompleteService } from './autocomplete.service';
     EditBudgetComponent,
     MinValidatorDirective,
     ReportComponent,
-    ImportExportComponent
+    ImportExportComponent,
+    OrdinalPipe,
+    WeekdayPipe
   ],
   imports: [
     BrowserModule,

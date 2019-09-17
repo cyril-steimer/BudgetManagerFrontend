@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Expense, SubList, Pagination, Sort, ActualExpense, ExpenseTemplate } from './model';
+import { Expense, SubList, Pagination, Sort, ActualExpense, ExpenseTemplate, ScheduledExpense } from './model';
 import { Observable } from 'rxjs/Observable';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Resolve, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
@@ -92,15 +92,30 @@ export class TemplateService extends AbstractExpenseService<ExpenseTemplate> {
 	}
 }
 
+@Injectable()
+export class ScheduledExpenseService extends AbstractExpenseService<ScheduledExpense> {
+
+	constructor(http: HttpClient) {
+		super(http, '/api/v1/schedules');
+	}
+}
+
 const TYPE_TEMPLATE = 'template';
 export const DATA_TEMPLATE = {'type': TYPE_TEMPLATE};
 
-export class ExpenseType<T extends Expense> {
+const TYPE_SCHEDULE = 'schedule';
+export const DATA_SCHEDULE = {'type': TYPE_SCHEDULE};
+
+export class ExpenseType {
 
 	private constructor (private singular: string, private plural: string) { }
 
 	public getAddUrl(): string {
 		return `/add/${this.singular}`;
+	}
+
+	public canClone(): boolean {
+		return this != ExpenseType.SCHEDULE;
 	}
 
 	public getCloneUrl(template: Expense): string {
@@ -126,6 +141,18 @@ export class ExpenseType<T extends Expense> {
 		return this == ExpenseType.EXPENSE;
 	}
 
+	public isStartDateFieldRelevant(): boolean {
+		return this == ExpenseType.SCHEDULE;
+	}
+
+	public isEndDateFieldRelevant(): boolean {
+		return this == ExpenseType.SCHEDULE;
+	}
+
+	public isScheduleFieldRelevant(): boolean {
+		return this == ExpenseType.SCHEDULE;
+	}
+
 	public isSumRelevant(): boolean {
 		return this == ExpenseType.EXPENSE;
 	}
@@ -134,14 +161,18 @@ export class ExpenseType<T extends Expense> {
 		return this == ExpenseType.EXPENSE;
 	}
 
-	public static TEMPLATE = new ExpenseType<ExpenseTemplate>('template', 'templates');
+	public static TEMPLATE = new ExpenseType('template', 'templates');
 
-	public static EXPENSE = new ExpenseType<ActualExpense>('expense', 'expenses');
+	public static EXPENSE = new ExpenseType('expense', 'expenses');
 
-	public static forRoute(route: ActivatedRoute): ExpenseType<Expense> {
+	public static SCHEDULE = new ExpenseType('schedule', 'schedules');
+
+	public static forRoute(route: ActivatedRoute): ExpenseType {
 		let data = route.snapshot.data;
 		if (data.type == TYPE_TEMPLATE) {
 			return ExpenseType.TEMPLATE;
+		} else if (data.type == TYPE_SCHEDULE) {
+			return ExpenseType.SCHEDULE;
 		}
 		return ExpenseType.EXPENSE;
 	}
@@ -162,11 +193,17 @@ export class ExpenseServiceProvider {
 		return new TemplateService(this.http);
 	}
 
-	getService<T extends Expense>(type: ExpenseType<T>): AbstractExpenseService<T> {
+	getScheduledExpenseService(): ScheduledExpenseService {
+		return new ScheduledExpenseService(this.http);
+	}
+
+	getService(type: ExpenseType): AbstractExpenseService<Expense> {
 		if (type == ExpenseType.TEMPLATE) {
-			return this.getTemplateService() as AbstractExpenseService<any>;
+			return this.getTemplateService();
 		} else if (type == ExpenseType.EXPENSE) {
-			return this.getExpenseService() as AbstractExpenseService<any>;
+			return this.getExpenseService();
+		} else if (type == ExpenseType.SCHEDULE) {
+			return this.getScheduledExpenseService();
 		}
 		throw new Error('Unknown expense type');
 	}
@@ -180,6 +217,8 @@ export class ExpenseResolverService implements Resolve<Expense> {
 	resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Expense> {
 		if (route.paramMap.has('templateid')) {
 			return this.provider.getTemplateService().getExpenseById(route.paramMap.get('templateid'));
+		} else if (route.paramMap.has('scheduleid')) {
+			return this.provider.getScheduledExpenseService().getExpenseById(route.paramMap.get('scheduleid'));
 		}
 		return this.provider.getExpenseService().getExpenseById(route.paramMap.get('id'));
 	}

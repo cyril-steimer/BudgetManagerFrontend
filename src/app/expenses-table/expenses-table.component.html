@@ -5,11 +5,14 @@
 			<th>Amount</th>
 			<th>Category</th>
 			<th *ngIf="expenseType.isDateFieldRelevant()">Date</th>
+			<th *ngIf="expenseType.isStartDateFieldRelevant()">Start Date</th>
+			<th *ngIf="expenseType.isEndDateFieldRelevant()">End Date</th>
+			<th *ngIf="expenseType.isScheduleFieldRelevant()">Schedule</th>
 			<th>Payment Method</th>
 			<th>Author</th>
 			<th>Tags</th>
 			<th></th>
-			<th></th>
+			<th *ngIf="expenseType.canClone()"></th>
 		</tr>
 	</thead>
 	<tbody>
@@ -22,6 +25,16 @@
 				</a>
 			</td>
 			<td *ngIf="expenseType.isDateFieldRelevant()">{{formatTimestamp(expense.date)}}</td>
+			<td *ngIf="expenseType.isStartDateFieldRelevant()">{{formatTimestamp(expense.startDate)}}</td>
+			<td *ngIf="expenseType.isEndDateFieldRelevant()">{{formatTimestamp(expense.endDate)}}</td>
+			<td *ngIf="expenseType.isScheduleFieldRelevant()">
+				<span *ngIf="expense.schedule.dayOfMonth != null">
+					Monthly on the {{ expense.schedule.dayOfMonth | ordinal }}
+				</span>
+				<span *ngIf="expense.schedule.dayOfWeek != null">
+					Weekly on {{ expense.schedule.dayOfWeek | titlecase }}
+				</span>
+			</td>
 			<td>
 				<a href="#" (click)="searchByMethod($event, expense.method.name)">
 					{{expense.method.name}}
@@ -40,7 +53,7 @@
 			<td>
 				<i class="fas fa-edit" (click)="edit(expense)"></i>
 			</td>
-			<td>
+			<td *ngIf="expenseType.canClone()">
 				<i class="fas fa-clone" (click)="clone(expense)"></i>
 			</td>
 		</tr>

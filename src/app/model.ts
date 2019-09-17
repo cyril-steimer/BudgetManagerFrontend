@@ -16,6 +16,12 @@ export class ActualExpense extends Expense {
 	date: Timestamp
 }
 
+export class ScheduledExpense extends Expense {
+	startDate: Timestamp
+	endDate: Timestamp
+	schedule: WeeklySchedule | MonthlySchedule
+}
+
 export class Budget {
 	category: Category
 	amounts: BudgetAmount[]
@@ -93,4 +99,12 @@ export class Pagination {
 export class Sort {
 	field: string
 	direction: string
+}
+
+export class WeeklySchedule {
+	dayOfWeek: string
+}
+
+export class MonthlySchedule {
+	dayOfMonth: number
 }
