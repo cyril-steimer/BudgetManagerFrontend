@@ -3,8 +3,14 @@
 </div>
 
 
-<div class="new-expense">
-	<a class="btn btn-primary btn-lg" routerLink="add">
+<div ngbDropdown placement="top-right" class="add">
+	<button class="btn btn-primary btn-lg" ngbDropdownToggle>
 		<i class="fas fa-plus"></i>
-	</a>
+	</button>
+	<div class="dropdown-menu" ngbDropdownMenu>
+		<a class="dropdown-item" routerLink="add/expense">Add Expense</a>
+		<a class="dropdown-item" routerLink="add/template">Add Template</a>
+		<a class="dropdown-item" routerLink="add/schedule">Add Scheduled Expense</a>
+		<a class="dropdown-item" routerLink="add/budget">Add Budget</a>
+	</div>
 </div>

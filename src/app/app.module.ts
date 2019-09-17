@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 
 import { AppComponent } from './app.component';
 import { ExpensesComponent } from './expenses/expenses.component';
-import { ExpenseService } from './expense.service';
+import { ExpenseServiceProvider, ExpenseService, TemplateService, ExpenseResolverService } from './expense.service';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -23,6 +23,8 @@ import { MinValidatorDirective } from './validators.directive';
 import { ReportComponent } from './report/report.component';
 import { ImportExportComponent } from './import-export/import-export.component';
 import { ImportExportService } from './import-export.service';
+import { AutocompleteService } from './autocomplete.service';
+import { OrdinalPipe, WeekdayPipe } from './pipes';
 
 @NgModule({
   declarations: [
@@ -36,7 +38,9 @@ import { ImportExportService } from './import-export.service';
     EditBudgetComponent,
     MinValidatorDirective,
     ReportComponent,
-    ImportExportComponent
+    ImportExportComponent,
+    OrdinalPipe,
+    WeekdayPipe
   ],
   imports: [
     BrowserModule,
@@ -49,9 +53,13 @@ import { ImportExportService } from './import-export.service';
     AppRoutingModule,
   ],
   providers: [
+    ExpenseServiceProvider,
     ExpenseService,
+    TemplateService,
     BudgetService,
-    ImportExportService
+    ImportExportService,
+    AutocompleteService,
+    ExpenseResolverService
   ],
   bootstrap: [AppComponent]
 })

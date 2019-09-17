@@ -1,9 +1,13 @@
-.new-expense {
+.add {
   position: fixed;
   bottom: 10px;
   right: 10px;
 }
 
-.new-expense > a {
+.add > button {
   border-radius: 50%;
+}
+
+.dropdown-toggle::after {
+  display: none;
 }

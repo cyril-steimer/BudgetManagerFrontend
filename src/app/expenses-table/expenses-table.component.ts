@@ -1,8 +1,8 @@
-import { Component, OnInit, Input, AfterContentChecked } from '@angular/core';
-import { Expense, Sort, SubList } from '../model';
+import { Component, Input, AfterContentChecked } from '@angular/core';
+import { Expense, Timestamp } from '../model';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs/Observable';
 import { ModelUtil } from '../model.util';
+import { ExpenseType } from '../expense.service';
 
 @Component({
 	selector: 'app-expenses-table',
@@ -14,6 +14,7 @@ export class ExpensesTableComponent implements AfterContentChecked {
 	@Input() expenses: Expense[] = []
 	@Input() beforeLeave: BeforeLeave
 	@Input() sorter: ExpenseSorter
+	@Input() expenseType = ExpenseType.EXPENSE
 
 	total = ModelUtil.emptyExpense();
 
@@ -27,27 +28,39 @@ export class ExpensesTableComponent implements AfterContentChecked {
 
 	edit(expense: Expense) {
 		this.prepareToLeave();
-		this.router.navigate(["edit", "expense", expense.id])
+		this.router.navigateByUrl(this.expenseType.getEditUrl(expense));
+	}
+
+	clone(expense: Expense) {
+		this.prepareToLeave();
+		this.router.navigateByUrl(this.expenseType.getCloneUrl(expense));
 	}
 
 	searchByTag(event: MouseEvent, tag: string) {
 		this.prepareToLeave(event);
-		this.router.navigate(["expenses", "field", "tag", tag]);
+		this.router.navigateByUrl(this.expenseType.getFilterByFieldUrl('tag', tag));
 	}
 
 	searchByMethod(event: MouseEvent, method: string) {
 		this.prepareToLeave(event);
-		this.router.navigate(["expenses", "field", "method", method]);
+		this.router.navigateByUrl(this.expenseType.getFilterByFieldUrl('method', method));
 	}
 
 	searchByCategory(event: MouseEvent, category: string) {
 		this.prepareToLeave(event);
-		this.router.navigate(["expenses", "field", "category", category]);
+		this.router.navigateByUrl(this.expenseType.getFilterByFieldUrl('category', category));
 	}
 
 	searchByAuthor(event: MouseEvent, author: string) {
 		this.prepareToLeave(event);
-		this.router.navigate(["expenses", "field", "author", author]);
+		this.router.navigateByUrl(this.expenseType.getFilterByFieldUrl('author', author));
+	}
+
+	formatTimestamp(ts: Timestamp): string {
+		if (ts == null) {
+			return '-';
+		}
+		return `${ts.day}.${ts.month}.${ts.year}`;
 	}
 
 	private prepareToLeave(event?: MouseEvent) {
@@ -62,7 +75,7 @@ export class ExpensesTableComponent implements AfterContentChecked {
 }
 
 export interface BeforeLeave {
-	beforeLeave();
+	beforeLeave(): void;
 }
 
 export class SortDirection {
@@ -74,6 +87,6 @@ export class SortField {
 }
 
 export interface ExpenseSorter {
-	sort(field: SortField, dir: SortDirection)
-	removeSort()
+	sort(field: SortField, dir: SortDirection): void;
+	removeSort(): void;
 }

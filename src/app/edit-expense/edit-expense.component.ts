@@ -1,37 +1,29 @@
-import { Component, OnInit, ChangeDetectorRef, AfterViewChecked, Injectable } from '@angular/core';
-import { Expense, Category, PaymentMethod } from '../model';
-import { ExpenseService } from '../expense.service';
+import { Component, OnInit, Injectable } from '@angular/core';
+import { Expense, Category, ActualExpense, Timestamp, ExpenseTemplate, ScheduledExpense, MonthlySchedule, WeeklySchedule } from '../model';
+import { ExpenseServiceProvider, AbstractExpenseService, ExpenseType } from '../expense.service';
 import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
-import { ModelUtil } from '../model.util';
+import { ModelUtil, TimestampUtil } from '../model.util';
 import { Observable } from 'rxjs/Observable';
 import { BudgetService } from '../budget.service';
 import { NgbDateStruct, NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap';
+import 'rxjs/add/observable/of';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/debounceTime';
 import 'rxjs/add/operator/distinctUntilChanged';
+import { AutocompleteService } from '../autocomplete.service';
+import { of } from 'rxjs/observable/of';
+import { range } from '../util';
 
 @Injectable()
-export class NgbDateTimestampAdapter extends NgbDateAdapter<number> {
+export class NgbDateTimestampAdapter extends NgbDateAdapter<Timestamp> {
 
-	fromModel(value: number): NgbDateStruct {
-		if (value) {
-			let date = new Date(value);
-			return {
-				year: date.getFullYear(),
-				month: date.getMonth() + 1,
-				day: date.getDate()
-			};
-		}
-		return null;
+	fromModel(value: Timestamp): NgbDateStruct {
+		return value;
 	}
 	
-	toModel(date: NgbDateStruct): number {
-		if (date) {
-			let res = new Date(date.year, date.month - 1, date.day);
-			return res.getTime();
-		}
-		return null;
+	toModel(date: NgbDateStruct): Timestamp {
+		return date;
 	}
 }
 
@@ -43,12 +35,16 @@ export class NgbDateTimestampAdapter extends NgbDateAdapter<number> {
 })
 export class EditExpenseComponent implements OnInit {
 
-	expense: Expense = null
-	newExpense: boolean = true
+	expense: Expense = null;
+	newExpense: boolean = true;
+	
+	scheduleType: 'monthly' | 'weekly' = 'monthly';
+	monthDays = range(1, 32);
+	scheduleMonthDay: number = 1;
+	weekDays = range(1, 8);
+	scheduleWeekDay: string = 'MONDAY';
 
 	categories: Category[] = []
-
-	initialized = false
 
 	private paymentMethods: string[] = []
 	methodTypeahead = (text$: Observable<string>) =>
@@ -72,29 +68,38 @@ export class EditExpenseComponent implements OnInit {
 			.distinctUntilChanged()
 			.map(term => this.authors.filter(v => v.indexOf(term) > -1));
 
+	private expenseService: AbstractExpenseService<Expense>;
+	expenseType: ExpenseType;
+	saveAsTemplate: boolean = false;
+
 	constructor(
-		private expenseService: ExpenseService,
+		private expenseServiceProvider: ExpenseServiceProvider,
+		private autocompleteService: AutocompleteService,
 		private budgetService: BudgetService,
 		private route: ActivatedRoute,
 		private location: Location) { }
 
 	ngOnInit() {
-		let id = this.route.snapshot.paramMap.get("id")
-		if (id == null) {
-			this.expense = ModelUtil.emptyExpense();
-			this.expense.date.timestamp = new Date().getTime();
-		} else {
-			this.newExpense = false
-			this.expenseService.getExpenseById(id)
-				.subscribe(expense => this.expense = expense);
-		}
+		this.expenseType = ExpenseType.forRoute(this.route);
+		this.expenseService = this.expenseServiceProvider.getService(this.expenseType);
+		this.route.data.subscribe((data: {expense: Expense}) => {
+			if (this.expenseType == ExpenseType.EXPENSE) {
+				this.expense = this.initForActualExpense(data.expense);
+			} else if (this.expenseType == ExpenseType.TEMPLATE) {
+				this.expense = this.initForExpenseTemplate(data.expense);
+			} else if (this.expenseType == ExpenseType.SCHEDULE) {
+				this.expense = this.initForScheduledExpense(data.expense);
+			}
+			let snapshot = this.route.snapshot;
+			this.newExpense = snapshot.url[0].path == 'add';
+		});
 		this.budgetService.getCategories()
 			.subscribe(categories => this.categories = categories.values);
-		this.expenseService.getPaymentMethods()
+		this.autocompleteService.getPaymentMethods()
 			.subscribe(methods => this.paymentMethods = methods.map(m => m.name));
-		this.expenseService.getTags()
+		this.autocompleteService.getTags()
 			.subscribe(tags => this.tags = tags.map(t => t.name));
-		this.expenseService.getAuthors()
+		this.autocompleteService.getAuthors()
 			.subscribe(authors => this.authors = authors.map(t => t.name));
 	}
 
@@ -103,7 +108,7 @@ export class EditExpenseComponent implements OnInit {
 	}
 
 	submit() {
-		this.doSubmit().subscribe(() => this.back());
+		this.doSubmit().then(() => this.back());
 	}
 
 	delete() {
@@ -127,10 +132,49 @@ export class EditExpenseComponent implements OnInit {
 		}
 	}
 
-	private doSubmit(): Observable<any> {
-		if (this.newExpense) {
-			return this.expenseService.addExpense(this.expense)
+	private initForActualExpense(expense: Expense): ActualExpense {
+		let res = expense as ActualExpense;
+		if (res == null) {
+			return ModelUtil.emptyExpense();
 		}
-		return this.expenseService.updateExpense(this.expense)
+		if (res.date == null) {
+			res.date = TimestampUtil.fromDate(new Date());
+		}
+		return res;
+	}
+
+	private initForExpenseTemplate(expense: Expense): ExpenseTemplate {
+		return expense == null ? ModelUtil.emptyExpense() : expense;
+	}
+
+	private initForScheduledExpense(expense: Expense): ScheduledExpense {
+		let res= expense == null ? ModelUtil.emptyScheduledExpense() : expense as ScheduledExpense;
+		if ((res.schedule as MonthlySchedule).dayOfMonth != null) {
+			this.scheduleType = 'monthly';
+			this.scheduleMonthDay = (res.schedule as MonthlySchedule).dayOfMonth;
+		} else {
+			this.scheduleType = 'weekly';
+			this.scheduleWeekDay = (res.schedule as WeeklySchedule).dayOfWeek;
+		}
+		return res;
+	}
+
+	private async doSubmit(): Promise<any> {
+		if (this.expenseType == ExpenseType.SCHEDULE) {
+			if (this.scheduleType == 'monthly') {
+				(this.expense as ScheduledExpense).schedule = {dayOfMonth: this.scheduleMonthDay};
+			} else {
+				(this.expense as ScheduledExpense).schedule = {dayOfWeek: this.scheduleWeekDay};
+			}
+		}
+		let saveAsTemplate: Observable<any> = of();
+		if (this.saveAsTemplate) {
+			saveAsTemplate = this.expenseServiceProvider.getTemplateService().addExpense(this.expense);
+		}
+		await saveAsTemplate.toPromise();
+		if (this.newExpense) {
+			return this.expenseService.addExpense(this.expense).toPromise();
+		}
+		return this.expenseService.updateExpense(this.expense).toPromise();
 	}
 }

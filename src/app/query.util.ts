@@ -1,5 +1,6 @@
 import { BudgetPeriodSwitcher, BudgetPeriodSwitch } from "./budget.period";
-import { Category } from "./model";
+import { Category, Timestamp } from "./model";
+import { TimestampUtil } from "./model.util";
 
 export class PeriodQuery implements BudgetPeriodSwitch<Date, {}> {
  
@@ -15,14 +16,14 @@ export class PeriodQuery implements BudgetPeriodSwitch<Date, {}> {
 export class QueryUtil {
 
 	static yearQuery(year: Date) {
-		let start = new Date(year.getFullYear(), 0).getTime()
-		let end = new Date(year.getFullYear() + 1, 0).getTime()
+		let start = new Date(year.getFullYear(), 0);
+		let end = new Date(year.getFullYear() + 1, 0);
 		return QueryUtil.betweenDateQuery(start, end)
 	}
 	
 	static monthQuery(month: Date) {
-		let start = new Date(month.getFullYear(), month.getMonth()).getTime()
-		let end = new Date(month.getFullYear(), month.getMonth() + 1).getTime()
+		let start = new Date(month.getFullYear(), month.getMonth());
+		let end = new Date(month.getFullYear(), month.getMonth() + 1);
 		return QueryUtil.betweenDateQuery(start, end)
 	}
 
@@ -31,19 +32,23 @@ export class QueryUtil {
 		res[field] = value;
 		return res;
 	}
+
+	private static format(date: Date): Timestamp {
+		return TimestampUtil.fromDate(date)
+	}
 	
-	private static betweenDateQuery(start: number, end: number) {
+	private static betweenDateQuery(start: Date, end: Date) {
 		return {
 			and: [
 				{
 					date: {
-						date: start,
+						date: QueryUtil.format(start),
 						comparison: ">="
 					}
 				},
 				{
 					date: {
-						date: end,
+						date: QueryUtil.format(end),
 						comparison: "<"
 					}
 				}

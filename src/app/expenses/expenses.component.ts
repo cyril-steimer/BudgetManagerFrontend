@@ -1,12 +1,11 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { SubList, Expense, Sort } from '../model';
-import { ExpenseService } from '../expense.service';
-import { MatTableDataSource, MatSort, MatSortable } from '@angular/material';
+import { ExpenseServiceProvider, AbstractExpenseService, ExpenseType } from '../expense.service';
 import { Observable } from 'rxjs/Observable';
 import { DelayedSearch } from '../delayed.search';
 import { ActivatedRoute } from '@angular/router';
 import { ExpenseSorter, SortDirection, SortField } from '../expenses-table/expenses-table.component';
-import { BudgetPeriodSwitcher, BudgetPeriod, DateExtractor } from '../budget.period';
+import { BudgetPeriodSwitcher, DateExtractor } from '../budget.period';
 import { PeriodQuery, QueryUtil } from '../query.util';
 import { ExpenseSearch } from '../date-header/date-header.component';
 
@@ -35,11 +34,16 @@ export class ExpensesComponent implements OnInit, ExpenseSorter, ExpenseSearch {
 
 	private activeSort: Sort = { field: "date", direction: "desc" }
 
+	private expenseService: AbstractExpenseService<Expense>;
+	expenseType: ExpenseType;
+
 	constructor(
-		private expenseService: ExpenseService,
+		private expenseServiceProvider: ExpenseServiceProvider,
 		private route: ActivatedRoute) { }
 
 	ngOnInit() {
+		this.expenseType = ExpenseType.forRoute(this.route);
+		this.expenseService = this.expenseServiceProvider.getService(this.expenseType);
 		this.route.params.subscribe(params => this.update(params));
 		this.getExpenses()
 	}

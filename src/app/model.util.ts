@@ -1,4 +1,4 @@
-import { Expense, Category, Amount, Budget, CategoryExpenses, BudgetInPeriod, BudgetAmount } from "./model";
+import { Expense, Category, Amount, Budget, CategoryExpenses, BudgetInPeriod, BudgetAmount, ActualExpense, Timestamp, ScheduledExpense } from "./model";
 import { BudgetPeriod } from "./budget.period";
 
 export class ModelUtil {
@@ -17,22 +17,54 @@ export class ModelUtil {
 		return { amount: sum }
 	}
 
-	static getExpensesWithCategory(expenses: Expense[], category: Category): Expense[] {
+	static getExpensesWithCategory<T extends Expense>(expenses: T[], category: Category): T[] {
 		return expenses
 			.filter(e => e.category.name === category.name)
 	}
 
-	static emptyExpense(): Expense {
+	static emptyExpense(): ActualExpense {
 		return {
 			id: "",
 			category: { name: "" },
 			amount: { amount: 0 },
-			date: { timestamp: new Date().getTime() },
+			date: TimestampUtil.fromDate(new Date()),
 			name: { name: "" },
 			method: { name: "" },
 			author: { name: "" },
 			tags: []
 		}
+	}
+
+	static emptyScheduledExpense(): ScheduledExpense {
+		return {
+			id: "",
+			category: { name: "" },
+			amount: { amount: 0 },
+			startDate: TimestampUtil.fromDate(new Date()),
+			endDate: null,
+			schedule: {
+				dayOfMonth: 1
+			},
+			name: { name: "" },
+			method: { name: "" },
+			author: { name: "" },
+			tags: []
+		}
+	}
+
+	static toActualExpense(expense: Expense): ActualExpense {
+		if (ModelUtil.isActualExpense(expense)) {
+			return expense;
+		} else if (expense != null) {
+			let res = expense as ActualExpense;
+			res.date = TimestampUtil.fromDate(new Date());
+			return res;
+		}
+		return null;
+	}
+
+	static isActualExpense(expense: Expense): expense is ActualExpense {
+		return expense != null && (expense as ActualExpense).date != null;
 	}
 
 	static emptyBudget(): Budget {
@@ -99,7 +131,7 @@ export class CategoryExpensesCalculator {
 	private sorter: (e1: CategoryExpenses, e2: CategoryExpenses) => number = null
 
 	constructor(
-		private expenses: Expense[], 
+		private expenses: ActualExpense[], 
 		private budgets: BudgetInPeriod[],
 		private period: BudgetPeriod) { }
 
@@ -162,5 +194,19 @@ export class CategoryExpensesCalculator {
 			budget: { amount: 0 }, 
 			expenses: other 
 		}
+	}
+}
+
+export class TimestampUtil {
+	static fromDate(date: Date): Timestamp {
+		return {
+			year: date.getFullYear(),
+			month: date.getMonth() + 1,
+			day: date.getDate()
+		};
+	}
+
+	static toDate(ts: Timestamp): Date {
+		return new Date(ts.year, ts.month - 1, ts.day);
 	}
 }

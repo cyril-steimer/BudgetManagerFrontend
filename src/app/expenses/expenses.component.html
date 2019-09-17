@@ -3,8 +3,8 @@
 
 <span *ngIf="field" class="chip mb-2">
     {{field}} = {{value}}
-    <i class="fas fa-times-circle chip-close" routerLink="/expenses"></i>
+    <i class="fas fa-times-circle chip-close" [routerLink]="expenseType.getViewAllUrl()"></i>
 </span>
 
-<app-expenses-table [expenses]="expenses" [sorter]="sorter" class="mt-2">
+<app-expenses-table [expenses]="expenses" [sorter]="sorter" [expenseType]="expenseType" class="mt-2">
 </app-expenses-table>
