@@ -15,7 +15,7 @@ export class ImportExportComponent {
 	export () {
 		this.importExportService.export()
 			.subscribe((json) => {
-				let blob = new Blob([json], {type: 'application/json'});
+				let blob = new Blob([json], {type: 'application/json;charset=utf-8'});
 				saveAs.saveAs(blob, 'export.json');
 			});
 	}
@@ -29,7 +29,7 @@ export class ImportExportComponent {
 		}
 		let reader = new FileReader();
 		reader.onload = () => this.doImport(reader.result as string);
-		reader.readAsBinaryString(file);
+		reader.readAsText(file, 'utf-8');
 	}
 
 	private doImport (content: string) {
