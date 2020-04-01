@@ -21,9 +21,9 @@
 						<td>{{expense.amount.amount | currency:'CHF'}}</td>
 						<td>{{expense.budget.amount | currency:'CHF'}}</td>
 						<td>
-							<i class="fas fa-edit" routerLink="/edit/budget/{{expense.category.name}}"
-							[hidden]="expense.category.name == 'Total' || expense.category.name == 'Not Budgeted'">
-							</i>
+							<div *ngIf="expense.budgetId">
+								<i class="fas fa-edit" routerLink="/edit/budget/{{expense.budgetId}}"></i>
+							</div>
 						</td>
 					</tr>
 				</tbody>

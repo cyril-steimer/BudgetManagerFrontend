@@ -1,5 +1,5 @@
 import { Component, Input, AfterContentChecked } from '@angular/core';
-import { Expense, Timestamp } from '../model';
+import {ActualExpense, Expense, ExpenseTemplate, ScheduledExpense, Timestamp} from '../model';
 import { Router } from '@angular/router';
 import { ModelUtil } from '../model.util';
 import { ExpenseType } from '../expense.service';
@@ -11,7 +11,7 @@ import { ExpenseType } from '../expense.service';
 })
 export class ExpensesTableComponent implements AfterContentChecked {
 
-	@Input() expenses: Expense[] = []
+	@Input() expenses: (ExpenseTemplate | ActualExpense | ScheduledExpense)[] = []
 	@Input() beforeLeave: BeforeLeave
 	@Input() sorter: ExpenseSorter
 	@Input() expenseType = ExpenseType.EXPENSE

@@ -18,14 +18,13 @@ export class ModelUtil {
 	}
 
 	static getExpensesWithCategory<T extends Expense>(expenses: T[], category: Category): T[] {
-		return expenses
-			.filter(e => e.category.name === category.name)
+		return expenses.filter(e => e.budget != null && e.budget.category.name == category.name);
 	}
 
 	static emptyExpense(): ActualExpense {
+		// TODO Does an empty expense need a budget?
 		return {
 			id: "",
-			category: { name: "" },
 			amount: { amount: 0 },
 			date: TimestampUtil.fromDate(new Date()),
 			name: { name: "" },
@@ -36,9 +35,9 @@ export class ModelUtil {
 	}
 
 	static emptyScheduledExpense(): ScheduledExpense {
+		// TODO Does an empty expense need a budget?
 		return {
 			id: "",
-			category: { name: "" },
 			amount: { amount: 0 },
 			startDate: TimestampUtil.fromDate(new Date()),
 			endDate: null,
@@ -69,6 +68,7 @@ export class ModelUtil {
 
 	static emptyBudget(): Budget {
 		return {
+			id: "",
 			category: { name: null },
 			amounts: [ ModelUtil.emptyBudgetAmount() ]
 		};
@@ -90,7 +90,7 @@ export class ModelUtil {
 }
 
 export class ExpensesPerCategory {
-	
+
 	constructor(
 		private budgeted: CategoryExpenses[],
 		private notBudgeted: CategoryExpenses,
@@ -131,11 +131,11 @@ export class CategoryExpensesCalculator {
 	private sorter: (e1: CategoryExpenses, e2: CategoryExpenses) => number = null
 
 	constructor(
-		private expenses: ActualExpense[], 
+		private expenses: ActualExpense[],
 		private budgets: BudgetInPeriod[],
 		private period: BudgetPeriod) { }
 
-	
+
 	sortByBudget(): CategoryExpensesCalculator {
 		let res = new CategoryExpensesCalculator(this.expenses, this.budgets, this.period)
 		res.sorter = (e1, e2) => e2.budget.amount - e1.budget.amount
@@ -156,8 +156,8 @@ export class CategoryExpensesCalculator {
 	}
 
 	private calculateTotalExpenses(): CategoryExpenses {
-		return { 
-			category: { name: "Total"}, 
+		return {
+			category: { name: "Total"},
 			amount: ModelUtil.sumExpenses(this.expenses),
 			budget: ModelUtil.sumBudgets(this.budgets),
 			expenses: this.expenses
@@ -165,11 +165,12 @@ export class CategoryExpensesCalculator {
 	}
 
 	private calculateCategoryExpensesForBudget(budget: BudgetInPeriod): CategoryExpenses {
-		let relevant = ModelUtil.getExpensesWithCategory(this.expenses, budget.category)
+		let relevant = ModelUtil.getExpensesWithCategory(this.expenses, budget.budget.category)
 		let sum = ModelUtil.sumExpenses(relevant)
-		return { 
-			category: budget.category, 
-			amount: sum, 
+		return {
+			budgetId: budget.budget.id,
+			category: budget.budget.category,
+			amount: sum,
 			budget: budget.amount,
 			expenses: relevant
 		}
@@ -185,16 +186,21 @@ export class CategoryExpensesCalculator {
 	}
 
 	private calculateNotBudgetedExpenses(): CategoryExpenses {
-		let other = this.expenses
-			.filter(e => this.budgets.filter(b => b.category.name === e.category.name).length == 0)
+		let other = this.expenses.filter(e => !this.isBudgeted(e))
 		let sum = ModelUtil.sumExpenses(other)
-		return { 
-			category: { name: "Not Budgeted" }, 
-			amount: sum, 
-			budget: { amount: 0 }, 
-			expenses: other 
+		return {
+			category: { name: "Not Budgeted" },
+			amount: sum,
+			budget: { amount: 0 },
+			expenses: other
 		}
 	}
+
+	private isBudgeted(e: Expense): boolean {
+	  return this.budgets.map(b => b.budget.category)
+      .filter(c => e.budget != null && e.budget.category.name === c.name)
+      .length > 0
+  }
 }
 
 export class TimestampUtil {

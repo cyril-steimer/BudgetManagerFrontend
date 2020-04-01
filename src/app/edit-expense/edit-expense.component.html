@@ -23,8 +23,8 @@
 	<div class="form-group">
 		<label for="category">Category</label>
 		<select class="form-control" id="category" name="category"
-		[(ngModel)]="expense.category.name" required>
-			<option *ngFor="let category of categories" value="{{category.name}}">{{category.name}}</option>
+		[(ngModel)]="selectedBudgetId" required>
+			<option *ngFor="let budget of budgets" value="{{budget.id}}">{{budget.category.name}}</option>
 		</select>
 	</div>
 	<div *ngIf="expenseType.isDateFieldRelevant()" class="form-group">

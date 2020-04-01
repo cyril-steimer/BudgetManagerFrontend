@@ -20,9 +20,11 @@
 			<td>{{expense.name.name}}</td>
 			<td>{{expense.amount.amount | currency:'CHF'}}</td>
 			<td>
-				<a href="#" (click)="searchByCategory($event, expense.category.name)">
-					{{expense.category.name}}
-				</a>
+        <div *ngIf="expense.budget">
+          <a href="#" (click)="searchByCategory($event, expense.budget.category.name)">
+            {{expense.budget.category.name}}
+          </a>
+        </div>
 			</td>
 			<td *ngIf="expenseType.isDateFieldRelevant()">{{formatTimestamp(expense.date)}}</td>
 			<td *ngIf="expenseType.isStartDateFieldRelevant()">{{formatTimestamp(expense.startDate)}}</td>
@@ -46,7 +48,7 @@
 				</a>
 			</td>
 			<td class="chip-list">
-				<a *ngFor="let tag of expense.tags" class="chip" 
+				<a *ngFor="let tag of expense.tags" class="chip"
 				href="#" (click)="searchByTag($event, tag.name)">
 					{{tag.name}}
 				</a></td>

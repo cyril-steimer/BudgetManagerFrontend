@@ -1,110 +1,112 @@
 import { BudgetPeriod } from "./budget.period";
 
-export class Expense {
+export interface Expense {
 	id: string
 	name: Name
 	amount: Amount
-	category: Category
+	budget?: Budget
 	method: PaymentMethod
 	author: Author
 	tags: Tag[]
 }
 
-export class ExpenseTemplate extends Expense {}
+export type ExpenseTemplate = Expense
 
-export class ActualExpense extends Expense {
+export interface ActualExpense extends Expense {
 	date: Timestamp
 }
 
-export class ScheduledExpense extends Expense {
+export interface ScheduledExpense extends Expense {
 	startDate: Timestamp
 	endDate: Timestamp
 	schedule: WeeklySchedule | MonthlySchedule
 }
 
-export class Budget {
+export interface Budget {
+	id: string
 	category: Category
 	amounts: BudgetAmount[]
 }
 
-export class BudgetAmount {
+export interface BudgetAmount {
 	amount: Amount
 	period: BudgetPeriod
 	from: MonthYear
 	to: MonthYear
 }
 
-export class MonthYear {
+export interface MonthYear {
 	month: number
 	year: number
 }
 
-export class MonthYearPeriod {
+export interface MonthYearPeriod {
 	from: MonthYear
 	to: MonthYear
 }
 
-export class BudgetInPeriod {
-	category: Category
+export interface BudgetInPeriod {
+	budget: Budget
 	amount: Amount
 }
 
-export class CategoryExpenses {
+export interface CategoryExpenses {
+	budgetId?: string
 	category: Category
 	amount: Amount
 	budget: Amount
 	expenses: ActualExpense[]
 }
 
-export class PaymentMethod {
+export interface PaymentMethod {
 	name: string
 }
 
-export class Tag {
+export interface Tag {
 	name: string
 }
 
-export class Author {
+export interface Author {
 	name: string
 }
 
-export class Amount {
+export interface Amount {
 	amount: number
 }
 
-export class Name {
+export interface Name {
 	name: string
 }
 
-export class Category {
+export interface Category {
 	name: string
 }
 
-export class Timestamp {
+export interface Timestamp {
 	year: number
 	month: number
 	day: number
 }
 
-export class SubList<T> {
+export interface SubList<T> {
 	count: number
 	values: T[]
 }
 
-export class Pagination {
+export interface Pagination {
 	from: number
 	count: number
 }
 
-export class Sort {
+export interface Sort {
 	field: string
 	direction: string
 }
 
-export class WeeklySchedule {
+export interface WeeklySchedule {
 	dayOfWeek: string
 }
 
-export class MonthlySchedule {
+export interface MonthlySchedule {
 	dayOfMonth: number
 }

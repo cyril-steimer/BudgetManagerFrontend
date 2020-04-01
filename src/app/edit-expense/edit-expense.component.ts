@@ -1,5 +1,5 @@
 import { Component, OnInit, Injectable } from '@angular/core';
-import { Expense, Category, ActualExpense, Timestamp, ExpenseTemplate, ScheduledExpense, MonthlySchedule, WeeklySchedule } from '../model';
+import { Expense, Category, ActualExpense, Timestamp, ExpenseTemplate, ScheduledExpense, MonthlySchedule, WeeklySchedule, Budget } from '../model';
 import { ExpenseServiceProvider, AbstractExpenseService, ExpenseType } from '../expense.service';
 import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
@@ -44,7 +44,8 @@ export class EditExpenseComponent implements OnInit {
 	weekDays = range(1, 8);
 	scheduleWeekDay: string = 'MONDAY';
 
-	categories: Category[] = []
+	budgets: Budget[] = []
+	selectedBudgetId: string = null;
 
 	private paymentMethods: string[] = []
 	methodTypeahead = (text$: Observable<string>) =>
@@ -92,9 +93,10 @@ export class EditExpenseComponent implements OnInit {
 			}
 			let snapshot = this.route.snapshot;
 			this.newExpense = snapshot.url[0].path == 'add';
+			this.selectedBudgetId = this.expense.budget == null ? null : this.expense.budget.id;
 		});
-		this.budgetService.getCategories()
-			.subscribe(categories => this.categories = categories.values);
+		this.budgetService.getBudgets()
+			.subscribe(budgets => this.budgets = budgets.values);
 		this.autocompleteService.getPaymentMethods()
 			.subscribe(methods => this.paymentMethods = methods.map(m => m.name));
 		this.autocompleteService.getTags()
@@ -160,6 +162,7 @@ export class EditExpenseComponent implements OnInit {
 	}
 
 	private async doSubmit(): Promise<any> {
+		this.expense.budget = this.budgets.filter(b => b.id == this.selectedBudgetId)[0];
 		if (this.expenseType == ExpenseType.SCHEDULE) {
 			if (this.scheduleType == 'monthly') {
 				(this.expense as ScheduledExpense).schedule = {dayOfMonth: this.scheduleMonthDay};

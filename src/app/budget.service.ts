@@ -20,13 +20,14 @@ export class BudgetService {
 		let url = `${this.budgetUrl}/category/${category}`;
 		return this.http.get<Budget>(url);
 	}
+
+	getBudgetById(id: string): Observable<Budget> {
+		let url = `${this.budgetUrl}/id/${id}`;
+		return this.http.get<Budget>(url);
+	}
 	
 	getBudgetsInPeriod(period: MonthYearPeriod): Observable<SubList<BudgetInPeriod>> {
 		return this.http.post<SubList<BudgetInPeriod>>(this.budgetUrl + '/period', period)
-	}
-
-	getCategories(): Observable<SubList<Category>> {
-		return this.http.get<SubList<Category>>(this.categoryUrl)
 	}
 
 	addBudget(budget: Budget): Observable<any> {
@@ -38,7 +39,7 @@ export class BudgetService {
 	}
 
 	deleteBudget(budget: Budget): Observable<any> {
-		let params = { "category": budget.category.name };
+		let params = { "id": budget.id };
 		return this.http.delete(this.budgetUrl, { params: params });
 	}
 }

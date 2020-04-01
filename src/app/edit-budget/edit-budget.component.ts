@@ -38,7 +38,7 @@ export class EditBudgetComponent implements OnInit {
 			this.budget = ModelUtil.emptyBudget();
 		} else {
 			this.newBudget = false;
-			this.budgetService.getBudgetByCategory(id)
+			this.budgetService.getBudgetById(id)
 				.subscribe(budget => this.budget = budget);
 		}
 	}
@@ -80,10 +80,4 @@ export class EditBudgetComponent implements OnInit {
 		}
 		return this.budgetService.updateBudget(this.budget);
 	}
-
-	private findBudgetWithId(budgets: Budget[], id: string) {
-		let filtered = budgets.filter(b => b.category.name == id);
-		return filtered.length == 1 ? filtered[0] : null;
-	}
-
 }
