@@ -1,5 +1,5 @@
 export function newFilledArray<T>(size: number, val: T): T[] {
-    let res = [];
+    const res = [];
     for (let i = 0; i < size; i++) {
         res.push(val);
     }
@@ -7,7 +7,7 @@ export function newFilledArray<T>(size: number, val: T): T[] {
 }
 
 export function range(from: number, to: number): number[] {
-    let res = [];
+    const res = [];
     for (let c = from; c < to; c++) {
         res.push(c);
     }

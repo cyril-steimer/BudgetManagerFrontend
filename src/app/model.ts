@@ -1,110 +1,112 @@
-import { BudgetPeriod } from "./budget.period";
+import {BudgetPeriod} from './budget.period';
 
-export class Expense {
-	id: string
-	name: Name
-	amount: Amount
-	category: Category
-	method: PaymentMethod
-	author: Author
-	tags: Tag[]
+export interface Expense {
+    id: string;
+    name: Name;
+    amount: Amount;
+    budget?: Budget;
+    method: PaymentMethod;
+    author: Author;
+    tags: Tag[];
 }
 
-export class ExpenseTemplate extends Expense {}
+export type ExpenseTemplate = Expense;
 
-export class ActualExpense extends Expense {
-	date: Timestamp
+export interface ActualExpense extends Expense {
+    date: Timestamp;
 }
 
-export class ScheduledExpense extends Expense {
-	startDate: Timestamp
-	endDate: Timestamp
-	schedule: WeeklySchedule | MonthlySchedule
+export interface ScheduledExpense extends Expense {
+    startDate: Timestamp;
+    endDate: Timestamp;
+    schedule: WeeklySchedule | MonthlySchedule;
 }
 
-export class Budget {
-	category: Category
-	amounts: BudgetAmount[]
+export interface Budget {
+    id: string;
+    category: Category;
+    amounts: BudgetAmount[];
 }
 
-export class BudgetAmount {
-	amount: Amount
-	period: BudgetPeriod
-	from: MonthYear
-	to: MonthYear
+export interface BudgetAmount {
+    amount: Amount;
+    period: BudgetPeriod;
+    from: MonthYear;
+    to: MonthYear;
 }
 
-export class MonthYear {
-	month: number
-	year: number
+export interface MonthYear {
+    month: number;
+    year: number;
 }
 
-export class MonthYearPeriod {
-	from: MonthYear
-	to: MonthYear
+export interface MonthYearPeriod {
+    from: MonthYear;
+    to: MonthYear;
 }
 
-export class BudgetInPeriod {
-	category: Category
-	amount: Amount
+export interface BudgetInPeriod {
+    budget: Budget;
+    amount: Amount;
 }
 
-export class CategoryExpenses {
-	category: Category
-	amount: Amount
-	budget: Amount
-	expenses: ActualExpense[]
+export interface CategoryExpenses {
+    budgetId?: string;
+    category: Category;
+    amount: Amount;
+    budget: Amount;
+    expenses: ActualExpense[];
 }
 
-export class PaymentMethod {
-	name: string
+export interface PaymentMethod {
+    name: string;
 }
 
-export class Tag {
-	name: string
+export interface Tag {
+    name: string;
 }
 
-export class Author {
-	name: string
+export interface Author {
+    name: string;
 }
 
-export class Amount {
-	amount: number
+export interface Amount {
+    amount: number;
 }
 
-export class Name {
-	name: string
+export interface Name {
+    name: string;
 }
 
-export class Category {
-	name: string
+export interface Category {
+    name: string;
 }
 
-export class Timestamp {
-	year: number
-	month: number
-	day: number
+export interface Timestamp {
+    year: number;
+    month: number;
+    day: number;
 }
 
-export class SubList<T> {
-	count: number
-	values: T[]
+export interface SubList<T> {
+    count: number;
+    values: T[];
 }
 
-export class Pagination {
-	from: number
-	count: number
+export interface Pagination {
+    from: number;
+    count: number;
 }
 
-export class Sort {
-	field: string
-	direction: string
+export interface Sort {
+    field: string;
+    direction: string;
 }
 
-export class WeeklySchedule {
-	dayOfWeek: string
+export interface WeeklySchedule {
+    dayOfWeek: string;
 }
 
-export class MonthlySchedule {
-	dayOfMonth: number
+export interface MonthlySchedule {
+    dayOfMonth: number;
 }

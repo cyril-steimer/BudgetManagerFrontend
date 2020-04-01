@@ -1,44 +1,46 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
-import { SubList, Budget, Category, MonthYear, BudgetInPeriod, MonthYearPeriod } from './model';
+import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {Observable} from 'rxjs/Observable';
+import {Budget, BudgetInPeriod, MonthYearPeriod, SubList} from './model';
 
 @Injectable()
 export class BudgetService {
 
-	private budgetUrl = "/api/v1/budget"
+    private budgetUrl = '/api/v1/budget';
 
-	private categoryUrl = "/api/v1/category"
+    private categoryUrl = '/api/v1/category';
 
-	constructor(private http: HttpClient) { }
+    constructor(private http: HttpClient) {
+    }
 
-	getBudgets(): Observable<SubList<Budget>> {
-		return this.http.get<SubList<Budget>>(this.budgetUrl)
-	}
+    getBudgets(): Observable<SubList<Budget>> {
+        return this.http.get<SubList<Budget>>(this.budgetUrl);
+    }
 
-	getBudgetByCategory(category: string): Observable<Budget> {
-		let url = `${this.budgetUrl}/category/${category}`;
-		return this.http.get<Budget>(url);
-	}
-	
-	getBudgetsInPeriod(period: MonthYearPeriod): Observable<SubList<BudgetInPeriod>> {
-		return this.http.post<SubList<BudgetInPeriod>>(this.budgetUrl + '/period', period)
-	}
+    getBudgetByCategory(category: string): Observable<Budget> {
+        const url = `${this.budgetUrl}/category/${category}`;
+        return this.http.get<Budget>(url);
+    }
 
-	getCategories(): Observable<SubList<Category>> {
-		return this.http.get<SubList<Category>>(this.categoryUrl)
-	}
+    getBudgetById(id: string): Observable<Budget> {
+        const url = `${this.budgetUrl}/id/${id}`;
+        return this.http.get<Budget>(url);
+    }
 
-	addBudget(budget: Budget): Observable<any> {
-		return this.http.post(this.budgetUrl, budget)
-	}
+    getBudgetsInPeriod(period: MonthYearPeriod): Observable<SubList<BudgetInPeriod>> {
+        return this.http.post<SubList<BudgetInPeriod>>(this.budgetUrl + '/period', period);
+    }
 
-	updateBudget(budget: Budget): Observable<any> {
-		return this.http.put(this.budgetUrl, budget);
-	}
+    addBudget(budget: Budget): Observable<any> {
+        return this.http.post(this.budgetUrl, budget);
+    }
 
-	deleteBudget(budget: Budget): Observable<any> {
-		let params = { "category": budget.category.name };
-		return this.http.delete(this.budgetUrl, { params: params });
-	}
+    updateBudget(budget: Budget): Observable<any> {
+        return this.http.put(this.budgetUrl, budget);
+    }
+
+    deleteBudget(budget: Budget): Observable<any> {
+        const params = {'id': budget.id};
+        return this.http.delete(this.budgetUrl, {params: params});
+    }
 }

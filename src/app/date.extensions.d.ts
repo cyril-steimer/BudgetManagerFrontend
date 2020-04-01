@@ -1,3 +1,3 @@
 declare interface Date {
-  getMonthName(): string
+    getMonthName(): string;
 }
