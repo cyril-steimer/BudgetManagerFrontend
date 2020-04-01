@@ -3,13 +3,13 @@ import {inject, TestBed} from '@angular/core/testing';
 import {BudgetService} from './budget.service';
 
 describe('BudgetService', () => {
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [BudgetService]
+    beforeEach(() => {
+        TestBed.configureTestingModule({
+            providers: [BudgetService]
+        });
     });
-  });
 
-  it('should be created', inject([BudgetService], (service: BudgetService) => {
-    expect(service).toBeTruthy();
-  }));
+    it('should be created', inject([BudgetService], (service: BudgetService) => {
+        expect(service).toBeTruthy();
+    }));
 });

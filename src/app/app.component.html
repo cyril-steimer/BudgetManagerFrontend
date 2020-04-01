@@ -1,16 +1,16 @@
 <div class="container">
-	<router-outlet></router-outlet>
+    <router-outlet></router-outlet>
 </div>
 
 
-<div ngbDropdown placement="top-right" class="add">
-	<button class="btn btn-primary btn-lg" ngbDropdownToggle>
-		<i class="fas fa-plus"></i>
-	</button>
-	<div class="dropdown-menu" ngbDropdownMenu>
-		<a class="dropdown-item" routerLink="add/expense">Add Expense</a>
-		<a class="dropdown-item" routerLink="add/template">Add Template</a>
-		<a class="dropdown-item" routerLink="add/schedule">Add Scheduled Expense</a>
-		<a class="dropdown-item" routerLink="add/budget">Add Budget</a>
-	</div>
+<div class="add" ngbDropdown placement="top-right">
+    <button class="btn btn-primary btn-lg" ngbDropdownToggle>
+        <i class="fas fa-plus"></i>
+    </button>
+    <div class="dropdown-menu" ngbDropdownMenu>
+        <a class="dropdown-item" routerLink="add/expense">Add Expense</a>
+        <a class="dropdown-item" routerLink="add/template">Add Template</a>
+        <a class="dropdown-item" routerLink="add/schedule">Add Scheduled Expense</a>
+        <a class="dropdown-item" routerLink="add/budget">Add Budget</a>
+    </div>
 </div>

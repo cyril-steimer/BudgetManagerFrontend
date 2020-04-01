@@ -2,132 +2,134 @@
 </app-date-header>
 
 <h3>{{newExpense ? 'Add Expense' : 'Edit Expense'}}</h3>
-<form *ngIf="expense" #expenseForm="ngForm" (ngSubmit)="submit()" 
-(keydown.enter)="$event.preventDefault()">
-	<div class="form-group">
-		<label for="name">Name</label>
-		<input class="form-control" type="text" id="name" name="name" 
-		[(ngModel)]="expense.name.name" required #name="ngModel">
-	</div>
-	<div [hidden]="name.valid || name.pristine" class="alert alert-danger">
-		Name is required
-	</div>
-	<div class="form-group">
-		<label for="name">Amount</label>
-		<input class="form-control" type="number" id="amount" name="amount"
-		[(ngModel)]="expense.amount.amount" required min="0.01" #amount="ngModel">
-	</div>
-	<div [hidden]="amount.valid || amount.pristine" class="alert alert-danger">
-		Amount is required and must be greater than zero
-	</div>
-	<div class="form-group">
-		<label for="category">Category</label>
-		<select class="form-control" id="category" name="category"
-		[(ngModel)]="selectedBudgetId" required>
-			<option *ngFor="let budget of budgets" value="{{budget.id}}">{{budget.category.name}}</option>
-		</select>
-	</div>
-	<div *ngIf="expenseType.isDateFieldRelevant()" class="form-group">
-		<label for="date">Date</label>
-		<div class="input-group">
-			<input class="form-control" id="date"  name="date"
-			[(ngModel)]="expense.date" required ngbDatepicker #d="ngbDatepicker">
-			<div class="input-group-append">
-				<button class="btn btn-outline-secondary" (click)="d.toggle()" type="button">
-					<i class="fas fa-calendar-alt"></i>
-				</button>
-			</div>
-		</div>
-	</div>
-	<div *ngIf="expenseType.isStartDateFieldRelevant()" class="form-group">
-		<label for="startDate">Start Date</label>
-		<div class="input-group">
-			<input class="form-control" id="startDate"  name="startDate"
-			[(ngModel)]="expense.startDate" required ngbDatepicker #d="ngbDatepicker">
-			<div class="input-group-append">
-				<button class="btn btn-outline-secondary" (click)="d.toggle()" type="button">
-					<i class="fas fa-calendar-alt"></i>
-				</button>
-			</div>
-		</div>
-	</div>
-	<div *ngIf="expenseType.isEndDateFieldRelevant()" class="form-group">
-		<label for="endDate">End Date</label>
-		<div class="input-group">
-			<input class="form-control" id="endDate" name="endDate"
-			[(ngModel)]="expense.endDate" ngbDatepicker #d="ngbDatepicker">
-			<div class="input-group-append">
-				<button class="btn btn-outline-secondary" (click)="d.toggle()" type="button">
-					<i class="fas fa-calendar-alt"></i>
-				</button>
-			</div>
-		</div>
-	</div>
-	<div *ngIf="expenseType.isScheduleFieldRelevant()" class="form-group">
-		<label>Schedule</label>
-		<div class="form-row">
-			<div class="col-md-6">
-				<select class="form-control" id="scheduleType" name="scheduleType"
-				[(ngModel)]="scheduleType" required>
-					<option value="monthly">Monthly on the</option>
-					<option value="weekly">Weekly on</option>
-				</select>
-			</div>
-			<div class="col-md-6" *ngIf="scheduleType == 'monthly'">
-				<select class="form-control" id="scheduleMonthDay" name="scheduleMonthDay"
-				[(ngModel)]="scheduleMonthDay" required>
-					<option *ngFor="let day of monthDays" value="{{day}}">{{ day | ordinal }}</option>
-				</select>
-			</div>
-			<div class="col-md-6" *ngIf="scheduleType == 'weekly'">
-				<select class="form-control" id="scheduleWeekDay" name="scheduleWeekDay"
-				[(ngModel)]="scheduleWeekDay" required>
-					<option *ngFor="let day of weekDays" value="{{ day | weekday | uppercase }}">{{ day | weekday }}</option>
-				</select>
-			</div>
-		</div>
-	</div>
-	<div class="form-group">
-		<label for="method">Payment Method</label>
-		<input class="form-control" type="text" id="method" name="method"
-		[(ngModel)]="expense.method.name"
-		[ngbTypeahead]="methodTypeahead">
-	</div>
-	<div class="form-group">
-		<label for="author">Author</label>
-		<input class="form-control" type="text" id="author" name="author"
-		[(ngModel)]="expense.author.name"
-		[ngbTypeahead]="authorTypeahead">
-	</div>
-	<div class="form-group">
-		<label for="tag">Tags</label>
-		<div class="chip-list">
+<form #expenseForm="ngForm" (keydown.enter)="$event.preventDefault()" (ngSubmit)="submit()"
+      *ngIf="expense">
+    <div class="form-group">
+        <label for="name">Name</label>
+        <input #name="ngModel" [(ngModel)]="expense.name.name" class="form-control" id="name"
+               name="name" required type="text">
+    </div>
+    <div [hidden]="name.valid || name.pristine" class="alert alert-danger">
+        Name is required
+    </div>
+    <div class="form-group">
+        <label for="name">Amount</label>
+        <input #amount="ngModel" [(ngModel)]="expense.amount.amount" class="form-control" id="amount"
+               min="0.01" name="amount" required type="number">
+    </div>
+    <div [hidden]="amount.valid || amount.pristine" class="alert alert-danger">
+        Amount is required and must be greater than zero
+    </div>
+    <div class="form-group">
+        <label for="category">Category</label>
+        <select [(ngModel)]="selectedBudgetId" class="form-control" id="category"
+                name="category" required>
+            <option *ngFor="let budget of budgets" value="{{budget.id}}">{{budget.category.name}}</option>
+        </select>
+    </div>
+    <div *ngIf="expenseType.isDateFieldRelevant()" class="form-group">
+        <label for="date">Date</label>
+        <div class="input-group">
+            <input #d="ngbDatepicker" [(ngModel)]="expense.date" class="form-control"
+                   id="date" name="date" ngbDatepicker required>
+            <div class="input-group-append">
+                <button (click)="d.toggle()" class="btn btn-outline-secondary" type="button">
+                    <i class="fas fa-calendar-alt"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="expenseType.isStartDateFieldRelevant()" class="form-group">
+        <label for="startDate">Start Date</label>
+        <div class="input-group">
+            <input #d="ngbDatepicker" [(ngModel)]="expense.startDate" class="form-control"
+                   id="startDate" name="startDate" ngbDatepicker required>
+            <div class="input-group-append">
+                <button (click)="d.toggle()" class="btn btn-outline-secondary" type="button">
+                    <i class="fas fa-calendar-alt"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="expenseType.isEndDateFieldRelevant()" class="form-group">
+        <label for="endDate">End Date</label>
+        <div class="input-group">
+            <input #d="ngbDatepicker" [(ngModel)]="expense.endDate" class="form-control"
+                   id="endDate" name="endDate" ngbDatepicker>
+            <div class="input-group-append">
+                <button (click)="d.toggle()" class="btn btn-outline-secondary" type="button">
+                    <i class="fas fa-calendar-alt"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="expenseType.isScheduleFieldRelevant()" class="form-group">
+        <label>Schedule</label>
+        <div class="form-row">
+            <div class="col-md-6">
+                <select [(ngModel)]="scheduleType" class="form-control" id="scheduleType"
+                        name="scheduleType" required>
+                    <option value="monthly">Monthly on the</option>
+                    <option value="weekly">Weekly on</option>
+                </select>
+            </div>
+            <div *ngIf="scheduleType == 'monthly'" class="col-md-6">
+                <select [(ngModel)]="scheduleMonthDay" class="form-control" id="scheduleMonthDay"
+                        name="scheduleMonthDay" required>
+                    <option *ngFor="let day of monthDays" value="{{day}}">{{ day | ordinal }}</option>
+                </select>
+            </div>
+            <div *ngIf="scheduleType == 'weekly'" class="col-md-6">
+                <select [(ngModel)]="scheduleWeekDay" class="form-control" id="scheduleWeekDay"
+                        name="scheduleWeekDay" required>
+                    <option *ngFor="let day of weekDays"
+                            value="{{ day | weekday | uppercase }}">{{ day | weekday }}</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="method">Payment Method</label>
+        <input [(ngModel)]="expense.method.name" [ngbTypeahead]="methodTypeahead" class="form-control" id="method"
+               name="method"
+               type="text">
+    </div>
+    <div class="form-group">
+        <label for="author">Author</label>
+        <input [(ngModel)]="expense.author.name" [ngbTypeahead]="authorTypeahead" class="form-control" id="author"
+               name="author"
+               type="text">
+    </div>
+    <div class="form-group">
+        <label for="tag">Tags</label>
+        <div class="chip-list">
 			<span *ngFor="let tag of expense.tags" class="chip">
 				{{tag.name}}
-				<i class="fas fa-times-circle chip-close" (click)="removeTag(tag.name)"></i>
+                <i (click)="removeTag(tag.name)" class="fas fa-times-circle chip-close"></i>
 			</span>
-		</div>
-		<input class="form-control" type="text" id="tag" name="tag" #tag
-		(keydown.enter)="addTag($event, tag.value); tag.value=''"
-		[ngbTypeahead]="tagTypeahead">
-	</div>
-	<div class="form-group" *ngIf="expenseType.canSaveAsTemplate()">
-		<div class="form-check">
-			<input type="checkbox" class="form-check-input" id="template" name="template" 
-			[(ngModel)]="saveAsTemplate">
-			<label class="form-check-label" for="template">Save as template</label>
-		</div>
-	</div>
-	<button class="btn btn-secondary" (click)="back()" type="button">
-		<i class="far fa-arrow-alt-circle-left"></i>
-		Back
-	</button>
-	<button class="btn btn-primary" type="submit" [disabled]="!expenseForm.form.valid">
-		Submit
-		<i class="far fa-arrow-alt-circle-right"></i>
-	</button>
-	<button *ngIf="!newExpense" class="btn btn-danger" (click)="delete()" type="button">
-		Delete
-		<i class="fas fa-trash-alt"></i>
-	</button>
+        </div>
+        <input #tag (keydown.enter)="addTag($event, tag.value); tag.value=''" [ngbTypeahead]="tagTypeahead"
+               class="form-control" id="tag"
+               name="tag"
+               type="text">
+    </div>
+    <div *ngIf="expenseType.canSaveAsTemplate()" class="form-group">
+        <div class="form-check">
+            <input [(ngModel)]="saveAsTemplate" class="form-check-input" id="template" name="template"
+                   type="checkbox">
+            <label class="form-check-label" for="template">Save as template</label>
+        </div>
+    </div>
+    <button (click)="back()" class="btn btn-secondary" type="button">
+        <i class="far fa-arrow-alt-circle-left"></i>
+        Back
+    </button>
+    <button [disabled]="!expenseForm.form.valid" class="btn btn-primary" type="submit">
+        Submit
+        <i class="far fa-arrow-alt-circle-right"></i>
+    </button>
+    <button (click)="delete()" *ngIf="!newExpense" class="btn btn-danger" type="button">
+        Delete
+        <i class="fas fa-trash-alt"></i>
+    </button>
 </form>

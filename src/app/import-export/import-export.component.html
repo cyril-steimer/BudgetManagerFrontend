@@ -1,27 +1,29 @@
 <app-date-header></app-date-header>
 
 <div>
-	<ngb-accordion>
-		<ngb-panel title="Export">
-			<ng-template ngbPanelContent>
-				<p>
-					Export all the data from a budget manager as a JSON file. The file can be used for importing into another instance or for any other activities.
-				</p>
-				<button class="btn btn-primary" (click)="export()">Export</button>
-			</ng-template>
-		</ngb-panel>
-	</ngb-accordion>
-	<ngb-accordion>
-		<ngb-panel title="Import">
-			<ng-template ngbPanelContent>
-				<p>
-					Import the data exported from another budget manager.
-				</p>
-				<div class="form-group">
-					<input id="import-file" accept=".json" type="file" class="form-control-file">
-				</div>
-				<button class="btn btn-primary" (click)="import()">Import</button>
-			</ng-template>
-		</ngb-panel>
-	</ngb-accordion>
+    <ngb-accordion>
+        <ngb-panel title="Export">
+            <ng-template ngbPanelContent>
+                <p>
+                    Export all the data from a budget manager as a JSON file. The file can be used for importing into
+                    another
+                    instance or for any other activities.
+                </p>
+                <button (click)="export()" class="btn btn-primary">Export</button>
+            </ng-template>
+        </ngb-panel>
+    </ngb-accordion>
+    <ngb-accordion>
+        <ngb-panel title="Import">
+            <ng-template ngbPanelContent>
+                <p>
+                    Import the data exported from another budget manager.
+                </p>
+                <div class="form-group">
+                    <input accept=".json" class="form-control-file" id="import-file" type="file">
+                </div>
+                <button (click)="import()" class="btn btn-primary">Import</button>
+            </ng-template>
+        </ngb-panel>
+    </ngb-accordion>
 </div>

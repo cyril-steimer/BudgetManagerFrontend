@@ -27,40 +27,41 @@ import {AutocompleteService} from './autocomplete.service';
 import {OrdinalPipe, WeekdayPipe} from './pipes';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    ExpensesComponent,
-    BudgetComponent,
-    DateHeaderComponent,
-    ExpensesTableComponent,
-    EditExpenseComponent,
-    DashboardComponent,
-    EditBudgetComponent,
-    MinValidatorDirective,
-    ReportComponent,
-    ImportExportComponent,
-    OrdinalPipe,
-    WeekdayPipe
-  ],
-  imports: [
-    BrowserModule,
-    HttpClientModule,
-    FormsModule,
-    NgbModule.forRoot(),
-    ReactiveFormsModule,
-    BrowserAnimationsModule,
-    ChartsModule,
-    AppRoutingModule,
-  ],
-  providers: [
-    ExpenseServiceProvider,
-    ExpenseService,
-    TemplateService,
-    BudgetService,
-    ImportExportService,
-    AutocompleteService,
-    ExpenseResolverService
-  ],
-  bootstrap: [AppComponent]
+    declarations: [
+        AppComponent,
+        ExpensesComponent,
+        BudgetComponent,
+        DateHeaderComponent,
+        ExpensesTableComponent,
+        EditExpenseComponent,
+        DashboardComponent,
+        EditBudgetComponent,
+        MinValidatorDirective,
+        ReportComponent,
+        ImportExportComponent,
+        OrdinalPipe,
+        WeekdayPipe
+    ],
+    imports: [
+        BrowserModule,
+        HttpClientModule,
+        FormsModule,
+        NgbModule.forRoot(),
+        ReactiveFormsModule,
+        BrowserAnimationsModule,
+        ChartsModule,
+        AppRoutingModule,
+    ],
+    providers: [
+        ExpenseServiceProvider,
+        ExpenseService,
+        TemplateService,
+        BudgetService,
+        ImportExportService,
+        AutocompleteService,
+        ExpenseResolverService
+    ],
+    bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+}

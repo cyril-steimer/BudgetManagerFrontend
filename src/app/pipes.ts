@@ -7,8 +7,8 @@ import {Pipe, PipeTransform} from '@angular/core';
 export class OrdinalPipe implements PipeTransform {
 
     transform(value: number): string {
-        let suffixTen = value % 10;
-        let suffixHundred = value % 100;
+        const suffixTen = value % 10;
+        const suffixHundred = value % 100;
         if (suffixTen == 1 && suffixHundred != 11) {
             return `${value}st`;
         } else if (suffixTen == 2 && suffixHundred != 12) {
@@ -29,7 +29,7 @@ const WEEKDAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Satur
 export class WeekdayPipe implements PipeTransform {
 
     transform(value: number): string {
-        let index = value - 1;
+        const index = value - 1;
         if (index < 0 || index >= WEEKDAYS.length) {
             return `Invalid weekday (${value})`;
         }
