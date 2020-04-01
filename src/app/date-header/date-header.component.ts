@@ -1,11 +1,10 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { BudgetPeriodSwitch, BudgetPeriod, BudgetPeriodSwitcher, DateExtractor, NextPeriod, PreviousPeriod } from '../budget.period';
-import { dashCaseToCamelCase } from '@angular/compiler/src/util';
+import {Component, Input, OnInit} from '@angular/core';
+import {ActivatedRoute} from '@angular/router';
+import {BudgetPeriod, BudgetPeriodSwitch, BudgetPeriodSwitcher, DateExtractor, NextPeriod, PreviousPeriod} from '../budget.period';
 
 export interface ExpenseSearch {
 	search(text: string): void
-} 
+}
 
 @Component({
 	selector: 'app-date-header',
@@ -22,7 +21,7 @@ export class DateHeaderComponent implements OnInit {
 	nextDateLink: DateLink
 	dateLink: DateLink
 	prevDateLink: DateLink
-	
+
 	parent: DateLink
 	children: DateLink[]
 
@@ -75,7 +74,7 @@ class DateLink {
 }
 
 class ChildrenLinks implements BudgetPeriodSwitch<Date, DateLink[]> {
- 
+
 	caseMonthly(arg: Date): DateLink[] {
 		return null //There is no finer view than 'monthly'
 	}

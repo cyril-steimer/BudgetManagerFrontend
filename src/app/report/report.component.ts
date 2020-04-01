@@ -1,9 +1,9 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { CategoryExpenses, Amount, Category, Timestamp, Expense, ActualExpense } from '../model';
+import {Component, Input, OnInit} from '@angular/core';
+import {ActualExpense, Amount, Category, CategoryExpenses, Timestamp} from '../model';
 import * as pdfmake from 'pdfmake/build/pdfmake';
 import * as pdffonts from 'pdfmake/build/vfs_fonts';
-import { DatePipe } from '@angular/common';
-import { ExpensesPerCategory, TimestampUtil } from '../model.util';
+import {DatePipe} from '@angular/common';
+import {ExpensesPerCategory, TimestampUtil} from '../model.util';
 
 pdfmake.vfs = pdffonts.pdfMake.vfs;
 
@@ -39,7 +39,7 @@ const NONE = {};
 type Style = {[key: string]: any};
 
 abstract class Config {
-	
+
 	constructor(
 		readonly name: string,
 		public selected: boolean) { }
@@ -50,7 +50,7 @@ abstract class Config {
 }
 
 class ContentConfig extends Config {
-	
+
 	constructor(
 		name: string,
 		selected: boolean,

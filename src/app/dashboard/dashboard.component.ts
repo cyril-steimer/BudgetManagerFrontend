@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
-import { Expense } from '../model';
-import { ExpenseService } from '../expense.service';
+import {Component} from '@angular/core';
+import {Expense} from '../model';
+import {ExpenseService} from '../expense.service';
 
 @Component({
 	selector: 'app-dashboard',
@@ -13,7 +13,7 @@ export class DashboardComponent {
 
 	filteredExpenses: Expense[] = null;
 
-	constructor(private expenseService: ExpenseService) { 
+	constructor(private expenseService: ExpenseService) {
 		this.initCards();
 	}
 

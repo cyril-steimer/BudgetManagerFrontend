@@ -1,12 +1,12 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router'
-import { ExpensesComponent } from './expenses/expenses.component';
-import { BudgetComponent } from './budget/budget.component';
-import { EditExpenseComponent } from './edit-expense/edit-expense.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
-import { EditBudgetComponent } from './edit-budget/edit-budget.component';
-import { ImportExportComponent } from './import-export/import-export.component';
-import { DATA_TEMPLATE, DATA_SCHEDULE, ExpenseResolverService } from './expense.service';
+import {NgModule} from '@angular/core';
+import {RouterModule, Routes} from '@angular/router';
+import {ExpensesComponent} from './expenses/expenses.component';
+import {BudgetComponent} from './budget/budget.component';
+import {EditExpenseComponent} from './edit-expense/edit-expense.component';
+import {DashboardComponent} from './dashboard/dashboard.component';
+import {EditBudgetComponent} from './edit-budget/edit-budget.component';
+import {ImportExportComponent} from './import-export/import-export.component';
+import {DATA_SCHEDULE, DATA_TEMPLATE, ExpenseResolverService} from './expense.service';
 
 const EXPENSE_RESOLVER = {expense: ExpenseResolverService};
 

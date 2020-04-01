@@ -1,16 +1,24 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { CategoryExpenses, BudgetInPeriod, ActualExpense } from '../model';
-import { ExpenseService } from '../expense.service';
-import { BudgetService } from '../budget.service';
-import { PeriodQuery } from '../query.util';
-import { CategoryExpensesCalculator, ExpensesPerCategory, TimestampUtil } from '../model.util';
-import { BeforeLeave } from '../expenses-table/expenses-table.component';
-import { BudgetPeriodSwitch, BudgetPeriodSwitcher, DateExtractor, DaysInPeriod, DaysSinceStart, isInPeriod, MonthYearPeriodCalculator } from '../budget.period';
-import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
-import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap/modal/modal-ref';
-import { ChartDataSets, ChartOptions, ChartTooltipItem, ChartData } from 'chart.js';
-import { range, newFilledArray } from '../util';
+import {Component, OnInit} from '@angular/core';
+import {ActivatedRoute} from '@angular/router';
+import {ActualExpense, BudgetInPeriod, CategoryExpenses} from '../model';
+import {ExpenseService} from '../expense.service';
+import {BudgetService} from '../budget.service';
+import {PeriodQuery} from '../query.util';
+import {CategoryExpensesCalculator, ExpensesPerCategory, TimestampUtil} from '../model.util';
+import {BeforeLeave} from '../expenses-table/expenses-table.component';
+import {
+  BudgetPeriodSwitch,
+  BudgetPeriodSwitcher,
+  DateExtractor,
+  DaysInPeriod,
+  DaysSinceStart,
+  isInPeriod,
+  MonthYearPeriodCalculator
+} from '../budget.period';
+import {NgbModal, NgbModalOptions} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModalRef} from '@ng-bootstrap/ng-bootstrap/modal/modal-ref';
+import {ChartData, ChartDataSets, ChartOptions, ChartTooltipItem} from 'chart.js';
+import {newFilledArray, range} from '../util';
 
 @Component({
 	selector: 'app-budget',
@@ -72,7 +80,7 @@ export class BudgetComponent implements OnInit, BeforeLeave {
 		if (expense.expenses.length > 0) {
 			this.detail = expense
 			this.modal = this.modalService.open(content, this.modalOptions);
-		}  
+		}
 	}
 
 	private piePlotData(calc: CategoryExpensesCalculator) {
@@ -186,7 +194,7 @@ class CategoryExpensesLineChartData {
 			let offset = this.switcher.switch(new DaysSinceStart(), date);
 			for (let i = offset; i <= days; i++) {
 				res[i] = res[i] + expense.amount.amount;
-			} 
+			}
 		}
 		return res;
 	}

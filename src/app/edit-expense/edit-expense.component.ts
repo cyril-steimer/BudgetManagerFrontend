@@ -1,19 +1,19 @@
-import { Component, OnInit, Injectable } from '@angular/core';
-import { Expense, Category, ActualExpense, Timestamp, ExpenseTemplate, ScheduledExpense, MonthlySchedule, WeeklySchedule, Budget } from '../model';
-import { ExpenseServiceProvider, AbstractExpenseService, ExpenseType } from '../expense.service';
-import { ActivatedRoute } from '@angular/router';
-import { Location } from '@angular/common';
-import { ModelUtil, TimestampUtil } from '../model.util';
-import { Observable } from 'rxjs/Observable';
-import { BudgetService } from '../budget.service';
-import { NgbDateStruct, NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap';
+import {Component, Injectable, OnInit} from '@angular/core';
+import {ActualExpense, Budget, Expense, ExpenseTemplate, MonthlySchedule, ScheduledExpense, Timestamp, WeeklySchedule} from '../model';
+import {AbstractExpenseService, ExpenseServiceProvider, ExpenseType} from '../expense.service';
+import {ActivatedRoute} from '@angular/router';
+import {Location} from '@angular/common';
+import {ModelUtil, TimestampUtil} from '../model.util';
+import {Observable} from 'rxjs/Observable';
+import {BudgetService} from '../budget.service';
+import {NgbDateAdapter, NgbDateStruct} from '@ng-bootstrap/ng-bootstrap';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/debounceTime';
 import 'rxjs/add/operator/distinctUntilChanged';
-import { AutocompleteService } from '../autocomplete.service';
-import { of } from 'rxjs/observable/of';
-import { range } from '../util';
+import {AutocompleteService} from '../autocomplete.service';
+import {of} from 'rxjs/observable/of';
+import {range} from '../util';
 
 @Injectable()
 export class NgbDateTimestampAdapter extends NgbDateAdapter<Timestamp> {
@@ -21,7 +21,7 @@ export class NgbDateTimestampAdapter extends NgbDateAdapter<Timestamp> {
 	fromModel(value: Timestamp): NgbDateStruct {
 		return value;
 	}
-	
+
 	toModel(date: NgbDateStruct): Timestamp {
 		return date;
 	}
@@ -37,7 +37,7 @@ export class EditExpenseComponent implements OnInit {
 
 	expense: Expense = null;
 	newExpense: boolean = true;
-	
+
 	scheduleType: 'monthly' | 'weekly' = 'monthly';
 	monthDays = range(1, 32);
 	scheduleMonthDay: number = 1;
@@ -54,7 +54,7 @@ export class EditExpenseComponent implements OnInit {
 			.distinctUntilChanged()
 			.map(term => this.paymentMethods.filter(v => v.indexOf(term) > -1));
 
-			
+
 	private tags: string[] = [];
 	tagTypeahead = (text$: Observable<string>) =>
 		text$
@@ -128,7 +128,7 @@ export class EditExpenseComponent implements OnInit {
 		if ((<Element>event.currentTarget).className.indexOf("open") > -1) {
 			return;
 		}
-		if (tag.length > 0 
+		if (tag.length > 0
 			&& this.expense.tags.findIndex(t => t.name == tag) == -1) {
 			this.expense.tags.push({"name": tag});
 		}

@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
-import { HttpClient } from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {Observable} from 'rxjs/Observable';
+import {HttpClient} from '@angular/common/http';
 
 const IMPORT_URL = "/api/v1/import";
 const EXPORT_URL = "/api/v1/export";

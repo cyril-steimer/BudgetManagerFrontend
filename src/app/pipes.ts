@@ -1,4 +1,4 @@
-import { Pipe, PipeTransform } from '@angular/core';
+import {Pipe, PipeTransform} from '@angular/core';
 
 /**
  * Convert a number to an ordinal number. E.g. 1 -> 1st, 2 -> 2nd, etc.
@@ -17,7 +17,7 @@ export class OrdinalPipe implements PipeTransform {
             return `${value}rd`;
         }
         return `${value}th`;
-    } 
+    }
 }
 
 const WEEKDAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];

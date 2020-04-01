@@ -1,8 +1,8 @@
-import { Component, Input, AfterContentChecked } from '@angular/core';
+import {AfterContentChecked, Component, Input} from '@angular/core';
 import {ActualExpense, Expense, ExpenseTemplate, ScheduledExpense, Timestamp} from '../model';
-import { Router } from '@angular/router';
-import { ModelUtil } from '../model.util';
-import { ExpenseType } from '../expense.service';
+import {Router} from '@angular/router';
+import {ModelUtil} from '../model.util';
+import {ExpenseType} from '../expense.service';
 
 @Component({
 	selector: 'app-expenses-table',

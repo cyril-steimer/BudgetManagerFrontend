@@ -1,4 +1,4 @@
-import { BudgetPeriod } from "./budget.period";
+import {BudgetPeriod} from './budget.period';
 
 export interface Expense {
 	id: string

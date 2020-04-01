@@ -1,5 +1,16 @@
-import { Expense, Category, Amount, Budget, CategoryExpenses, BudgetInPeriod, BudgetAmount, ActualExpense, Timestamp, ScheduledExpense } from "./model";
-import { BudgetPeriod } from "./budget.period";
+import {
+  ActualExpense,
+  Amount,
+  Budget,
+  BudgetAmount,
+  BudgetInPeriod,
+  Category,
+  CategoryExpenses,
+  Expense,
+  ScheduledExpense,
+  Timestamp
+} from './model';
+import {BudgetPeriod} from './budget.period';
 
 export class ModelUtil {
 

@@ -1,4 +1,4 @@
-import { Budget, BudgetInPeriod, MonthYearPeriod } from "./model";
+import {MonthYearPeriod} from './model';
 
 export enum BudgetPeriod {
 	MONTHLY = "monthly",
@@ -44,8 +44,8 @@ export class MonthYearPeriodCalculator implements BudgetPeriodSwitch<Date, Month
 				year: year
 			}
 		}
-	}	
-	
+	}
+
 	caseYearly(arg: Date): MonthYearPeriod {
 		let year = arg.getFullYear()
 		return {
@@ -62,7 +62,7 @@ export class MonthYearPeriodCalculator implements BudgetPeriodSwitch<Date, Month
 }
 
 export class DateExtractor implements BudgetPeriodSwitch<{[key: string]: string}, Date> {
-	
+
 	static getBudgetPeriod(params: { [key: string]: string; }) {
 		if (params.month) {
 			return BudgetPeriod.MONTHLY
@@ -111,7 +111,7 @@ export class DaysSinceStart implements BudgetPeriodSwitch<Date, number> {
 }
 
 export class NextPeriod implements BudgetPeriodSwitch<Date, Date> {
-	
+
 	caseMonthly(arg: Date): Date {
 		return new Date(arg.getFullYear(), arg.getMonth() + 1)
 	}

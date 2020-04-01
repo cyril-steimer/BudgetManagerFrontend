@@ -1,7 +1,7 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
-import { PaymentMethod, Tag, Author } from './model';
+import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {Observable} from 'rxjs/Observable';
+import {Author, PaymentMethod, Tag} from './model';
 
 
 const METHOD_URL = "/api/v1/paymentmethod";

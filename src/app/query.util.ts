@@ -1,9 +1,9 @@
-import { BudgetPeriodSwitcher, BudgetPeriodSwitch } from "./budget.period";
-import { Category, Timestamp } from "./model";
-import { TimestampUtil } from "./model.util";
+import {BudgetPeriodSwitch} from './budget.period';
+import {Timestamp} from './model';
+import {TimestampUtil} from './model.util';
 
 export class PeriodQuery implements BudgetPeriodSwitch<Date, {}> {
- 
+
 	caseMonthly(arg: Date): {} {
 		return QueryUtil.monthQuery(arg)
 	}
@@ -20,7 +20,7 @@ export class QueryUtil {
 		let end = new Date(year.getFullYear() + 1, 0);
 		return QueryUtil.betweenDateQuery(start, end)
 	}
-	
+
 	static monthQuery(month: Date) {
 		let start = new Date(month.getFullYear(), month.getMonth());
 		let end = new Date(month.getFullYear(), month.getMonth() + 1);
@@ -36,7 +36,7 @@ export class QueryUtil {
 	private static format(date: Date): Timestamp {
 		return TimestampUtil.fromDate(date)
 	}
-	
+
 	private static betweenDateQuery(start: Date, end: Date) {
 		return {
 			and: [

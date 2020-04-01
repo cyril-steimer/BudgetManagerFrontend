@@ -1,11 +1,11 @@
-import { Component, OnInit } from '@angular/core';
-import { BudgetService } from '../budget.service';
-import { Budget, BudgetAmount } from '../model';
-import { ModelUtil } from '../model.util';
-import { Location } from '@angular/common';
-import { BudgetPeriod } from '../budget.period';
-import { ActivatedRoute } from '@angular/router';
-import { Observable } from 'rxjs/Observable';
+import {Component, OnInit} from '@angular/core';
+import {BudgetService} from '../budget.service';
+import {Budget, BudgetAmount} from '../model';
+import {ModelUtil} from '../model.util';
+import {Location} from '@angular/common';
+import {BudgetPeriod} from '../budget.period';
+import {ActivatedRoute} from '@angular/router';
+import {Observable} from 'rxjs/Observable';
 
 @Component({
 	selector: 'app-edit-budget',

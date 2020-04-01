@@ -1,7 +1,7 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
-import { SubList, Budget, Category, MonthYear, BudgetInPeriod, MonthYearPeriod } from './model';
+import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {Observable} from 'rxjs/Observable';
+import {Budget, BudgetInPeriod, MonthYearPeriod, SubList} from './model';
 
 @Injectable()
 export class BudgetService {
@@ -25,7 +25,7 @@ export class BudgetService {
 		let url = `${this.budgetUrl}/id/${id}`;
 		return this.http.get<Budget>(url);
 	}
-	
+
 	getBudgetsInPeriod(period: MonthYearPeriod): Observable<SubList<BudgetInPeriod>> {
 		return this.http.post<SubList<BudgetInPeriod>>(this.budgetUrl + '/period', period)
 	}

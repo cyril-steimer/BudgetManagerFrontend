@@ -1,17 +1,17 @@
-import { Injectable } from '@angular/core';
-import { Expense, SubList, Pagination, Sort, ActualExpense, ExpenseTemplate, ScheduledExpense } from './model';
-import { Observable } from 'rxjs/Observable';
-import { HttpClient } from '@angular/common/http';
-import { ActivatedRoute, Resolve, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+import {Injectable} from '@angular/core';
+import {ActualExpense, Expense, ExpenseTemplate, Pagination, ScheduledExpense, Sort, SubList} from './model';
+import {Observable} from 'rxjs/Observable';
+import {HttpClient} from '@angular/common/http';
+import {ActivatedRoute, ActivatedRouteSnapshot, Resolve, RouterStateSnapshot} from '@angular/router';
 
 export abstract class AbstractExpenseService<T extends Expense> {
 
 	constructor(private http: HttpClient, private url: string) { }
 
 	getExpenses(
-		filter?: string, 
-		searchBody?: any, 
-		sort?: Sort, 
+		filter?: string,
+		searchBody?: any,
+		sort?: Sort,
 		pagination?: Pagination): Observable<SubList<T>> {
 
 		let url = this.getSearchUrl(filter, searchBody);
