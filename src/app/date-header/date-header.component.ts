@@ -77,7 +77,7 @@ class DateLink {
 class ChildrenLinks implements BudgetPeriodSwitch<Date, DateLink[]> {
 
     caseMonthly(arg: Date): DateLink[] {
-        return null; //There is no finer view than 'monthly'
+        return null; // There is no finer view than 'monthly'
     }
 
     caseYearly(arg: Date): DateLink[] {

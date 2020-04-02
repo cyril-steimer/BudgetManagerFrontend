@@ -1,5 +1,7 @@
-<app-date-header [date]="date" [switcher]="switcher" [urlPrefix]="urlPrefix">
-</app-date-header>
+<div *ngIf="date">
+    <app-date-header [date]="date" [switcher]="switcher" [urlPrefix]="urlPrefix">
+    </app-date-header>
+</div>
 
 <ngb-tabset>
     <ngb-tab title="Overview">

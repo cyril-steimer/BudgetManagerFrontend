@@ -25,6 +25,7 @@ import {ImportExportComponent} from './import-export/import-export.component';
 import {ImportExportService} from './import-export.service';
 import {AutocompleteService} from './autocomplete.service';
 import {OrdinalPipe, WeekdayPipe} from './pipes';
+import {ViewService} from './view.service';
 
 @NgModule({
     declarations: [
@@ -57,6 +58,7 @@ import {OrdinalPipe, WeekdayPipe} from './pipes';
         ExpenseService,
         TemplateService,
         BudgetService,
+        ViewService,
         ImportExportService,
         AutocompleteService,
         ExpenseResolverService

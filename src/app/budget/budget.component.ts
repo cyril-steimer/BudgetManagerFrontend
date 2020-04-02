@@ -3,7 +3,7 @@ import {ActivatedRoute} from '@angular/router';
 import {ActualExpense, BudgetInPeriod, CategoryExpenses} from '../model';
 import {ExpenseService} from '../expense.service';
 import {BudgetService} from '../budget.service';
-import {PeriodQuery} from '../query.util';
+import {PeriodQuery, QueryUtil} from '../query.util';
 import {CategoryExpensesCalculator, ExpensesPerCategory, TimestampUtil} from '../model.util';
 import {BeforeLeave} from '../expenses-table/expenses-table.component';
 import {
@@ -19,6 +19,8 @@ import {NgbModal, NgbModalOptions} from '@ng-bootstrap/ng-bootstrap';
 import {NgbModalRef} from '@ng-bootstrap/ng-bootstrap/modal/modal-ref';
 import {ChartData, ChartDataSets, ChartOptions, ChartTooltipItem} from 'chart.js';
 import {newFilledArray, range} from '../util';
+import {ViewService} from '../view.service';
+import {BudgetView} from '../view';
 
 @Component({
     selector: 'app-budget',
@@ -56,24 +58,25 @@ export class BudgetComponent implements OnInit, BeforeLeave {
     lineCharts: CategoryExpensesLineChartData[] = [];
 
     date: Date;
+    view: BudgetView;
     switcher: BudgetPeriodSwitcher;
-    urlPrefix = 'budget';
+    urlPrefix: string;
 
     constructor(
         private expenseService: ExpenseService,
         private budgetService: BudgetService,
+        private viewService: ViewService,
         private route: ActivatedRoute,
         private modalService: NgbModal) {
     }
 
     ngOnInit() {
         this.route.params.subscribe(params => this.update(params));
-        this.getBudgets();
     }
 
     beforeLeave() {
-        //The modal would not close correctly on changing the URL
-        //due to the background not being contained in the 'app-root' tag
+        // The modal would not close correctly on changing the URL
+        // due to the background not being contained in the 'app-root' tag
         this.modal.close();
     }
 
@@ -100,23 +103,46 @@ export class BudgetComponent implements OnInit, BeforeLeave {
     }
 
     private update(params: any) {
-        const period = DateExtractor.getBudgetPeriod(params);
-        this.switcher = new BudgetPeriodSwitcher(period);
-        this.date = this.switcher.switch(new DateExtractor(), params);
-        this.getBudgets();
+        const budgetViewId = params.viewId;
+        this.viewService.getBudgetViewById(budgetViewId)
+            .subscribe(val => {
+                this.view = val;
+                this.urlPrefix = `budget/view/${val.id}`;
+                const period = val.period;
+                this.switcher = new BudgetPeriodSwitcher(period);
+                this.date = this.switcher.switch(new DateExtractor(), params);
+                this.getBudgets();
+            });
     }
 
     private getBudgets() {
         const period = this.switcher.switch(new MonthYearPeriodCalculator(), this.date);
         this.budgetService.getBudgetsInPeriod(period)
-            .subscribe(budgets => this.getExpenses(budgets.values));
+            .subscribe(budgets => this.getExpenses(this.filterBudgets(budgets.values)));
     }
 
     private getExpenses(budgets: BudgetInPeriod[]) {
-        const query = this.switcher.switch(new PeriodQuery(), this.date);
+        const query = this.getExpenseQuery();
         const sort = {field: 'date', direction: 'desc'};
         this.expenseService.getExpenses(null, query, sort, null)
             .subscribe(expenses => this.init(expenses.values, budgets));
+    }
+
+    private filterBudgets(budgets: BudgetInPeriod[]): BudgetInPeriod[] {
+        if (this.view.filter == null) {
+            return budgets;
+        }
+        const budgetIds = this.view.filter.budgets.map(b => b.id);
+        return budgets.filter(b => budgetIds.indexOf(b.budget.id) >= 0);
+    }
+
+    private getExpenseQuery() {
+        const dateQuery = this.switcher.switch(new PeriodQuery(), this.date);
+        if (this.view.filter == null) {
+            return dateQuery;
+        }
+        const budgetQueries = QueryUtil.orQuery(this.view.filter.budgets.map(b => QueryUtil.budgetIdQuery(b.id)));
+        return QueryUtil.andQuery([dateQuery, budgetQueries]);
     }
 
     private init(expenses: ActualExpense[], budgets: BudgetInPeriod[]) {

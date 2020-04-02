@@ -8,8 +8,6 @@ export class BudgetService {
 
     private budgetUrl = '/api/v1/budget';
 
-    private categoryUrl = '/api/v1/category';
-
     constructor(private http: HttpClient) {
     }
 

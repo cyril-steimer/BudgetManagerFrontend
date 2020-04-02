@@ -15,6 +15,24 @@ export class PeriodQuery implements BudgetPeriodSwitch<Date, {}> {
 
 export class QueryUtil {
 
+    static budgetIdQuery(budgetId: string) {
+        return {
+            'budgetId': budgetId
+        };
+    }
+
+    static andQuery(queries: any[]) {
+        return {
+            and: queries
+        };
+    }
+
+    static orQuery(queries: any[]) {
+        return {
+            or: queries
+        };
+    }
+
     static yearQuery(year: Date) {
         const start = new Date(year.getFullYear(), 0);
         const end = new Date(year.getFullYear() + 1, 0);
@@ -38,21 +56,19 @@ export class QueryUtil {
     }
 
     private static betweenDateQuery(start: Date, end: Date) {
-        return {
-            and: [
-                {
-                    date: {
-                        date: QueryUtil.format(start),
-                        comparison: '>='
-                    }
-                },
-                {
-                    date: {
-                        date: QueryUtil.format(end),
-                        comparison: '<'
-                    }
+        return this.andQuery([
+            {
+                date: {
+                    date: QueryUtil.format(start),
+                    comparison: '>='
                 }
-            ]
-        };
+            },
+            {
+                date: {
+                    date: QueryUtil.format(end),
+                    comparison: '<'
+                }
+            }
+        ]);
     }
 }

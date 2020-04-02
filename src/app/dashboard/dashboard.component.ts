@@ -1,6 +1,8 @@
 import {Component} from '@angular/core';
 import {Expense} from '../model';
 import {ExpenseService} from '../expense.service';
+import {ViewService} from '../view.service';
+import {BudgetView, getViewUrl} from '../view';
 
 @Component({
     selector: 'app-dashboard',
@@ -13,7 +15,7 @@ export class DashboardComponent {
 
     filteredExpenses: Expense[] = null;
 
-    constructor(private expenseService: ExpenseService) {
+    constructor(private expenseService: ExpenseService, private viewService: ViewService) {
         this.initCards();
     }
 
@@ -82,27 +84,28 @@ export class DashboardComponent {
         };
     }
 
-    private budget(date: Date): Card {
+    private viewToLink(view: BudgetView): Link {
         return {
-            title: 'Budget',
-            content: 'Check the state of your budget during the current month or year',
-            links: [
-                {
-                    name: 'This Month',
-                    url: `/budget/year/${date.getFullYear()}/month/${date.getMonth()}`
-                },
-                {
-                    name: 'This Year',
-                    url: `/budget/year/${date.getFullYear()}`
-                }
-            ]
+            name: view.title.title,
+            url: getViewUrl(view)
         };
+    }
+
+    private budget(date: Date): Card {
+        const res: Card = {
+            title: 'Budget',
+            content: 'Check the state of your budget',
+            links: []
+        };
+        this.viewService.getBudgetViews()
+            .subscribe(val => res.links = val.values.map(v => this.viewToLink(v)));
+        return res;
     }
 
     private importExport(): Card {
         return {
             title: 'Import/Export',
-            content: 'Import or export all expende/budget data. The data can then be used in another instance of the budget manager',
+            content: 'Import or export all expense/budget data. The data can then be used in another instance of the budget manager',
             links: [
                 {
                     name: 'Import/Export',

@@ -13,13 +13,14 @@
                         {{prevDateLink.label}}
                     </a>
                 </li>
-                <li *ngIf="parent" class="nav-item">
+                <!-- TODO: The parent link no longer works. We need to define a parent view for this. -->
+                <!--<li *ngIf="parent" class="nav-item">
                     <a class="nav-link"
                        routerLink="/{{urlPrefix}}/{{parent.urlSuffix}}">
                         {{parent.label}}
                         <i class="fas fa-arrow-up"></i>
                     </a>
-                </li>
+                </li>-->
                 <li class="nav-item">
                     <a class="nav-link"
                        routerLink="/{{urlPrefix}}/{{nextDateLink.urlSuffix}}">
@@ -27,7 +28,8 @@
                         <i class="fas fa-arrow-right"></i>
                     </a>
                 </li>
-                <li *ngIf="children" class="nav-item dropdown" ngbDropdown>
+                <!-- TODO: The children links no longer work. We need to define children views for this. -->
+                <!--<li *ngIf="children" class="nav-item dropdown" ngbDropdown>
                     <a class="nav-link" ngbDropdownToggle role="button">
                         <i class="fas fa-arrow-down"></i>
                     </a>
@@ -37,7 +39,7 @@
                             {{child.label}}
                         </a>
                     </div>
-                </li>
+                </li>-->
             </ul>
         </div>
         <form *ngIf="search" class="form-inline">
