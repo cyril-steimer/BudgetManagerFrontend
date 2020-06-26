@@ -2,44 +2,42 @@
     <a class="navbar-brand" routerLink="/">Dashboard</a>
     <div class="collapse navbar-collapse">
         <div class="navbar-nav mr-auto">
-            <ul *ngIf="date" class="navbar-nav mr-auto">
+            <ul *ngIf="dateLink" class="navbar-nav mr-auto">
                 <li class="nav-item active">
                     <a class="nav-link">{{dateLink.label}}</a>
                 </li>
-                <li class="nav-item">
+                <li *ngIf="prevDateLink" class="nav-item">
                     <a class="nav-link"
-                       routerLink="/{{urlPrefix}}/{{prevDateLink.urlSuffix}}">
+                       routerLink="/{{prevDateLink.url}}">
                         <i class="fas fa-arrow-left"></i>
                         {{prevDateLink.label}}
                     </a>
                 </li>
-                <!-- TODO: The parent link no longer works. We need to define a parent view for this. -->
-                <!--<li *ngIf="parent" class="nav-item">
+                <li *ngIf="drillUp" class="nav-item">
                     <a class="nav-link"
-                       routerLink="/{{urlPrefix}}/{{parent.urlSuffix}}">
-                        {{parent.label}}
+                       routerLink="/{{drillUp.url}}">
+                        {{drillUp.label}}
                         <i class="fas fa-arrow-up"></i>
                     </a>
-                </li>-->
-                <li class="nav-item">
+                </li>
+                <li *ngIf="nextDateLink" class="nav-item">
                     <a class="nav-link"
-                       routerLink="/{{urlPrefix}}/{{nextDateLink.urlSuffix}}">
+                       routerLink="/{{nextDateLink.url}}">
                         {{nextDateLink.label}}
                         <i class="fas fa-arrow-right"></i>
                     </a>
                 </li>
-                <!-- TODO: The children links no longer work. We need to define children views for this. -->
-                <!--<li *ngIf="children" class="nav-item dropdown" ngbDropdown>
+                <li *ngIf="drillDown" class="nav-item dropdown" ngbDropdown>
                     <a class="nav-link" ngbDropdownToggle role="button">
                         <i class="fas fa-arrow-down"></i>
                     </a>
                     <div class="dropdown-menu" ngbDropdownMenu>
-                        <a *ngFor="let child of children" class="dropdown-item"
-                           routerLink="/{{urlPrefix}}/{{child.urlSuffix}}">
+                        <a *ngFor="let child of drillDown" class="dropdown-item"
+                           routerLink="/{{child.url}}">
                             {{child.label}}
                         </a>
                     </div>
-                </li>-->
+                </li>
             </ul>
         </div>
         <form *ngIf="search" class="form-inline">

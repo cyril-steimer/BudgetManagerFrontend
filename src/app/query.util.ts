@@ -33,6 +33,12 @@ export class QueryUtil {
         };
     }
 
+    static notQuery(query: any) {
+        return {
+            not: query
+        };
+    }
+
     static yearQuery(year: Date) {
         const start = new Date(year.getFullYear(), 0);
         const end = new Date(year.getFullYear() + 1, 0);
@@ -51,24 +57,29 @@ export class QueryUtil {
         return res;
     }
 
+    static afterOrEqualQuery(start: Date) {
+        return {
+            date: {
+                date: QueryUtil.format(start),
+                comparison: '>='
+            }
+        };
+    }
+
+    static beforeQuery(end: Date) {
+        return {
+            date: {
+                date: QueryUtil.format(end),
+                comparison: '<'
+            }
+        };
+    }
+
     private static format(date: Date): Timestamp {
         return TimestampUtil.fromDate(date);
     }
 
     private static betweenDateQuery(start: Date, end: Date) {
-        return this.andQuery([
-            {
-                date: {
-                    date: QueryUtil.format(start),
-                    comparison: '>='
-                }
-            },
-            {
-                date: {
-                    date: QueryUtil.format(end),
-                    comparison: '<'
-                }
-            }
-        ]);
+        return this.andQuery([this.afterOrEqualQuery(start), this.beforeQuery(end)]);
     }
 }

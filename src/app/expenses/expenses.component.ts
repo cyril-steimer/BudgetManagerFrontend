@@ -5,9 +5,12 @@ import {Observable} from 'rxjs/Observable';
 import {DelayedSearch} from '../delayed.search';
 import {ActivatedRoute} from '@angular/router';
 import {ExpenseSorter, SortDirection, SortField} from '../expenses-table/expenses-table.component';
-import {BudgetPeriodSwitcher, DateExtractor} from '../budget.period';
 import {PeriodQuery, QueryUtil} from '../query.util';
 import {ExpenseSearch} from '../date-header/date-header.component';
+import {extractDate, toBudgetPeriod, View, ViewPeriod} from '../view';
+import {ViewService} from '../view.service';
+import {BudgetPeriodSwitcher} from '../budget.period';
+import {DateUtil, MonthYearUtil} from '../model.util';
 
 @Component({
     selector: 'app-expenses',
@@ -21,8 +24,7 @@ export class ExpensesComponent implements OnInit, ExpenseSorter, ExpenseSearch {
     expenses: Expense[] = [];
 
     date: Date;
-    switcher: BudgetPeriodSwitcher;
-    urlPrefix = 'expenses';
+    view: View;
 
     field: string = null;
     value: string = null;
@@ -36,6 +38,7 @@ export class ExpensesComponent implements OnInit, ExpenseSorter, ExpenseSearch {
 
     constructor(
         private expenseServiceProvider: ExpenseServiceProvider,
+        private viewService: ViewService,
         private route: ActivatedRoute) {
     }
 
@@ -61,22 +64,38 @@ export class ExpensesComponent implements OnInit, ExpenseSorter, ExpenseSearch {
     }
 
     private update(params: { [key: string]: any }) {
-        const period = DateExtractor.getBudgetPeriod(params);
-        if (period) {
-            this.switcher = new BudgetPeriodSwitcher(period);
-            this.date = this.switcher.switch(new DateExtractor(), params);
-        } else {
-            this.switcher = null;
-            this.date = null;
-        }
+        this.date = extractDate(params);
         this.field = params.field;
         this.value = params.value;
-        this.getExpenses();
+        const viewId = params.viewId;
+        if (viewId != null) {
+            this.viewService.getViewById(viewId)
+                .subscribe(view => {
+                    this.view = view;
+                    this.getExpenses();
+                });
+        } else {
+            this.getExpenses();
+        }
     }
 
     private getSearchBody() {
-        if (this.date) {
-            return this.switcher.switch(new PeriodQuery(), this.date);
+        if (this.view != null) {
+            if (this.view.period === ViewPeriod.FIXED) {
+                const queries = [];
+                if (this.view.start != null) {
+                    queries.push(QueryUtil.afterOrEqualQuery(MonthYearUtil.toDate(this.view.start)));
+                }
+                if (this.view.end != null) {
+                    const after = DateUtil.startOfNextMonth(MonthYearUtil.toDate(this.view.end));
+                    queries.push(QueryUtil.beforeQuery(after));
+                }
+                return queries.length === 0 ? null : queries;
+            } else {
+                const budgetPeriod = toBudgetPeriod(this.view.period);
+                const switcher = new BudgetPeriodSwitcher(budgetPeriod);
+                return switcher.switch(new PeriodQuery(), this.date);
+            }
         } else if (this.field) {
             return QueryUtil.fieldQuery(this.field, this.value);
         }
@@ -95,8 +114,7 @@ export class ExpensesComponent implements OnInit, ExpenseSorter, ExpenseSearch {
     }
 
     private getExpensesObservable(): Observable<SubList<Expense>> {
-        return this.expenseService.getExpenses(
-            this.searchTerm, this.getSearchBody(), this.activeSort, null);
+        return this.expenseService.getExpenses(this.searchTerm, this.getSearchBody(), this.activeSort, null);
     }
 
     private setExpenses(res: SubList<Expense>) {

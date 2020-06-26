@@ -6,7 +6,7 @@ import {
     BudgetInPeriod,
     Category,
     CategoryExpenses,
-    Expense,
+    Expense, MonthYear,
     ScheduledExpense,
     Timestamp
 } from './model';
@@ -229,3 +229,35 @@ export class TimestampUtil {
         return new Date(ts.year, ts.month - 1, ts.day);
     }
 }
+
+export class MonthYearUtil {
+    static fromDate(date: Date): MonthYear {
+        return {
+            year: date.getFullYear(),
+            month: date.getMonth() + 1
+        };
+    }
+
+    static toDate(monthYear: MonthYear): Date{
+        return new Date(monthYear.year, monthYear.month - 1);
+    }
+}
+
+export class DateUtil {
+    static startOfNextMonth(date: Date): Date {
+        return new Date(date.getFullYear(), date.getMonth() + 1);
+    }
+
+    static startOfNextYear(date: Date): Date {
+        return new Date(date.getFullYear() + 1, 0);
+    }
+
+    static startOfPreviousMonth(date: Date): Date {
+        return new Date(date.getFullYear(), date.getMonth() - 1);
+    }
+
+    static startOfPreviousYear(date: Date): Date {
+        return new Date(date.getFullYear() - 1, 0);
+    }
+}
+

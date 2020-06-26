@@ -1,6 +1,8 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {BudgetPeriod, BudgetPeriodSwitch, BudgetPeriodSwitcher, DateExtractor, NextPeriod, PreviousPeriod} from '../budget.period';
+import {BudgetPeriodSwitch, BudgetPeriodSwitcher, NextPeriod, PreviousPeriod} from '../budget.period';
+import {extractDate, getViewLabel, getViewUrl, toBudgetPeriod, View, ViewPeriod} from '../view';
+import {ViewService} from '../view.service';
 
 export interface ExpenseSearch {
     search(text: string): void;
@@ -14,18 +16,17 @@ export interface ExpenseSearch {
 export class DateHeaderComponent implements OnInit {
 
     @Input() date: Date;
-    @Input() switcher: BudgetPeriodSwitcher;
-    @Input() urlPrefix: string;
+    @Input() view: View;
     @Input() search: ExpenseSearch;
 
     nextDateLink: DateLink;
     dateLink: DateLink;
     prevDateLink: DateLink;
 
-    parent: DateLink;
-    children: DateLink[];
+    drillUp: DateLink;
+    drillDown: DateLink[];
 
-    constructor(private route: ActivatedRoute) {
+    constructor(private viewService: ViewService, private route: ActivatedRoute) {
     }
 
     ngOnInit() {
@@ -42,79 +43,78 @@ export class DateHeaderComponent implements OnInit {
     }
 
     private updateDate(params: any) {
-        if (this.switcher != null) {
-            const date = this.switcher.switch(new DateExtractor(), params);
+        if (this.date != null) {
+            const date = extractDate(params);
             this.update(date);
         }
     }
 
     private update(date: Date) {
-        this.dateLink = DateLink.create(this.switcher, date);
+        this.dateLink = DateLink.create(this.view, date);
+        if (this.view.period === ViewPeriod.FIXED || date == null) {
+            this.nextDateLink = null;
+            this.prevDateLink = null;
+            this.drillUp = null;
+            this.drillDown = null;
+        } else {
+            const switcher = new BudgetPeriodSwitcher(toBudgetPeriod(this.view.period));
 
-        const nextDate = this.switcher.switch(new NextPeriod(), date);
-        this.nextDateLink = DateLink.create(this.switcher, nextDate);
+            const nextDate = switcher.switch(new NextPeriod(), date);
+            this.nextDateLink = DateLink.create(this.view, nextDate);
 
-        const prevDate = this.switcher.switch(new PreviousPeriod(), date);
-        this.prevDateLink = DateLink.create(this.switcher, prevDate);
+            const prevDate = switcher.switch(new PreviousPeriod(), date);
+            this.prevDateLink = DateLink.create(this.view, prevDate);
 
-        this.parent = this.switcher.switch(new ParentLink(), date);
-        this.children = this.switcher.switch(new ChildrenLinks(), date);
+            if (this.view.drillUpViewId != null) {
+                this.viewService.getViewById(this.view.drillUpViewId)
+                    .subscribe(drillUp => this.drillUp = switcher.switch(new ParentLink(), [drillUp, date]));
+            }
+            if (this.view.drillDownViewId != null) {
+                this.viewService.getViewById(this.view.drillDownViewId)
+                    .subscribe(drillDown => this.drillDown = switcher.switch(new ChildrenLinks(), [drillDown, date]));
+            }
+        }
     }
 }
+
+type ViewDate = [View, Date];
 
 class DateLink {
     label: string;
-    urlSuffix: string;
+    url: string;
 
-    static create(switcher: BudgetPeriodSwitcher | BudgetPeriod, date: Date) {
-        if (!(switcher instanceof BudgetPeriodSwitcher)) {
-            switcher = new BudgetPeriodSwitcher(switcher);
-        }
-        return switcher.switch(new DateLinkFactory(), date);
+    static create(view: View, date: Date): DateLink {
+        return {
+            label: getViewLabel(view, date),
+            url: getViewUrl(view, date)
+        };
     }
 }
 
-class ChildrenLinks implements BudgetPeriodSwitch<Date, DateLink[]> {
+class ChildrenLinks implements BudgetPeriodSwitch<ViewDate, DateLink[]> {
 
-    caseMonthly(arg: Date): DateLink[] {
+    caseMonthly(arg: ViewDate): DateLink[] {
         return null; // There is no finer view than 'monthly'
     }
 
-    caseYearly(arg: Date): DateLink[] {
+    caseYearly(arg: ViewDate): DateLink[] {
         const result = [];
         for (let month = 0; month < 12; month++) {
-            const date = new Date(arg.getFullYear(), month);
-            result.push(DateLink.create(BudgetPeriod.MONTHLY, date));
+            const date = new Date(arg[1].getFullYear(), month);
+            result.push(DateLink.create(arg[0], date));
         }
         return result;
     }
 }
 
-class ParentLink implements BudgetPeriodSwitch<Date, DateLink> {
+class ParentLink implements BudgetPeriodSwitch<ViewDate, DateLink> {
 
-    caseMonthly(arg: Date): DateLink {
-        const year = new Date(arg.getFullYear(), 0);
-        return DateLink.create(BudgetPeriod.YEARLY, year);
+    caseMonthly(arg: ViewDate): DateLink {
+        const year = new Date(arg[1].getFullYear(), 0);
+        return DateLink.create(arg[0], year);
     }
 
-    caseYearly(arg: Date): DateLink {
-        return null; //There is no coarser view than 'yearly'
-    }
-}
-
-class DateLinkFactory implements BudgetPeriodSwitch<Date, DateLink> {
-
-    caseMonthly(arg: Date): DateLink {
-        return {
-            label: `${arg.getMonthName()} ${arg.getFullYear()}`,
-            urlSuffix: `year/${arg.getFullYear()}/month/${arg.getMonth()}`
-        };
-    }
-
-    caseYearly(arg: Date): DateLink {
-        return {
-            label: `${arg.getFullYear()}`,
-            urlSuffix: `year/${arg.getFullYear()}`
-        };
+    caseYearly(arg: ViewDate): DateLink {
+        return null; // There is no coarser view than 'yearly'
     }
 }

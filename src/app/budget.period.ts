@@ -1,4 +1,5 @@
 import {MonthYearPeriod} from './model';
+import {DateUtil} from './model.util';
 
 export enum BudgetPeriod {
     MONTHLY = 'monthly',
@@ -62,26 +63,6 @@ export class MonthYearPeriodCalculator implements BudgetPeriodSwitch<Date, Month
     }
 }
 
-export class DateExtractor implements BudgetPeriodSwitch<{ [key: string]: string }, Date> {
-
-    static getBudgetPeriod(params: { [key: string]: string; }) {
-        if (params.month) {
-            return BudgetPeriod.MONTHLY;
-        } else if (params.year) {
-            return BudgetPeriod.YEARLY;
-        }
-        return null;
-    }
-
-    caseMonthly(params: { [key: string]: string; }): Date {
-        return new Date(+params.year, +params.month);
-    }
-
-    caseYearly(params: { [key: string]: string; }): Date {
-        return new Date(+params.year, 0);
-    }
-}
-
 export class DaysInPeriod implements BudgetPeriodSwitch<Date, number> {
 
     caseMonthly(arg: Date): number {
@@ -114,22 +95,22 @@ export class DaysSinceStart implements BudgetPeriodSwitch<Date, number> {
 export class NextPeriod implements BudgetPeriodSwitch<Date, Date> {
 
     caseMonthly(arg: Date): Date {
-        return new Date(arg.getFullYear(), arg.getMonth() + 1);
+        return DateUtil.startOfNextMonth(arg);
     }
 
     caseYearly(arg: Date): Date {
-        return new Date(arg.getFullYear() + 1, 0);
+        return DateUtil.startOfNextYear(arg);
     }
 }
 
 export class PreviousPeriod implements BudgetPeriodSwitch<Date, Date> {
 
     caseMonthly(arg: Date): Date {
-        return new Date(arg.getFullYear(), arg.getMonth() - 1);
+        return DateUtil.startOfPreviousMonth(arg);
     }
 
     caseYearly(arg: Date): Date {
-        return new Date(arg.getFullYear() - 1, 0);
+        return DateUtil.startOfPreviousYear(arg);
     }
 }
 

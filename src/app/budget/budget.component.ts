@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {ActualExpense, BudgetInPeriod, CategoryExpenses} from '../model';
+import {ActualExpense, Budget, BudgetInPeriod, CategoryExpenses} from '../model';
 import {ExpenseService} from '../expense.service';
 import {BudgetService} from '../budget.service';
 import {PeriodQuery, QueryUtil} from '../query.util';
@@ -9,7 +9,6 @@ import {BeforeLeave} from '../expenses-table/expenses-table.component';
 import {
     BudgetPeriodSwitch,
     BudgetPeriodSwitcher,
-    DateExtractor,
     DaysInPeriod,
     DaysSinceStart,
     isInPeriod,
@@ -20,7 +19,7 @@ import {NgbModalRef} from '@ng-bootstrap/ng-bootstrap/modal/modal-ref';
 import {ChartData, ChartDataSets, ChartOptions, ChartTooltipItem} from 'chart.js';
 import {newFilledArray, range} from '../util';
 import {ViewService} from '../view.service';
-import {BudgetView} from '../view';
+import {View, toBudgetPeriod, extractDate} from '../view';
 
 @Component({
     selector: 'app-budget',
@@ -58,9 +57,8 @@ export class BudgetComponent implements OnInit, BeforeLeave {
     lineCharts: CategoryExpensesLineChartData[] = [];
 
     date: Date;
-    view: BudgetView;
+    view: View;
     switcher: BudgetPeriodSwitcher;
-    urlPrefix: string;
 
     constructor(
         private expenseService: ExpenseService,
@@ -103,14 +101,13 @@ export class BudgetComponent implements OnInit, BeforeLeave {
     }
 
     private update(params: any) {
-        const budgetViewId = params.viewId;
-        this.viewService.getBudgetViewById(budgetViewId)
-            .subscribe(val => {
-                this.view = val;
-                this.urlPrefix = `budget/view/${val.id}`;
-                const period = val.period;
+        const viewId = params.viewId;
+        this.viewService.getViewById(viewId)
+            .subscribe(view => {
+                this.view = view;
+                const period = toBudgetPeriod(view.period);
                 this.switcher = new BudgetPeriodSwitcher(period);
-                this.date = this.switcher.switch(new DateExtractor(), params);
+                this.date = extractDate(params);
                 this.getBudgets();
             });
     }
@@ -129,20 +126,37 @@ export class BudgetComponent implements OnInit, BeforeLeave {
     }
 
     private filterBudgets(budgets: BudgetInPeriod[]): BudgetInPeriod[] {
-        if (this.view.filter == null) {
+        if (this.view.budgetFilter != null && this.view.budgetFilter.blacklist != null) {
+            const ids = this.budgetIds(this.view.budgetFilter.blacklist);
+            return budgets.filter(b => ids.indexOf(b.budget.id) < 0);
+        } else if (this.view.budgetFilter != null && this.view.budgetFilter.whitelist != null) {
+            const ids = this.budgetIds(this.view.budgetFilter.whitelist);
+            return budgets.filter(b => ids.indexOf(b.budget.id) >= 0);
+        } else {
             return budgets;
         }
-        const budgetIds = this.view.filter.budgets.map(b => b.id);
-        return budgets.filter(b => budgetIds.indexOf(b.budget.id) >= 0);
+    }
+
+    private budgetIds(budgets: Budget[]): string[] {
+        return budgets.map(b => b.id);
     }
 
     private getExpenseQuery() {
         const dateQuery = this.switcher.switch(new PeriodQuery(), this.date);
-        if (this.view.filter == null) {
+        // TODO Should blacklist or whitelist be stronger?
+        if (this.view.budgetFilter != null && this.view.budgetFilter.blacklist != null) {
+            const blacklistQuery = QueryUtil.notQuery(this.anyOfBudgetsQuery(this.view.budgetFilter.blacklist));
+            return QueryUtil.andQuery([dateQuery, blacklistQuery]);
+        } else if (this.view.budgetFilter != null && this.view.budgetFilter.whitelist != null) {
+            const whitelistQuery = this.anyOfBudgetsQuery(this.view.budgetFilter.whitelist);
+            return QueryUtil.andQuery([dateQuery, whitelistQuery]);
+        } else {
             return dateQuery;
         }
-        const budgetQueries = QueryUtil.orQuery(this.view.filter.budgets.map(b => QueryUtil.budgetIdQuery(b.id)));
-        return QueryUtil.andQuery([dateQuery, budgetQueries]);
+    }
+
+    private anyOfBudgetsQuery(budgets: Budget[]): any {
+        return QueryUtil.orQuery(budgets.map(b => QueryUtil.budgetIdQuery(b.id)));
     }
 
     private init(expenses: ActualExpense[], budgets: BudgetInPeriod[]) {

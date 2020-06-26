@@ -2,7 +2,7 @@ import {Component} from '@angular/core';
 import {Expense} from '../model';
 import {ExpenseService} from '../expense.service';
 import {ViewService} from '../view.service';
-import {BudgetView, getViewUrl} from '../view';
+import {getViewUrl, View, ViewType} from '../view';
 
 @Component({
     selector: 'app-dashboard',
@@ -20,7 +20,7 @@ export class DashboardComponent {
     }
 
     searchExpenses(text: string) {
-        if (text.length == 0) {
+        if (text.length === 0) {
             this.filteredExpenses = null;
         } else {
             this.expenseService.getExpenses(text)
@@ -64,31 +64,27 @@ export class DashboardComponent {
     }
 
     private expenses(date: Date): Card {
-        return {
+        const res: Card = {
             title: 'Expenses',
-            content: 'View the list of all expenses during a certain time frame',
-            links: [
-                {
-                    name: 'This Month',
-                    url: `/expenses/year/${date.getFullYear()}/month/${date.getMonth()}`
-                },
-                {
-                    name: 'This Year',
-                    url: `/expenses/year/${date.getFullYear()}`
-                },
-                {
-                    name: 'All Time',
-                    url: '/expenses'
-                }
-            ]
+            content: 'View the list of all expenses during a certain time',
+            links: []
+        };
+        this.viewService.getViews(ViewType.EXPENSE_VIEW)
+            .subscribe(val => res.links = this.viewsToLinks(val.values));
+        return res;
+    }
+
+    private viewToLink(view: View, date: Date): Link {
+        return {
+            name: view.title.title,
+            url: getViewUrl(view, date)
         };
     }
 
-    private viewToLink(view: BudgetView): Link {
-        return {
-            name: view.title.title,
-            url: getViewUrl(view)
-        };
+    private viewsToLinks(views: View[]): Link[] {
+        const now = new Date();
+        // TODO Check start/end
+        return views.map(view => this.viewToLink(view, now));
     }
 
     private budget(date: Date): Card {
@@ -97,8 +93,8 @@ export class DashboardComponent {
             content: 'Check the state of your budget',
             links: []
         };
-        this.viewService.getBudgetViews()
-            .subscribe(val => res.links = val.values.map(v => this.viewToLink(v)));
+        this.viewService.getViews(ViewType.BUDGET_VIEW)
+            .subscribe(val => res.links = this.viewsToLinks(val.values));
         return res;
     }
 
