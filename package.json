@@ -6,6 +6,7 @@
     "@types/node": "^16.18.21",
     "@types/react": "^18.0.29",
     "@types/react-dom": "^18.0.11",
+    "dayjs": "^1.11.7",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.9.0",
@@ -24,6 +25,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
+  "proxy": "http://192.168.1.103",
   "eslintConfig": {
     "extends": [
       "react-app",
