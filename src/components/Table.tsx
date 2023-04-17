@@ -8,14 +8,16 @@ export interface ColumnSettingsInterface<T, K extends keyof T> {
 export class ColumnSettings<T> {
     private constructor(
         readonly name: string,
+        readonly id: string,
         readonly render: (value: T) => string,
         readonly filter: ((value: T, filter: string) => boolean) | undefined,
         readonly compare: ((a: T, b: T) => number) | undefined) {
     }
 
-    static of<T, K extends keyof T>(key: K, settings: ColumnSettingsInterface<T, K>): ColumnSettings<T> {
+    static of<T, K extends keyof T & string>(key: K, settings: ColumnSettingsInterface<T, K>): ColumnSettings<T> {
         return new ColumnSettings<T>(
             settings.name,
+            key,
             value => settings.render(value[key]),
             settings.filter === undefined ? undefined : (value, filter) => settings.filter!(value[key], filter),
             settings.compare === undefined ? undefined : (a, b) => settings.compare!(a[key], b[key])
@@ -31,7 +33,7 @@ interface TableRowParameters<T> {
 function TableRow<T>({value, columns}: TableRowParameters<T>) {
     return (
         <tr>
-            {columns.map(c => <td>{c.render(value)}</td>)}
+            {columns.map(c => <td key={c.id}>{c.render(value)}</td>)}
         </tr>
     );
 }
@@ -56,7 +58,7 @@ export default function Table<T extends TableItem>({values, columns, filter}: Ta
         <table>
             <thead>
             <tr>
-                {columns.map(s => <th>{s.name}</th>)}
+                {columns.map(s => <th key={s.id}>{s.name}</th>)}
             </tr>
             </thead>
             <tbody>
