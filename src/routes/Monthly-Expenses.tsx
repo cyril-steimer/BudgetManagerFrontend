@@ -2,9 +2,7 @@ import {LoaderFunctionArgs, useLoaderData} from 'react-router-dom';
 import {Expense} from '../model/expense';
 import dayjs from 'dayjs';
 import {ListResponse} from '../model/responses';
-import {dateStructToDayJsObject, dateStructToISO8601String, NamedObject} from '../model/common';
-import {expenseColumnSettings} from '../util/expenses-table';
-import Table from '../components/Table';
+import ExpensesTable from '../components/Expenses-Table';
 import {useState} from 'react';
 
 export async function monthlyExpensesLoader({params}: LoaderFunctionArgs): Promise<ListResponse<Expense>> {
@@ -50,62 +48,14 @@ export async function monthlyExpensesLoader({params}: LoaderFunctionArgs): Promi
     throw new Error('Nope!');
 }
 
-function filterNamedObject(value: NamedObject, filter: string): boolean {
-    return value.name.toLowerCase().includes(filter.toLowerCase());
-}
-
-function compareNamedObject(a: NamedObject, b: NamedObject): number {
-    return a.name.localeCompare(b.name);
-}
-
 export default function MonthlyExpenses() {
     const expenses = useLoaderData() as ListResponse<Expense>;
     const [filter, setFilter] = useState('');
 
-    const name = expenseColumnSettings('name', {
-        name: 'Name',
-        render: value => value.name,
-        filter: filterNamedObject,
-        compare: compareNamedObject
-    });
-    const amount = expenseColumnSettings('amount', {
-        name: 'Amount',
-        render: value => value.amount.toString(),
-        compare: (a, b) => a.amount - b.amount
-    });
-    const category = expenseColumnSettings('category', {
-        name: 'Category',
-        render: value => value.name,
-        filter: filterNamedObject,
-        compare: compareNamedObject
-    });
-    const date = expenseColumnSettings('date', {
-        name: 'Date',
-        render: value => dateStructToISO8601String(value),
-        compare: (a, b) => dateStructToDayJsObject(a).valueOf() - dateStructToDayJsObject(b).valueOf()
-    });
-    const method = expenseColumnSettings('method', {
-        name: 'Method',
-        render: value => value.name,
-        filter: filterNamedObject,
-        compare: compareNamedObject
-    });
-    const author = expenseColumnSettings('author', {
-        name: 'Author',
-        render: value => value.name,
-        filter: filterNamedObject,
-        compare: compareNamedObject
-    });
-    const tags = expenseColumnSettings('tags', {
-        name: 'Tags',
-        render: value => value.map(v => v.name).join(', '),
-        filter: (value, filter) => value.find(v => filterNamedObject(v, filter)) !== undefined
-    });
-
     return (
         <div>
             <input type="text" value={filter} placeholder="Search..." onChange={e => setFilter(e.target.value)}/>
-            <Table values={expenses.values} columns={[name, amount, category, date, method, author, tags]} filter={filter}/>
+            <ExpensesTable expenses={expenses.values} filter={filter}/>
         </div>
     );
 }
