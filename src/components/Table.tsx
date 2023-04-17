@@ -40,31 +40,33 @@ function TableRow<T>({value, columns}: TableRowParameters<T>) {
     );
 }
 
-type SortDirection = 'asc' | 'desc';
-
 interface TableItem {
     id: string;
 }
+
+export type SortDirection = 'asc' | 'desc';
 
 export interface TableParameters<T extends TableItem> {
     values: T[];
     columns: ColumnSettings<T>[];
     filter?: string;
+    initialSortColumn?: ColumnSettings<T>
+    initialSortDirection?: SortDirection;
 }
 
-export default function Table<T extends TableItem>({values, columns, filter}: TableParameters<T>) {
-    const [sortColumn, setSortColumn] = useState<ColumnSettings<T>>();
-    const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+export default function Table<T extends TableItem>({values, columns, filter, initialSortColumn, initialSortDirection}: TableParameters<T>) {
+    const [sortColumn, setSortColumn] = useState(initialSortColumn);
+    const [sortDirection, setSortDirection] = useState(initialSortDirection ?? 'asc');
 
     function matchesFilter(value: T, filter: string): boolean {
         return columns.find(col => col.filter !== undefined && col.filter(value, filter)) !== undefined;
     }
 
     function compare(a: T, b: T): number {
-        if (sortColumn === undefined) {
+        if (sortColumn === undefined || sortColumn.compare === undefined) {
             return 0; // No sorting (sort is stable nowadays: https://developer.mozilla.org/en-US/docs/web/javascript/reference/global_objects/array/sort#sort_stability)
         } else {
-            const compared = sortColumn.compare!(a, b); // We only set 'sortColumn' to columns with a comparator in 'updateSort'
+            const compared = sortColumn.compare(a, b);
             return sortDirection === 'asc' ? compared : -compared;
         }
     }

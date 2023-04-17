@@ -60,5 +60,10 @@ export default function ExpensesTable({expenses, filter}: ExpensesTableParameter
         filter: (value, filter) => value.find(v => filterNamedObject(v, filter)) !== undefined
     });
 
-    return <Table values={expenses} columns={[name, amount, category, date, method, author, tags]} filter={filter}/>;
+    return <Table
+        values={expenses}
+        columns={[name, amount, category, date, method, author, tags]}
+        filter={filter}
+        initialSortColumn={date}
+    />;
 }
