@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import {styled} from '@mui/material/styles';
-import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from '@mui/material';
+import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel} from '@mui/material';
 
 export interface ColumnSettingsInterface<T, K extends keyof T> {
     name: string;
@@ -86,17 +86,7 @@ export default function DataTable<T extends TableItem>({
         }
     }
 
-    function getSortIcon(column: ColumnSettings<T>): string {
-        if (sortColumn === column) {
-            return sortDirection === 'asc' ? ' ↑' : ' ↓';
-        }
-        return '';
-    }
-
     function updateSort(column: ColumnSettings<T>) {
-        if (column.compare === undefined) {
-            return; // Cannot sort this column
-        }
         if (sortColumn === column) {
             setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
         } else {
@@ -105,16 +95,25 @@ export default function DataTable<T extends TableItem>({
         }
     }
 
+    function headerCell(column: ColumnSettings<T>): JSX.Element {
+        if (column.compare === undefined) {
+            return <TableCell key={column.id}>{column.name}</TableCell>;
+        }
+        return (
+            <TableCell key={column.id} sortDirection={sortColumn === column ? sortDirection : false} onClick={() => updateSort(column)}>
+                <TableSortLabel active={sortColumn === column} direction={sortColumn === column ? sortDirection : 'asc'}>
+                    {column.name}
+                </TableSortLabel>
+            </TableCell>
+        );
+    }
+
     return (
         <TableContainer>
             <Table>
                 <TableHead>
                     <TableRow>
-                        {
-                            columns
-                                .map(col => <TableCell onClick={() => updateSort(col)}
-                                                       key={col.id}>{col.name}{getSortIcon(col)}</TableCell>)
-                        }
+                        {columns.map(headerCell)}
                     </TableRow>
                 </TableHead>
                 <TableBody>
