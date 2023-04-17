@@ -1,6 +1,7 @@
 import {Expense, sumAmount} from '../model/expense';
 import DataTable, {ColumnSettings, ColumnSettingsInterface} from './Data-Table';
 import {dateStructToDayJsObject, dateStructToISO8601String, NamedObject} from '../model/common';
+import {Chip} from '@mui/material';
 
 function expenseColumnSettings<K extends keyof Expense>(key: K, settings: ColumnSettingsInterface<Expense, K>): ColumnSettings<Expense> {
     return ColumnSettings.of(key, settings);
@@ -56,7 +57,11 @@ export default function ExpensesTable({expenses, filter}: ExpensesTableParameter
     });
     const tags = expenseColumnSettings('tags', {
         name: 'Tags',
-        render: value => value.map(v => v.name).join(', '),
+        render: value => (
+            <div>
+                {value.map(tag => <Chip label={tag.name}></Chip>)}
+            </div>
+        ),
         filter: (value, filter) => value.find(v => filterNamedObject(v, filter)) !== undefined
     });
 

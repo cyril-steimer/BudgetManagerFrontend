@@ -55,7 +55,7 @@ export default function MonthlyExpenses() {
 
     return (
         <div>
-            <TextField type="text" value={filter} label="Search" variant="outlined" onChange={e => setFilter(e.target.value)}/>
+            <TextField type="text" value={filter} label="Filter" variant="outlined" onChange={e => setFilter(e.target.value)}/>
             <ExpensesTable expenses={expenses.values} filter={filter}/>
         </div>
     );

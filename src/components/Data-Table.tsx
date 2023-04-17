@@ -2,9 +2,24 @@ import {useState} from 'react';
 import {styled} from '@mui/material/styles';
 import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel} from '@mui/material';
 
+const SummaryTableRow = styled(TableRow)(({theme}) => ({
+    // TODO How best to highlight the row?
+    td: {
+        color: theme.palette.text.disabled,
+        fontWeight: theme.typography.fontWeightBold
+    }
+}));
+
+// https://mui.com/material-ui/react-table/#customization
+const StyledTableRow = styled(TableRow)(({theme}) => ({
+    '&:nth-of-type(odd)': {
+        backgroundColor: theme.palette.action.hover
+    }
+}));
+
 export interface ColumnSettingsInterface<T, K extends keyof T> {
     name: string;
-    render: (value: T[K]) => string;
+    render: (value: T[K]) => string | JSX.Element;
     filter?: (value: T[K], filter: string) => boolean;
     compare?: (a: T[K], b: T[K]) => number;
 }
@@ -13,7 +28,7 @@ export class ColumnSettings<T> {
     private constructor(
         readonly name: string,
         readonly id: string,
-        readonly render: (value: T) => string,
+        readonly render: (value: T) => string | JSX.Element,
         readonly filter: ((value: T, filter: string) => boolean) | undefined,
         readonly compare: ((a: T, b: T) => number) | undefined) {
     }
@@ -33,21 +48,6 @@ interface TableRowParameters<T> {
     value: T;
     columns: ColumnSettings<T>[];
 }
-
-const SummaryTableRow = styled(TableRow)(({theme}) => ({
-    // TODO What makes sense to highlight the summary row?
-    td: {
-        color: theme.palette.text.disabled,
-        fontWeight: theme.typography.fontWeightBold
-    }
-}));
-
-// https://mui.com/material-ui/react-table/#customization
-const StyledTableRow = styled(TableRow)(({theme}) => ({
-    '&:nth-of-type(odd)': {
-        backgroundColor: theme.palette.action.hover
-    }
-}));
 
 function DataTableRow<T>({value, columns}: TableRowParameters<T>) {
     return (
