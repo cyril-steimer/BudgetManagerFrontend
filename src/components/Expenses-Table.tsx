@@ -1,5 +1,5 @@
 import {Expense} from '../model/expense';
-import Table, {ColumnSettings, ColumnSettingsInterface} from './Table';
+import DataTable, {ColumnSettings, ColumnSettingsInterface} from './Data-Table';
 import {dateStructToDayJsObject, dateStructToISO8601String, NamedObject} from '../model/common';
 
 function expenseColumnSettings<K extends keyof Expense>(key: K, settings: ColumnSettingsInterface<Expense, K>): ColumnSettings<Expense> {
@@ -60,7 +60,7 @@ export default function ExpensesTable({expenses, filter}: ExpensesTableParameter
         filter: (value, filter) => value.find(v => filterNamedObject(v, filter)) !== undefined
     });
 
-    return <Table
+    return <DataTable
         values={expenses}
         columns={[name, amount, category, date, method, author, tags]}
         filter={filter}

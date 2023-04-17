@@ -1,6 +1,7 @@
 import {useNavigate} from 'react-router-dom';
 import dayjs from 'dayjs';
 import {useIsNavigating} from '../hooks/hooks';
+import {Button, ButtonGroup} from '@mui/material';
 
 export default function Dashboard() {
     const navigate = useNavigate();
@@ -20,9 +21,9 @@ export default function Dashboard() {
     }
 
     return (
-        <div>
-            <button type="button" onClick={viewLastMonth} disabled={disableButtons}>Last Month</button>
-            <button type="button" onClick={viewThisMonth} disabled={disableButtons}>This Month</button>
-        </div>
+        <ButtonGroup variant="outlined" disabled={disableButtons}>
+            <Button type="button" onClick={viewLastMonth}>Last Month</Button>
+            <Button type="button" onClick={viewThisMonth}>This Month</Button>
+        </ButtonGroup>
     );
 }

@@ -4,6 +4,7 @@ import dayjs from 'dayjs';
 import {ListResponse} from '../model/responses';
 import ExpensesTable from '../components/Expenses-Table';
 import {useState} from 'react';
+import {TextField} from '@mui/material';
 
 export async function monthlyExpensesLoader({params}: LoaderFunctionArgs): Promise<ListResponse<Expense>> {
     const year = params['year'];
@@ -54,7 +55,7 @@ export default function MonthlyExpenses() {
 
     return (
         <div>
-            <input type="text" value={filter} placeholder="Search..." onChange={e => setFilter(e.target.value)}/>
+            <TextField type="text" value={filter} label="Search" variant="outlined" onChange={e => setFilter(e.target.value)}/>
             <ExpensesTable expenses={expenses.values} filter={filter}/>
         </div>
     );

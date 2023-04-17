@@ -1,4 +1,6 @@
 import {useState} from 'react';
+import {styled} from '@mui/material/styles';
+import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from '@mui/material';
 
 export interface ColumnSettingsInterface<T, K extends keyof T> {
     name: string;
@@ -32,11 +34,18 @@ interface TableRowParameters<T> {
     columns: ColumnSettings<T>[];
 }
 
-function TableRow<T>({value, columns}: TableRowParameters<T>) {
+// https://mui.com/material-ui/react-table/#customization
+const StyledTableRow = styled(TableRow)(({theme}) => ({
+    '&:nth-of-type(odd)': {
+        backgroundColor: theme.palette.action.hover
+    }
+}));
+
+function DataTableRow<T>({value, columns}: TableRowParameters<T>) {
     return (
-        <tr>
-            {columns.map(c => <td key={c.id}>{c.render(value)}</td>)}
-        </tr>
+        <StyledTableRow>
+            {columns.map(c => <TableCell key={c.id}>{c.render(value)}</TableCell>)}
+        </StyledTableRow>
     );
 }
 
@@ -50,11 +59,17 @@ export interface TableParameters<T extends TableItem> {
     values: T[];
     columns: ColumnSettings<T>[];
     filter?: string;
-    initialSortColumn?: ColumnSettings<T>
+    initialSortColumn?: ColumnSettings<T>;
     initialSortDirection?: SortDirection;
 }
 
-export default function Table<T extends TableItem>({values, columns, filter, initialSortColumn, initialSortDirection}: TableParameters<T>) {
+export default function DataTable<T extends TableItem>({
+                                                           values,
+                                                           columns,
+                                                           filter,
+                                                           initialSortColumn,
+                                                           initialSortDirection
+                                                       }: TableParameters<T>) {
     const [sortColumn, setSortColumn] = useState(initialSortColumn);
     const [sortDirection, setSortDirection] = useState(initialSortDirection ?? 'asc');
 
@@ -91,23 +106,26 @@ export default function Table<T extends TableItem>({values, columns, filter, ini
     }
 
     return (
-        <table>
-            <thead>
-            <tr>
-                {
-                    columns
-                        .map(col => <th onClick={() => updateSort(col)} key={col.id}>{col.name}{getSortIcon(col)}</th>)
-                }
-            </tr>
-            </thead>
-            <tbody>
-            {
-                values
-                    .filter(value => filter === undefined || filter.length == 0 || matchesFilter(value, filter))
-                    .sort((a, b) => compare(a, b))
-                    .map(value => <TableRow value={value} columns={columns} key={value.id}/>)
-            }
-            </tbody>
-        </table>
+        <TableContainer>
+            <Table>
+                <TableHead>
+                    <TableRow>
+                        {
+                            columns
+                                .map(col => <TableCell onClick={() => updateSort(col)}
+                                                       key={col.id}>{col.name}{getSortIcon(col)}</TableCell>)
+                        }
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {
+                        values
+                            .filter(value => filter === undefined || filter.length == 0 || matchesFilter(value, filter))
+                            .sort((a, b) => compare(a, b))
+                            .map(value => <DataTableRow value={value} columns={columns} key={value.id}/>)
+                    }
+                </TableBody>
+            </Table>
+        </TableContainer>
     );
 }
