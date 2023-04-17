@@ -15,11 +15,14 @@ export interface DateStruct {
 }
 
 export function dateStructToISO8601String(date: DateStruct): string {
-    const dateObject = dayjs()
-        .year(date.year)
-        .month(date.month - 1) // month is zero-indexed in dayjs
-        .date(date.day);
+    const dateObject = dateStructToDayJsObject(date);
     return dateObject.format('YYYY-MM-DD');
+}
+
+export function dateStructToDayJsObject(date: DateStruct): dayjs.Dayjs {
+    // month is zero-indexed in JavaScript
+    const jsDate = new Date(date.year, date.month - 1, date.day);
+    return dayjs(jsDate);
 }
 
 export function dateStructfromISO8601String(string: string): DateStruct {

@@ -6,13 +6,23 @@ export default function Dashboard() {
     const navigate = useNavigate();
     const disableButtons = useIsNavigating();
 
-    function viewMonthlyExpenses() {
-        const now = dayjs();
-        const url = `/expenses/year/${now.year()}/month/${now.month() + 1}`;
+    function viewThisMonth() {
+        viewMonthlyExpenses(dayjs())
+    }
+
+    function viewLastMonth() {
+        viewMonthlyExpenses(dayjs().subtract(1, 'month'))
+    }
+
+    function viewMonthlyExpenses(date: dayjs.Dayjs) {
+        const url = `/expenses/year/${date.year()}/month/${date.month() + 1}`;
         navigate(url);
     }
 
     return (
-        <button type="button" onClick={viewMonthlyExpenses} disabled={disableButtons}>Monthly Expenses</button>
+        <div>
+            <button type="button" onClick={viewLastMonth} disabled={disableButtons}>Last Month</button>
+            <button type="button" onClick={viewThisMonth} disabled={disableButtons}>This Month</button>
+        </div>
     );
 }
