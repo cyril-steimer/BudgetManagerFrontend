@@ -1,9 +1,10 @@
 import {useNavigate} from 'react-router-dom';
 import dayjs from 'dayjs';
 import {useIsNavigating} from '../hooks/hooks';
-import {Button, Card, CardActions, CardContent, CardHeader, cardHeaderClasses, Typography} from '@mui/material';
+import {Button, Card, CardActions, CardContent, CardHeader, cardHeaderClasses, TextField, Typography} from '@mui/material';
 import Grid2 from '@mui/material/Unstable_Grid2';
 import {styled} from '@mui/material/styles';
+import {useState} from 'react';
 
 const StyledCardHeader = styled(CardHeader)(({theme}) => ({
     [`&.${cardHeaderClasses.root}`]: {
@@ -42,6 +43,7 @@ function DashboardCard({title, text, buttons}: CardParameters) {
 
 export default function Dashboard() {
     const navigate = useNavigate();
+    const [search, setSearch] = useState('');
 
     function viewThisMonth() {
         viewMonthlyExpenses(dayjs());
@@ -51,6 +53,10 @@ export default function Dashboard() {
         alert('Not yet implemented');
     }
 
+    function searchExpenses() {
+        alert(`Searching for '${search}'`);
+    }
+
     function viewMonthlyExpenses(date: dayjs.Dayjs) {
         const url = `/expenses/year/${date.year()}/month/${date.month() + 1}`;
         navigate(url);
@@ -58,6 +64,29 @@ export default function Dashboard() {
 
     return (
         <Grid2 container spacing={2}>
+            <Grid2 xs={9}>
+                <TextField
+                    fullWidth={true}
+                    size="small"
+                    variant="outlined"
+                    label="Search"
+                    placeholder="Expense name, category, amount, etc."
+                    type="text"
+                    value={search}
+                    onChange={e => setSearch(e.target.value)}
+                />
+            </Grid2>
+            <Grid2 xs={3}>
+                <Button
+                    sx={{height: "100%"}}
+                    fullWidth={true}
+                    type="button"
+                    variant="outlined"
+                    onClick={searchExpenses}
+                >
+                    Search Expenses
+                </Button>
+            </Grid2>
             <DashboardCard
                 title="Expenses"
                 text="View the list of all expenses during a certain time frame"
