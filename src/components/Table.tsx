@@ -1,3 +1,5 @@
+import {useState} from 'react';
+
 export interface ColumnSettingsInterface<T, K extends keyof T> {
     name: string;
     render: (value: T[K]) => string;
@@ -38,6 +40,8 @@ function TableRow<T>({value, columns}: TableRowParameters<T>) {
     );
 }
 
+type SortDirection = 'asc' | 'desc';
+
 interface TableItem {
     id: string;
 }
@@ -49,22 +53,56 @@ export interface TableParameters<T extends TableItem> {
 }
 
 export default function Table<T extends TableItem>({values, columns, filter}: TableParameters<T>) {
+    const [sortColumn, setSortColumn] = useState<ColumnSettings<T>>();
+    const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+
     function matchesFilter(value: T, filter: string): boolean {
         return columns.find(col => col.filter !== undefined && col.filter(value, filter)) !== undefined;
     }
 
-    // TODO Sorting
+    function compare(a: T, b: T): number {
+        if (sortColumn === undefined) {
+            return 0; // No sorting (sort is stable nowadays: https://developer.mozilla.org/en-US/docs/web/javascript/reference/global_objects/array/sort#sort_stability)
+        } else {
+            const compared = sortColumn.compare!(a, b); // We only set 'sortColumn' to columns with a comparator in 'updateSort'
+            return sortDirection === 'asc' ? compared : -compared;
+        }
+    }
+
+    function getSortIcon(column: ColumnSettings<T>): string {
+        if (sortColumn === column) {
+            return sortDirection === 'asc' ? ' ↑' : ' ↓';
+        }
+        return '';
+    }
+
+    function updateSort(column: ColumnSettings<T>) {
+        if (column.compare === undefined) {
+            return; // Cannot sort this column
+        }
+        if (sortColumn === column) {
+            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+        } else {
+            setSortDirection('asc');
+            setSortColumn(column);
+        }
+    }
+
     return (
         <table>
             <thead>
             <tr>
-                {columns.map(s => <th key={s.id}>{s.name}</th>)}
+                {
+                    columns
+                        .map(col => <th onClick={() => updateSort(col)} key={col.id}>{col.name}{getSortIcon(col)}</th>)
+                }
             </tr>
             </thead>
             <tbody>
             {
                 values
                     .filter(value => filter === undefined || filter.length == 0 || matchesFilter(value, filter))
+                    .sort((a, b) => compare(a, b))
                     .map(value => <TableRow value={value} columns={columns} key={value.id}/>)
             }
             </tbody>
