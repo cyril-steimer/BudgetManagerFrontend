@@ -59,7 +59,7 @@ export default function ExpensesTable({expenses, filter}: ExpensesTableParameter
         name: 'Tags',
         render: value => (
             <div>
-                {value.map(tag => <Chip label={tag.name}></Chip>)}
+                {value.map(tag => <Chip label={tag.name} key={tag.name}></Chip>)}
             </div>
         ),
         filter: (value, filter) => value.find(v => filterNamedObject(v, filter)) !== undefined

@@ -138,8 +138,12 @@ export default function DataTable<T extends TableItem>(
                         <SummaryTableRow>
                             <TableCell>Total</TableCell>
                             <TableCell>{computeTotal(sortedFilteredValues)}</TableCell>
-                            {/*Create dummy empty cells for the other columns*/}
-                            {columns.filter((value, index) => index >= 2).map(() => <TableCell></TableCell>)}
+                            {
+                                /*Create dummy empty cells for the other columns*/
+                                columns
+                                    .filter((value, index) => index >= 2)
+                                    .map((value, index) => <TableCell key={index}></TableCell>)
+                            }
                         </SummaryTableRow>
                     }
                 </TableBody>
