@@ -43,10 +43,15 @@ interface TableItem {
 export interface TableParameters<T extends TableItem> {
     values: T[];
     columns: ColumnSettings<T>[];
+    filter?: string;
 }
 
-export default function Table<T extends TableItem>({values, columns}: TableParameters<T>) {
-    // TODO Filtering, sorting
+export default function Table<T extends TableItem>({values, columns, filter}: TableParameters<T>) {
+    function matchesFilter(value: T, filter: string): boolean {
+        return columns.find(col => col.filter !== undefined && col.filter(value, filter)) !== undefined;
+    }
+
+    // TODO Sorting
     return (
         <table>
             <thead>
@@ -55,7 +60,11 @@ export default function Table<T extends TableItem>({values, columns}: TableParam
             </tr>
             </thead>
             <tbody>
-            {values.map(value => <TableRow value={value} columns={columns} key={value.id}/>)}
+            {
+                values
+                    .filter(value => filter === undefined || filter.length == 0 || matchesFilter(value, filter))
+                    .map(value => <TableRow value={value} columns={columns} key={value.id}/>)
+            }
             </tbody>
         </table>
     );

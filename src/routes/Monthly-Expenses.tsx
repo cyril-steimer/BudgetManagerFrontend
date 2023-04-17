@@ -5,6 +5,7 @@ import {ListResponse} from '../model/responses';
 import {dateStructToDayJsObject, dateStructToISO8601String, NamedObject} from '../model/common';
 import {expenseColumnSettings} from '../util/expenses-table';
 import Table from '../components/Table';
+import {useState} from 'react';
 
 export async function monthlyExpensesLoader({params}: LoaderFunctionArgs): Promise<ListResponse<Expense>> {
     const year = params['year'];
@@ -59,6 +60,7 @@ function compareNamedObject(a: NamedObject, b: NamedObject): number {
 
 export default function MonthlyExpenses() {
     const expenses = useLoaderData() as ListResponse<Expense>;
+    const [filter, setFilter] = useState('');
 
     const name = expenseColumnSettings('name', {
         name: 'Name',
@@ -96,11 +98,14 @@ export default function MonthlyExpenses() {
     });
     const tags = expenseColumnSettings('tags', {
         name: 'Tags',
-        render: value => value.map(v => v.name).join(", "),
+        render: value => value.map(v => v.name).join(', '),
         filter: (value, filter) => value.find(v => filterNamedObject(v, filter)) !== undefined
     });
 
     return (
-        <Table values={expenses.values} columns={[name, amount, category, date, method, author, tags]}/>
+        <div>
+            <input type="text" value={filter} placeholder="Search..." onChange={e => setFilter(e.target.value)}/>
+            <Table values={expenses.values} columns={[name, amount, category, date, method, author, tags]} filter={filter}/>
+        </div>
     );
 }
