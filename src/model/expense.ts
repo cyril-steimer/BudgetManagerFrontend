@@ -10,3 +10,7 @@ export interface Expense {
     author: NamedObject;
     tags: NamedObject[];
 }
+
+export function sumAmount(expenses: Expense[]): number {
+    return expenses.reduce((total, expense) => total + expense.amount.amount, 0);
+}

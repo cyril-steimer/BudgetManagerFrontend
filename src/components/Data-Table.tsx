@@ -34,6 +34,14 @@ interface TableRowParameters<T> {
     columns: ColumnSettings<T>[];
 }
 
+const SummaryTableRow = styled(TableRow)(({theme}) => ({
+    // TODO What makes sense to highlight the summary row?
+    td: {
+        color: theme.palette.text.disabled,
+        fontWeight: theme.typography.fontWeightBold
+    }
+}));
+
 // https://mui.com/material-ui/react-table/#customization
 const StyledTableRow = styled(TableRow)(({theme}) => ({
     '&:nth-of-type(odd)': {
@@ -61,15 +69,19 @@ export interface TableParameters<T extends TableItem> {
     filter?: string;
     initialSortColumn?: ColumnSettings<T>;
     initialSortDirection?: SortDirection;
+    computeTotal?: (values: T[]) => number;
 }
 
-export default function DataTable<T extends TableItem>({
-                                                           values,
-                                                           columns,
-                                                           filter,
-                                                           initialSortColumn,
-                                                           initialSortDirection
-                                                       }: TableParameters<T>) {
+export default function DataTable<T extends TableItem>(
+    {
+        values,
+        columns,
+        filter,
+        initialSortColumn,
+        initialSortDirection,
+        computeTotal
+    }: TableParameters<T>
+) {
     const [sortColumn, setSortColumn] = useState(initialSortColumn);
     const [sortDirection, setSortDirection] = useState(initialSortDirection ?? 'asc');
 
@@ -108,6 +120,10 @@ export default function DataTable<T extends TableItem>({
         );
     }
 
+    const sortedFilteredValues = values
+        .filter(value => filter === undefined || filter.length == 0 || matchesFilter(value, filter))
+        .sort((a, b) => compare(a, b));
+
     return (
         <TableContainer>
             <Table>
@@ -117,14 +133,18 @@ export default function DataTable<T extends TableItem>({
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {
-                        values
-                            .filter(value => filter === undefined || filter.length == 0 || matchesFilter(value, filter))
-                            .sort((a, b) => compare(a, b))
-                            .map(value => <DataTableRow value={value} columns={columns} key={value.id}/>)
+                    {sortedFilteredValues.map(value => <DataTableRow value={value} columns={columns} key={value.id}/>)}
+                    {computeTotal !== undefined &&
+                        <SummaryTableRow>
+                            <TableCell>Total</TableCell>
+                            <TableCell>{computeTotal(sortedFilteredValues)}</TableCell>
+                            {/*Create dummy empty cells for the other columns*/}
+                            {columns.filter((value, index) => index >= 2).map(() => <TableCell></TableCell>)}
+                        </SummaryTableRow>
                     }
                 </TableBody>
             </Table>
         </TableContainer>
-    );
+    )
+        ;
 }

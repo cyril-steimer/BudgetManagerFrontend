@@ -1,4 +1,4 @@
-import {Expense} from '../model/expense';
+import {Expense, sumAmount} from '../model/expense';
 import DataTable, {ColumnSettings, ColumnSettingsInterface} from './Data-Table';
 import {dateStructToDayJsObject, dateStructToISO8601String, NamedObject} from '../model/common';
 
@@ -60,10 +60,13 @@ export default function ExpensesTable({expenses, filter}: ExpensesTableParameter
         filter: (value, filter) => value.find(v => filterNamedObject(v, filter)) !== undefined
     });
 
+    const columns = [name, amount, category, date, method, author, tags]
+
     return <DataTable
         values={expenses}
-        columns={[name, amount, category, date, method, author, tags]}
+        columns={columns}
         filter={filter}
         initialSortColumn={date}
+        computeTotal={sumAmount}
     />;
 }
