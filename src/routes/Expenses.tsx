@@ -59,7 +59,7 @@ export async function yearlyExpensesLoader({params}: LoaderFunctionArgs): Promis
     const year = params.year;
     if (year !== undefined) {
         const from = dayjs().year(parseInt(year)).month(0).date(1);
-        const to = from.add(1, 'month');
+        const to = from.add(1, 'year');
         return await searchExpenses(dateRangeQuery(from, to));
     }
     // TODO Better error handling
