@@ -1,10 +1,10 @@
 import {LoaderFunctionArgs, Params, useLoaderData, useParams} from 'react-router-dom';
-import {Expense} from '../model/expense';
+import {BaseExpense, Expense, ExpenseTemplate, ScheduledExpense} from '../model/expense';
 import dayjs, {Dayjs} from 'dayjs';
 import {ListResponse} from '../model/responses';
-import ExpensesTable from '../components/Expenses-Table';
 import {useState} from 'react';
 import {TextField, Typography} from '@mui/material';
+import {ExpensesTable, ExpenseTemplatesTable, ScheduledExpensesTable} from '../components/Expenses-Table';
 
 function dateRangeQuery(fromInclusive: Dayjs, toExclusive: Dayjs): object {
     return {
@@ -66,38 +66,79 @@ export async function yearlyExpensesLoader({params}: LoaderFunctionArgs): Promis
     throw new Error('Nope!');
 }
 
-export async function allExpensesLoader(): Promise<ListResponse<Expense>> {
-    const url = '/api/v1/expenses';
+async function loadAllExpenses<E extends BaseExpense>(url: string): Promise<ListResponse<E>> {
     const response = await fetch(url, {
         method: 'get'
     });
     // TODO Check the response for errors
-    return await response.json() as ListResponse<Expense>;
+    return await response.json() as ListResponse<E>;
 }
 
-function getTitle(params: Params): string {
+export async function allExpensesLoader(): Promise<ListResponse<Expense>> {
+    return await loadAllExpenses('/api/v1/expenses');
+}
+
+export async function allExpenseTemplatesLoader(): Promise<ListResponse<ExpenseTemplate>> {
+    return await loadAllExpenses('/api/v1/templates');
+}
+
+export async function allScheduledExpensesLoader(): Promise<ListResponse<ScheduledExpense>> {
+    return await loadAllExpenses('/api/v1/schedules');
+}
+
+function getTitle(params: Params, expenseType: string): string {
     const year = params.year;
     const month = params.month;
     if (year !== undefined && month !== undefined) {
         const date = dayjs().month(parseInt(month, 10) - 1).toDate();
         const monthName = date.toLocaleDateString(undefined, {month: 'long'});
-        return `Expenses in ${monthName} ${year}`;
+        return `${expenseType} in ${monthName} ${year}`;
     } else if (year !== undefined) {
-        return `Expenses in ${year}`;
+        return `${expenseType} in ${year}`;
     }
-    return 'All Expenses';
+    return `All ${expenseType}`;
 }
 
-export default function Expenses() {
-    const title = getTitle(useParams());
-    const expenses = useLoaderData() as ListResponse<Expense>;
+export interface ExpensesParameters<E extends BaseExpense> {
+    expenseType: 'Expenses' | 'Scheduled Expenses' | 'Expense Templates';
+    renderTable: (expenses: E[], filter: string) => JSX.Element;
+}
+
+function ExpensesComponent<E extends BaseExpense>({expenseType, renderTable}: ExpensesParameters<E>) {
+    const title = getTitle(useParams(), expenseType);
+    const expenses = useLoaderData() as ListResponse<E>;
     const [filter, setFilter] = useState('');
 
     return (
         <div>
             <Typography variant="h5">{title}</Typography>
             <TextField type="text" value={filter} label="Filter" variant="outlined" onChange={e => setFilter(e.target.value)}/>
-            <ExpensesTable expenses={expenses.values} filter={filter}/>
+            {renderTable(expenses.values, filter)}
         </div>
     );
 }
+
+export function Expenses() {
+    return (
+        <ExpensesComponent expenseType="Expenses" renderTable={
+            (expenses: Expense[], filter) => <ExpensesTable expenses={expenses} filter={filter}/>
+        }/>
+    );
+}
+
+export function ExpenseTemplates() {
+    return (
+        <ExpensesComponent expenseType="Expense Templates" renderTable={
+            (expenses: ExpenseTemplate[], filter) => <ExpenseTemplatesTable expenses={expenses} filter={filter}/>
+        }/>
+    );
+}
+
+export function ScheduledExpenses() {
+    return (
+        <ExpensesComponent expenseType="Scheduled Expenses" renderTable={
+            (expenses: ScheduledExpense[], filter) => <ScheduledExpensesTable expenses={expenses} filter={filter}/>
+        }/>
+    );
+}
+

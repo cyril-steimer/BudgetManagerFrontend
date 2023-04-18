@@ -1,9 +1,17 @@
-import {Expense, sumAmount} from '../model/expense';
+import {BaseExpense, Expense, ExpenseTemplate, ScheduledExpense, scheduleToString, sumAmount} from '../model/expense';
 import DataTable, {ColumnSettings, ColumnSettingsInterface} from './Data-Table';
-import {dateStructToDayJsObject, dateStructToISO8601String, NamedObject} from '../model/common';
+import {compareDateStruct, dateStructToISO8601String, NamedObject} from '../model/common';
 import {Chip} from '@mui/material';
 
+function baseExpenseColumnSettings<K extends keyof BaseExpense>(key: K, settings: ColumnSettingsInterface<BaseExpense, K>): ColumnSettings<BaseExpense> {
+    return ColumnSettings.of(key, settings);
+}
+
 function expenseColumnSettings<K extends keyof Expense>(key: K, settings: ColumnSettingsInterface<Expense, K>): ColumnSettings<Expense> {
+    return ColumnSettings.of(key, settings);
+}
+
+function scheduledExpenseColumnSettings<K extends keyof ScheduledExpense>(key: K, settings: ColumnSettingsInterface<ScheduledExpense, K>): ColumnSettings<ScheduledExpense> {
     return ColumnSettings.of(key, settings);
 }
 
@@ -15,57 +23,100 @@ function compareNamedObject(a: NamedObject, b: NamedObject): number {
     return a.name.localeCompare(b.name);
 }
 
-export interface ExpensesTableParameters {
-    expenses: Expense[];
+export interface ExpensesTableParameters<E extends BaseExpense> {
+    expenses: E[];
     filter?: string;
 }
 
-export default function ExpensesTable({expenses, filter}: ExpensesTableParameters) {
-    const name = expenseColumnSettings('name', {
-        name: 'Name',
-        render: value => value.name,
-        filter: filterNamedObject,
-        compare: compareNamedObject
+const name = baseExpenseColumnSettings('name', {
+    name: 'Name',
+    render: value => value.name,
+    filter: filterNamedObject,
+    compare: compareNamedObject
+});
+
+const amount = baseExpenseColumnSettings('amount', {
+    name: 'Amount',
+    render: value => value.amount.toString(),
+    compare: (a, b) => a.amount - b.amount
+});
+
+const category = baseExpenseColumnSettings('category', {
+    name: 'Category',
+    render: value => value?.name,
+    filter: filterNamedObject,
+    compare: compareNamedObject
+});
+
+const method = baseExpenseColumnSettings('method', {
+    name: 'Method',
+    render: value => value.name,
+    filter: filterNamedObject,
+    compare: compareNamedObject
+});
+
+const author = baseExpenseColumnSettings('author', {
+    name: 'Author',
+    render: value => value.name,
+    filter: filterNamedObject,
+    compare: compareNamedObject
+});
+
+const tags = baseExpenseColumnSettings('tags', {
+    name: 'Tags',
+    render: value => (
+        <div>
+            {value.map(tag => <Chip label={tag.name} key={tag.name}></Chip>)}
+        </div>
+    ),
+    filter: (value, filter) => value.find(v => filterNamedObject(v, filter)) !== undefined
+});
+
+export function ScheduledExpensesTable({expenses, filter}: ExpensesTableParameters<ScheduledExpense>) {
+    const start = scheduledExpenseColumnSettings('startDate', {
+        name: 'Start Date',
+        render: dateStructToISO8601String,
+        compare: compareDateStruct
     });
-    const amount = expenseColumnSettings('amount', {
-        name: 'Amount',
-        render: value => value.amount.toString(),
-        compare: (a, b) => a.amount - b.amount
+    const end = scheduledExpenseColumnSettings('endDate', {
+        name: 'End Date',
+        render: dateStructToISO8601String,
+        compare: compareDateStruct
     });
-    const category = expenseColumnSettings('category', {
-        name: 'Category',
-        render: value => value.name,
-        filter: filterNamedObject,
-        compare: compareNamedObject
-    });
-    const date = expenseColumnSettings('date', {
-        name: 'Date',
-        render: value => dateStructToISO8601String(value),
-        compare: (a, b) => dateStructToDayJsObject(a).valueOf() - dateStructToDayJsObject(b).valueOf()
-    });
-    const method = expenseColumnSettings('method', {
-        name: 'Method',
-        render: value => value.name,
-        filter: filterNamedObject,
-        compare: compareNamedObject
-    });
-    const author = expenseColumnSettings('author', {
-        name: 'Author',
-        render: value => value.name,
-        filter: filterNamedObject,
-        compare: compareNamedObject
-    });
-    const tags = expenseColumnSettings('tags', {
-        name: 'Tags',
-        render: value => (
-            <div>
-                {value.map(tag => <Chip label={tag.name} key={tag.name}></Chip>)}
-            </div>
-        ),
-        filter: (value, filter) => value.find(v => filterNamedObject(v, filter)) !== undefined
+    const schedule = scheduledExpenseColumnSettings('schedule', {
+        name: 'Schedule',
+        render: scheduleToString
     });
 
-    const columns = [name, amount, category, date, method, author, tags]
+    const columns = [name, amount, category, start, end, schedule, method, author, tags];
+
+    return <DataTable
+        values={expenses}
+        columns={columns}
+        filter={filter}
+        initialSortColumn={name}
+    />;
+}
+
+export function ExpenseTemplatesTable({expenses, filter}: ExpensesTableParameters<ExpenseTemplate>) {
+    const columns = [name, amount, category, method, author, tags];
+
+    return <DataTable
+        values={expenses}
+        columns={columns}
+        filter={filter}
+        initialSortColumn={name}
+    />;
+}
+
+export function ExpensesTable({expenses, filter}: ExpensesTableParameters<Expense>) {
+    const date = expenseColumnSettings('date', {
+        name: 'Date',
+        render: dateStructToISO8601String,
+        compare: compareDateStruct
+    });
+
+    const columns = [name, amount, category, date, method, author, tags];
 
     return <DataTable
         values={expenses}

@@ -25,11 +25,15 @@ export function dateStructToDayJsObject(date: DateStruct): dayjs.Dayjs {
     return dayjs(jsDate);
 }
 
-export function dateStructfromISO8601String(string: string): DateStruct {
+export function dateStructFromISO8601String(string: string): DateStruct {
     const dateObject = dayjs(string);
     return {
         year: dateObject.year(),
         month: dateObject.month() + 1, // month is zero-indexed in dayjs
         day: dateObject.date()
     };
+}
+
+export function compareDateStruct(a: DateStruct, b: DateStruct): number {
+    return dateStructToDayJsObject(a).valueOf() - dateStructToDayJsObject(b).valueOf();
 }

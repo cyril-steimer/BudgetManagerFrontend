@@ -58,6 +58,14 @@ export default function Dashboard() {
         navigate('/expenses');
     }
 
+    function templates() {
+        navigate('/templates');
+    }
+
+    function schedules() {
+        navigate('/schedules');
+    }
+
     function notYetImplemented() {
         alert('Not yet implemented');
     }
@@ -82,7 +90,7 @@ export default function Dashboard() {
             </Grid2>
             <Grid2 xs={3}>
                 <Button
-                    sx={{height: "100%"}}
+                    sx={{height: '100%'}}
                     fullWidth={true}
                     type="button"
                     variant="outlined"
@@ -119,14 +127,14 @@ export default function Dashboard() {
                 title="Templates"
                 text="View the list of templates"
                 buttons={[
-                    new CardButton('All Templates', notYetImplemented)
+                    new CardButton('All Templates', templates)
                 ]}
             />
             <DashboardCard
                 title="Scheduled Expenses"
                 text="View the list of scheduled expenses"
                 buttons={[
-                    new CardButton('All Scheduled Expenses', notYetImplemented)
+                    new CardButton('All Scheduled Expenses', schedules)
                 ]}
             />
         </Grid2>
