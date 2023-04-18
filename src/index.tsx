@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import {createBrowserRouter, RouterProvider} from 'react-router-dom';
 import Root from './routes/Root';
-import MonthlyExpenses, {monthlyExpensesLoader} from './routes/Monthly-Expenses';
+import Expenses, {allExpensesLoader, monthlyExpensesLoader, yearlyExpensesLoader} from './routes/Expenses';
 import Dashboard from './routes/Dashboard';
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
@@ -20,8 +20,18 @@ const router = createBrowserRouter([
             },
             {
                 path: 'expenses/year/:year/month/:month',
-                element: <MonthlyExpenses/>,
+                element: <Expenses/>,
                 loader: monthlyExpensesLoader
+            },
+            {
+                path: 'expenses/year/:year',
+                element: <Expenses/>,
+                loader: yearlyExpensesLoader
+            },
+            {
+                path: 'expenses',
+                element: <Expenses/>,
+                loader: allExpensesLoader
             }
         ]
     }

@@ -44,9 +44,18 @@ function DashboardCard({title, text, buttons}: CardParameters) {
 export default function Dashboard() {
     const navigate = useNavigate();
     const [search, setSearch] = useState('');
+    const now = dayjs();
 
-    function viewThisMonth() {
-        viewMonthlyExpenses(dayjs());
+    function monthlyExpenses() {
+        navigate(`/expenses/year/${now.year()}/month/${now.month() + 1}`);
+    }
+
+    function yearlyExpenses() {
+        navigate(`/expenses/year/${now.year()}`);
+    }
+
+    function allExpenses() {
+        navigate('/expenses');
     }
 
     function notYetImplemented() {
@@ -55,11 +64,6 @@ export default function Dashboard() {
 
     function searchExpenses() {
         alert(`Searching for '${search}'`);
-    }
-
-    function viewMonthlyExpenses(date: dayjs.Dayjs) {
-        const url = `/expenses/year/${date.year()}/month/${date.month() + 1}`;
-        navigate(url);
     }
 
     return (
@@ -91,9 +95,9 @@ export default function Dashboard() {
                 title="Expenses"
                 text="View the list of all expenses during a certain time frame"
                 buttons={[
-                    new CardButton('This Month', viewThisMonth),
-                    new CardButton('This Year', notYetImplemented),
-                    new CardButton('All Time', notYetImplemented)
+                    new CardButton('This Month', monthlyExpenses),
+                    new CardButton('This Year', yearlyExpenses),
+                    new CardButton('All Time', allExpenses)
                 ]}
             />
             <DashboardCard

@@ -121,7 +121,7 @@ export default function DataTable<T extends TableItem>(
     }
 
     const sortedFilteredValues = values
-        .filter(value => filter === undefined || filter.length == 0 || matchesFilter(value, filter))
+        .filter(value => filter === undefined || filter.length === 0 || matchesFilter(value, filter))
         .sort((a, b) => compare(a, b));
 
     return (
