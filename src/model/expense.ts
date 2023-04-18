@@ -29,7 +29,7 @@ export interface MonthlySchedule {
 
 export interface ScheduledExpense extends Expense {
     startDate: DateStruct;
-    endDate: DateStruct;
+    endDate?: DateStruct;
     schedule: WeeklySchedule | MonthlySchedule;
 }
 

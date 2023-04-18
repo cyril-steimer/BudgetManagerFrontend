@@ -14,7 +14,10 @@ export interface DateStruct {
     year: number;
 }
 
-export function dateStructToISO8601String(date: DateStruct): string {
+export function dateStructToISO8601String(date: DateStruct | undefined): string {
+    if (date === undefined) {
+        return '-';
+    }
     const dateObject = dateStructToDayJsObject(date);
     return dateObject.format('YYYY-MM-DD');
 }
@@ -34,6 +37,13 @@ export function dateStructFromISO8601String(string: string): DateStruct {
     };
 }
 
-export function compareDateStruct(a: DateStruct, b: DateStruct): number {
+export function compareDateStruct(a: DateStruct | undefined, b: DateStruct | undefined): number {
+    if (a === undefined && b === undefined) {
+        return 0;
+    } else if (a === undefined) {
+        return -1;
+    } else if (b === undefined) {
+        return 1;
+    }
     return dateStructToDayJsObject(a).valueOf() - dateStructToDayJsObject(b).valueOf();
 }
