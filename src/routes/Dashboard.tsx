@@ -16,7 +16,7 @@ const StyledCardHeader = styled(CardHeader)(({theme}) => ({
 }));
 
 class CardButton {
-    constructor(readonly text: string, readonly action: () => void) {
+    constructor(readonly text: string, readonly url: string) {
     }
 }
 
@@ -28,6 +28,12 @@ interface CardParameters {
 }
 
 function DashboardCard({title, text, disableButtons, buttons}: CardParameters) {
+    const navigate = useNavigate();
+
+    function click(button: CardButton) {
+        navigate(button.url);
+    }
+
     return (
         <Grid2 xs={6}>
             <Card variant="outlined">
@@ -36,7 +42,7 @@ function DashboardCard({title, text, disableButtons, buttons}: CardParameters) {
                     <Typography>{text}</Typography>
                 </CardContent>
                 <CardActions>
-                    {buttons.map(b => <Button key={b.text} type="button" onClick={b.action} disabled={disableButtons}>{b.text}</Button>)}
+                    {buttons.map(b => <Button key={b.text} type="button" onClick={() => click(b)} disabled={disableButtons}>{b.text}</Button>)}
                 </CardActions>
             </Card>
         </Grid2>
@@ -44,37 +50,12 @@ function DashboardCard({title, text, disableButtons, buttons}: CardParameters) {
 }
 
 export default function Dashboard() {
-    const navigate = useNavigate();
     const [loadingExpenses, setLoadingExpenses] = useState(false);
     const [expenses, setExpenses] = useState<Expense[]>();
     const [search, setSearch] = useState('');
     const now = dayjs();
 
     const disableButtons = useIsNavigating() || loadingExpenses;
-
-    function monthlyExpenses() {
-        navigate(`/expenses/year/${now.year()}/month/${now.month() + 1}`);
-    }
-
-    function yearlyExpenses() {
-        navigate(`/expenses/year/${now.year()}`);
-    }
-
-    function allExpenses() {
-        navigate('/expenses');
-    }
-
-    function templates() {
-        navigate('/templates');
-    }
-
-    function schedules() {
-        navigate('/schedules');
-    }
-
-    function notYetImplemented() {
-        alert('Not yet implemented');
-    }
 
     async function searchExpenses() {
         if (search === '') {
@@ -123,9 +104,9 @@ export default function Dashboard() {
                 text="View the list of all expenses during a certain time frame"
                 disableButtons={disableButtons}
                 buttons={[
-                    new CardButton('This Month', monthlyExpenses),
-                    new CardButton('This Year', yearlyExpenses),
-                    new CardButton('All Time', allExpenses)
+                    new CardButton('This Month', `/expenses/year/${now.year()}/month/${now.month() + 1}`),
+                    new CardButton('This Year', `/expenses/year/${now.year()}`),
+                    new CardButton('All Time', '/expenses')
                 ]}
             />
             <DashboardCard
@@ -133,8 +114,8 @@ export default function Dashboard() {
                 text="Check the state of your budget during the current month or year"
                 disableButtons={disableButtons}
                 buttons={[
-                    new CardButton('This Month', notYetImplemented),
-                    new CardButton('This Year', notYetImplemented)
+                    new CardButton('This Month', '/missing'),
+                    new CardButton('This Year', '/missing')
                 ]}
             />
             <DashboardCard
@@ -142,7 +123,7 @@ export default function Dashboard() {
                 text="Import or export all expense/budget data. The data can then be used in another instance of the budget manager"
                 disableButtons={disableButtons}
                 buttons={[
-                    new CardButton('Import/Export', notYetImplemented)
+                    new CardButton('Import/Export', '/missing')
                 ]}
             />
             <DashboardCard
@@ -150,7 +131,7 @@ export default function Dashboard() {
                 text="View the list of templates"
                 disableButtons={disableButtons}
                 buttons={[
-                    new CardButton('All Templates', templates)
+                    new CardButton('All Templates', '/templates')
                 ]}
             />
             <DashboardCard
@@ -158,7 +139,7 @@ export default function Dashboard() {
                 text="View the list of scheduled expenses"
                 disableButtons={disableButtons}
                 buttons={[
-                    new CardButton('All Scheduled Expenses', schedules)
+                    new CardButton('All Scheduled Expenses', '/schedules')
                 ]}
             />
         </Grid2>
