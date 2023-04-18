@@ -86,6 +86,10 @@ export async function allScheduledExpensesLoader(): Promise<ListResponse<Schedul
     return await loadAllExpenses('/api/v1/schedules');
 }
 
+export async function filterExpenses(filter: string): Promise<ListResponse<Expense>> {
+    return await loadAllExpenses(`/api/v1/expenses/search/${filter}`);
+}
+
 function getTitle(params: Params, expenseType: string): string {
     const year = params.year;
     const month = params.month;
