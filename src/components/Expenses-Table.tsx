@@ -4,6 +4,8 @@ import {compareDateStruct, dateStructToISO8601String, NamedObject} from '../mode
 import {Chip} from '@mui/material';
 import {useContext} from 'react';
 import {CurrencyContext} from '../context/contexts';
+import {Link, useNavigate} from 'react-router-dom';
+import {useIsNavigating} from '../hooks/hooks';
 
 function baseExpenseColumnSettings<K extends keyof BaseExpense>(key: K, settings: ColumnSettingsInterface<BaseExpense, K>): ColumnSettings<BaseExpense> {
     return ColumnSettings.of(key, settings);
@@ -47,21 +49,27 @@ const amount = baseExpenseColumnSettings('amount', {
 
 const category = baseExpenseColumnSettings('category', {
     name: 'Category',
-    render: value => value?.name,
+    render: value => (
+        <FilterCell field='category' value={value?.name ?? ''}></FilterCell> 
+    ),
     filter: filterNamedObject,
     compare: compareNamedObject
 });
 
 const method = baseExpenseColumnSettings('method', {
     name: 'Method',
-    render: value => value.name,
+    render: value => (
+        <FilterCell field='method' value={value.name ?? ''}></FilterCell>
+    ),
     filter: filterNamedObject,
     compare: compareNamedObject
 });
 
 const author = baseExpenseColumnSettings('author', {
     name: 'Author',
-    render: value => value.name,
+    render: value => (
+        <FilterCell field='author' value={value.name ?? ''}></FilterCell>
+    ),
     filter: filterNamedObject,
     compare: compareNamedObject
 });
@@ -70,15 +78,39 @@ const tags = baseExpenseColumnSettings('tags', {
     name: 'Tags',
     render: value => (
         <div>
-            {value.map(tag => <Chip label={tag.name} key={tag.name}></Chip>)}
+            {value.map(tag => <TagChip tag={tag.name}/>)}
         </div>
     ),
     filter: (value, filter) => value.find(v => filterNamedObject(v, filter)) !== undefined
 });
 
+function filterFieldQueryUrl(field: string, value: string) {
+    return `/expenses/field/${field}/${encodeURIComponent(value)}`;
+}
+
 function CurrencyCell({value}: {value: number}) {
     const currency = useContext(CurrencyContext);
-    return <div>{value.toFixed(2)} {currency}</div>;
+    return <span>{value.toFixed(2)} {currency}</span>;
+}
+
+function FilterCell({field, value}: {field: string, value: string}) {
+    const isNavigating = useIsNavigating();
+    if (isNavigating) {
+        return <span>{value}</span>;
+    }
+    return <Link to={filterFieldQueryUrl(field, value)} >{value}</Link>;
+}
+
+function TagChip({tag}: {tag: string}) {
+    const navigate = useNavigate();
+    return <Chip
+        label={tag}
+        key={tag}
+        onClick={() => navigate(filterFieldQueryUrl('tag', tag))}
+        color='primary'
+        variant='outlined'
+        disabled={useIsNavigating()}
+    />;
 }
 
 export function ScheduledExpensesTable({expenses, filter}: ExpensesTableParameters<ScheduledExpense>) {
