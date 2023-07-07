@@ -153,6 +153,5 @@ export default function DataTable<T extends TableItem>(
                 </TableBody>
             </Table>
         </TableContainer>
-    )
-        ;
+    );
 }

@@ -7,6 +7,7 @@ import {
     allExpenseTemplatesLoader,
     allScheduledExpensesLoader,
     Expenses,
+    expensesFilteredByFieldLoader,
     ExpenseTemplates,
     monthlyExpensesLoader,
     ScheduledExpenses,
@@ -52,6 +53,11 @@ const router = createBrowserRouter([
                 path: 'schedules',
                 element: <ScheduledExpenses/>,
                 loader: allScheduledExpensesLoader
+            },
+            {
+                path: 'expenses/field/:field/:value',
+                element: <Expenses/>,
+                loader: expensesFilteredByFieldLoader
             }
         ]
     }

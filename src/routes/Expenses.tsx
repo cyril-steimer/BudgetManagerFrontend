@@ -86,6 +86,18 @@ export async function allScheduledExpensesLoader(): Promise<ListResponse<Schedul
     return await loadAllExpenses('/api/v1/schedules');
 }
 
+export async function expensesFilteredByFieldLoader({params}: LoaderFunctionArgs): Promise<ListResponse<Expense>> {
+    const field = params.field;
+    const value = params.value;
+    if (field !== undefined && value !== undefined) {
+        const queryObject: {[key: string]: string} = {};
+        queryObject[field] = value;
+        return await searchExpenses(queryObject);
+    }
+    // TODO Better error handling
+    throw new Error('Nope!');
+}
+
 export async function filterExpenses(filter: string): Promise<ListResponse<Expense>> {
     return await loadAllExpenses(`/api/v1/expenses/search/${filter}`);
 }
