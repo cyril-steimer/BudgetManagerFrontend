@@ -49,45 +49,15 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     },
 }));
 
-function monthString(month: number): string {
-    switch (month) {
-        case 0:
-            return 'January';
-        case 1:
-            return 'February';
-        case 2:
-            return 'March';
-        case 3:
-            return 'April';
-        case 4:
-            return 'May';
-        case 5:
-            return 'June';
-        case 6:
-            return 'July';
-        case 7:
-            return 'August';
-        case 8:
-            return 'September';
-        case 9:
-            return 'October';
-        case 10:
-            return 'November';
-        case 11:
-            return 'December';
-        default:
-            return 'Unknown Month';
-    }
-}
-
-const JANUARY = 0;
-const DECEMBER = 11;
+const JANUARY = 1;
+const DECEMBER = 12;
 
 function rangeString(params: TimeRange): string {
     if (params.activeMonth === undefined) {
         return params.activeYear.toString();
     }
-    const date = dayjs().month(params.activeMonth).toDate();
+    // dayjs has 0-indexed months
+    const date = dayjs().month(params.activeMonth - 1).toDate();
     const monthName = date.toLocaleDateString(undefined, { month: 'long' });
     return monthName + ' ' + params.activeYear.toString();
 }
@@ -117,7 +87,7 @@ function drillUpRange(range: TimeRange): TimeRange | undefined {
 
 function drillDownRanges(range: TimeRange): TimeRange[] {
     if (range.activeMonth === undefined) {
-        return Array.from(Array(DECEMBER + 1)).map((_, month) => new SimpleTimeRange(range.activeYear, month));
+        return Array.from(Array(DECEMBER)).map((_, month) => new SimpleTimeRange(range.activeYear, month + 1));
     }
     return [];
 }

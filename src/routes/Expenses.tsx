@@ -1,10 +1,10 @@
-import {LoaderFunctionArgs, Params, useLoaderData, useParams} from 'react-router-dom';
+import {LoaderFunctionArgs, NavigateFunction, Params, useLoaderData, useNavigate, useParams} from 'react-router-dom';
 import {BaseExpense, Expense, ExpenseTemplate, ScheduledExpense} from '../model/expense';
 import dayjs, {Dayjs} from 'dayjs';
 import {ListResponse} from '../model/responses';
 import {useState} from 'react';
 import {ExpensesTable, ExpenseTemplatesTable, ScheduledExpensesTable} from '../components/Expenses-Table';
-import {Header} from '../components/Header';
+import {Header, TimeRangeParameters} from '../components/Header';
 
 function dateRangeQuery(fromInclusive: Dayjs, toExclusive: Dayjs): object {
     return {
@@ -122,16 +122,40 @@ export async function filterExpenses(filter: string): Promise<ListResponse<Expen
 }
 
 export interface ExpensesParameters<E extends BaseExpense> {
+    endpoint: ExpenseEndpoint;
     renderTable: (expenses: E[], filter: string) => JSX.Element;
 }
 
-function ExpensesComponent<E extends BaseExpense>({renderTable}: ExpensesParameters<E>) {
+function getTimeRangeParameters(endpoint: ExpenseEndpoint, navigate: NavigateFunction, params: Params<string>): TimeRangeParameters | undefined {
+    const year = params.year;
+    const month = params.month;
+    let parameters: TimeRangeParameters | undefined = undefined;
+    if (year !== undefined) {
+        parameters = {
+            activeYear: parseInt(year, 10),
+            setActiveTimeRange(range) {
+                if (range.activeMonth === undefined) {
+                    navigate(`/${endpoint}/year/${range.activeYear}`);
+                } else {
+                    navigate(`/${endpoint}/year/${range.activeYear}/month/${range.activeMonth}`);
+                }
+            },
+        };
+        if (month !== undefined) {
+            parameters.activeMonth = parseInt(month, 10);
+        }
+    }
+    return parameters;
+}
+
+function ExpensesComponent<E extends BaseExpense>({endpoint, renderTable}: ExpensesParameters<E>) {
+    const timeRange = getTimeRangeParameters(endpoint, useNavigate(), useParams());
     const expenses = useLoaderData() as ListResponse<E>;
     const [filter, setFilter] = useState('');
 
     return (
         <div>
-            <Header filter={{filter, setFilter}}/>
+            <Header filter={{filter, setFilter}} timeRange={timeRange}/>
             {renderTable(expenses.values, filter)}
         </div>
     );
@@ -139,7 +163,7 @@ function ExpensesComponent<E extends BaseExpense>({renderTable}: ExpensesParamet
 
 export function Expenses() {
     return (
-        <ExpensesComponent renderTable={(expenses: Expense[], filter) =>
+        <ExpensesComponent endpoint='expenses' renderTable={(expenses: Expense[], filter) =>
             <ExpensesTable expenses={expenses} filter={filter}/>
         }/>
     );
@@ -147,7 +171,7 @@ export function Expenses() {
 
 export function ExpenseTemplates() {
     return (
-        <ExpensesComponent renderTable={(expenses: ExpenseTemplate[], filter) =>
+        <ExpensesComponent endpoint='templates' renderTable={(expenses: ExpenseTemplate[], filter) =>
             <ExpenseTemplatesTable expenses={expenses} filter={filter}/>
         }/>
     );
@@ -155,7 +179,7 @@ export function ExpenseTemplates() {
 
 export function ScheduledExpenses() {
     return (
-        <ExpensesComponent renderTable={(expenses: ScheduledExpense[], filter) =>
+        <ExpensesComponent endpoint='schedules' renderTable={(expenses: ScheduledExpense[], filter) =>
             <ScheduledExpensesTable expenses={expenses} filter={filter}/>
         }/>
     );
