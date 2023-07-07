@@ -2,6 +2,8 @@ import {BaseExpense, Expense, ExpenseTemplate, ScheduledExpense, scheduleToStrin
 import DataTable, {ColumnSettings, ColumnSettingsInterface} from './Data-Table';
 import {compareDateStruct, dateStructToISO8601String, NamedObject} from '../model/common';
 import {Chip} from '@mui/material';
+import {useContext} from 'react';
+import {CurrencyContext} from '../context/contexts';
 
 function baseExpenseColumnSettings<K extends keyof BaseExpense>(key: K, settings: ColumnSettingsInterface<BaseExpense, K>): ColumnSettings<BaseExpense> {
     return ColumnSettings.of(key, settings);
@@ -37,7 +39,9 @@ const name = baseExpenseColumnSettings('name', {
 
 const amount = baseExpenseColumnSettings('amount', {
     name: 'Amount',
-    render: value => value.amount.toString(),
+    render: value => (
+        <CurrencyCell value={value.amount}></CurrencyCell>
+    ),
     compare: (a, b) => a.amount - b.amount
 });
 
@@ -71,6 +75,11 @@ const tags = baseExpenseColumnSettings('tags', {
     ),
     filter: (value, filter) => value.find(v => filterNamedObject(v, filter)) !== undefined
 });
+
+function CurrencyCell({value}: {value: number}) {
+    const currency = useContext(CurrencyContext);
+    return <div>{value.toString()} {currency}</div>;
+}
 
 export function ScheduledExpensesTable({expenses, filter}: ExpensesTableParameters<ScheduledExpense>) {
     const start = scheduledExpenseColumnSettings('startDate', {

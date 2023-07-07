@@ -17,6 +17,7 @@ import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
+import {CurrencyContext} from './context/contexts';
 
 const router = createBrowserRouter([
     {
@@ -61,6 +62,8 @@ const root = ReactDOM.createRoot(
 );
 root.render(
     <React.StrictMode>
-        <RouterProvider router={router}/>
+        <CurrencyContext.Provider value='CHF'>
+            <RouterProvider router={router}/>
+        </CurrencyContext.Provider>
     </React.StrictMode>
 );
