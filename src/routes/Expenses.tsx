@@ -33,14 +33,20 @@ function dateRangeQuery(fromInclusive: Dayjs, toExclusive: Dayjs): object {
     };
 }
 
-async function searchExpenses(query: object): Promise<ListResponse<Expense>> {
-    const url = '/api/v1/expenses/search?sort=date&dir=desc';
+export type ExpenseEndpoint = 'expenses' | 'templates' | 'schedules';
+
+export function getFilterByFieldUrl(endpoint: ExpenseEndpoint, field: string, value: string): string {
+    return `/${endpoint}/field/${field}/${encodeURIComponent(value)}`;
+}
+
+async function search<T extends Expense>(endpoint: ExpenseEndpoint, query: object): Promise<ListResponse<T>> {
+    const url = `/api/v1/${endpoint}/search?sort=date&dir=desc`;
     const response = await fetch(url, {
         method: 'post',
         body: JSON.stringify(query)
     });
     // TODO Check the response for errors
-    return await response.json() as ListResponse<Expense>;
+    return await response.json() as ListResponse<T>;
 }
 
 export async function monthlyExpensesLoader({params}: LoaderFunctionArgs): Promise<ListResponse<Expense>> {
@@ -49,7 +55,7 @@ export async function monthlyExpensesLoader({params}: LoaderFunctionArgs): Promi
     if (year !== undefined && month !== undefined) {
         const from = dayjs().year(parseInt(year)).month(parseInt(month) - 1).date(1);
         const to = from.add(1, 'month');
-        return await searchExpenses(dateRangeQuery(from, to));
+        return await search('expenses', dateRangeQuery(from, to));
     }
     // TODO Better error handling
     throw new Error('Nope!');
@@ -60,7 +66,7 @@ export async function yearlyExpensesLoader({params}: LoaderFunctionArgs): Promis
     if (year !== undefined) {
         const from = dayjs().year(parseInt(year)).month(0).date(1);
         const to = from.add(1, 'year');
-        return await searchExpenses(dateRangeQuery(from, to));
+        return await search('expenses', dateRangeQuery(from, to));
     }
     // TODO Better error handling
     throw new Error('Nope!');
@@ -86,16 +92,29 @@ export async function allScheduledExpensesLoader(): Promise<ListResponse<Schedul
     return await loadAllExpenses('/api/v1/schedules');
 }
 
-export async function expensesFilteredByFieldLoader({params}: LoaderFunctionArgs): Promise<ListResponse<Expense>> {
+async function loadExpensesFilteredByField<T extends Expense>(params: Params<string>, endpoint: ExpenseEndpoint): Promise<ListResponse<T>> {
     const field = params.field;
     const value = params.value;
     if (field !== undefined && value !== undefined) {
         const queryObject: {[key: string]: string} = {};
         queryObject[field] = value;
-        return await searchExpenses(queryObject);
+        return await search(endpoint, queryObject);
     }
     // TODO Better error handling
     throw new Error('Nope!');
+
+}
+
+export async function expensesFilteredByFieldLoader({params}: LoaderFunctionArgs): Promise<ListResponse<Expense>> {
+    return loadExpensesFilteredByField(params, 'expenses');
+}
+
+export async function expenseTemplatesFilteredByFieldLoader({params}: LoaderFunctionArgs): Promise<ListResponse<ExpenseTemplate>> {
+    return loadExpensesFilteredByField(params, 'templates');
+}
+
+export async function scheduledExpensesFilteredByFieldLoader({params}: LoaderFunctionArgs): Promise<ListResponse<ScheduledExpense>> {
+    return loadExpensesFilteredByField(params, 'schedules');
 }
 
 export async function filterExpenses(filter: string): Promise<ListResponse<Expense>> {

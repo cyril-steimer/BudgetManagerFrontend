@@ -6,6 +6,7 @@ import {useContext} from 'react';
 import {CurrencyContext} from '../context/contexts';
 import {Link, useNavigate} from 'react-router-dom';
 import {useIsNavigating} from '../hooks/hooks';
+import {ExpenseEndpoint, getFilterByFieldUrl} from '../routes/Expenses';
 
 function baseExpenseColumnSettings<K extends keyof BaseExpense>(key: K, settings: ColumnSettingsInterface<BaseExpense, K>): ColumnSettings<BaseExpense> {
     return ColumnSettings.of(key, settings);
@@ -32,60 +33,67 @@ export interface ExpensesTableParameters<E extends BaseExpense> {
     filter?: string;
 }
 
-const name = baseExpenseColumnSettings('name', {
-    name: 'Name',
-    render: value => value.name,
-    filter: filterNamedObject,
-    compare: compareNamedObject
-});
+class BaseColumns {
+    readonly name: ColumnSettings<BaseExpense>;
+    readonly amount: ColumnSettings<BaseExpense>;
+    readonly category: ColumnSettings<BaseExpense>;
+    readonly method: ColumnSettings<BaseExpense>;
+    readonly author: ColumnSettings<BaseExpense>;
+    readonly tags: ColumnSettings<BaseExpense>;
 
-const amount = baseExpenseColumnSettings('amount', {
-    name: 'Amount',
-    render: value => (
-        <CurrencyCell value={value.amount}></CurrencyCell>
-    ),
-    compare: (a, b) => a.amount - b.amount
-});
+    constructor(endpoint: ExpenseEndpoint) {
+        this.name = baseExpenseColumnSettings('name', {
+            name: 'Name',
+            render: value => value.name,
+            filter: filterNamedObject,
+            compare: compareNamedObject
+        });
 
-const category = baseExpenseColumnSettings('category', {
-    name: 'Category',
-    render: value => (
-        <FilterCell field='category' value={value?.name ?? ''}></FilterCell> 
-    ),
-    filter: filterNamedObject,
-    compare: compareNamedObject
-});
+        this.amount = baseExpenseColumnSettings('amount', {
+            name: 'Amount',
+            render: value => (
+                <CurrencyCell value={value.amount}></CurrencyCell>
+            ),
+            compare: (a, b) => a.amount - b.amount
+        });
 
-const method = baseExpenseColumnSettings('method', {
-    name: 'Method',
-    render: value => (
-        <FilterCell field='method' value={value.name ?? ''}></FilterCell>
-    ),
-    filter: filterNamedObject,
-    compare: compareNamedObject
-});
+        this.category = baseExpenseColumnSettings('category', {
+            name: 'Category',
+            render: value => (
+                <FilterCell endpoint={endpoint} field='category' value={value?.name ?? ''}></FilterCell> 
+            ),
+            filter: filterNamedObject,
+            compare: compareNamedObject
+        });
 
-const author = baseExpenseColumnSettings('author', {
-    name: 'Author',
-    render: value => (
-        <FilterCell field='author' value={value.name ?? ''}></FilterCell>
-    ),
-    filter: filterNamedObject,
-    compare: compareNamedObject
-});
+        this.method = baseExpenseColumnSettings('method', {
+            name: 'Method',
+            render: value => (
+                <FilterCell endpoint={endpoint} field='method' value={value.name ?? ''}></FilterCell>
+            ),
+            filter: filterNamedObject,
+            compare: compareNamedObject
+        });
 
-const tags = baseExpenseColumnSettings('tags', {
-    name: 'Tags',
-    render: value => (
-        <div>
-            {value.map(tag => <TagChip tag={tag.name}/>)}
-        </div>
-    ),
-    filter: (value, filter) => value.find(v => filterNamedObject(v, filter)) !== undefined
-});
+        this.author = baseExpenseColumnSettings('author', {
+            name: 'Author',
+            render: value => (
+                <FilterCell endpoint={endpoint} field='author' value={value.name ?? ''}></FilterCell>
+            ),
+            filter: filterNamedObject,
+            compare: compareNamedObject
+        });
 
-function filterFieldQueryUrl(field: string, value: string) {
-    return `/expenses/field/${field}/${encodeURIComponent(value)}`;
+        this.tags = baseExpenseColumnSettings('tags', {
+            name: 'Tags',
+            render: value => (
+                <div>
+                    {value.map(tag => <TagChip endpoint={endpoint} tag={tag.name}/>)}
+                </div>
+            ),
+            filter: (value, filter) => value.find(v => filterNamedObject(v, filter)) !== undefined
+        });
+    }
 }
 
 function CurrencyCell({value}: {value: number}) {
@@ -93,20 +101,20 @@ function CurrencyCell({value}: {value: number}) {
     return <span>{value.toFixed(2)} {currency}</span>;
 }
 
-function FilterCell({field, value}: {field: string, value: string}) {
+function FilterCell({endpoint, field, value}: {endpoint: ExpenseEndpoint, field: string, value: string}) {
     const isNavigating = useIsNavigating();
     if (isNavigating) {
         return <span>{value}</span>;
     }
-    return <Link to={filterFieldQueryUrl(field, value)} >{value}</Link>;
+    return <Link to={getFilterByFieldUrl(endpoint, field, value)} >{value}</Link>;
 }
 
-function TagChip({tag}: {tag: string}) {
+function TagChip({endpoint, tag}: {endpoint: ExpenseEndpoint, tag: string}) {
     const navigate = useNavigate();
     return <Chip
         label={tag}
         key={tag}
-        onClick={() => navigate(filterFieldQueryUrl('tag', tag))}
+        onClick={() => navigate(getFilterByFieldUrl(endpoint, 'tag', tag))}
         color='primary'
         variant='outlined'
         disabled={useIsNavigating()}
@@ -129,24 +137,26 @@ export function ScheduledExpensesTable({expenses, filter}: ExpensesTableParamete
         render: scheduleToString
     });
 
-    const columns = [name, amount, category, start, end, schedule, method, author, tags];
+    const base = new BaseColumns('schedules');
+    const columns = [base.name, base.amount, base.category, start, end, schedule, base.method, base.author, base.tags];
 
     return <DataTable
         values={expenses}
         columns={columns}
         filter={filter}
-        initialSortColumn={name}
+        initialSortColumn={base.name}
     />;
 }
 
 export function ExpenseTemplatesTable({expenses, filter}: ExpensesTableParameters<ExpenseTemplate>) {
-    const columns = [name, amount, category, method, author, tags];
+    const base = new BaseColumns('templates');
+    const columns = [base.name, base.amount, base.category, base.method, base.author, base.tags];
 
     return <DataTable
         values={expenses}
         columns={columns}
         filter={filter}
-        initialSortColumn={name}
+        initialSortColumn={base.name}
     />;
 }
 
@@ -157,7 +167,8 @@ export function ExpensesTable({expenses, filter}: ExpensesTableParameters<Expens
         compare: compareDateStruct
     });
 
-    const columns = [name, amount, category, date, method, author, tags];
+    const base = new BaseColumns('expenses');
+    const columns = [base.name, base.amount, base.category, date, base.method, base.author, base.tags];
 
     return <DataTable
         values={expenses}

@@ -9,8 +9,10 @@ import {
     Expenses,
     expensesFilteredByFieldLoader,
     ExpenseTemplates,
+    expenseTemplatesFilteredByFieldLoader,
     monthlyExpensesLoader,
     ScheduledExpenses,
+    scheduledExpensesFilteredByFieldLoader,
     yearlyExpensesLoader
 } from './routes/Expenses';
 import Dashboard from './routes/Dashboard';
@@ -58,6 +60,16 @@ const router = createBrowserRouter([
                 path: 'expenses/field/:field/:value',
                 element: <Expenses/>,
                 loader: expensesFilteredByFieldLoader
+            },
+            {
+                path: 'templates/field/:field/:value',
+                element: <ExpenseTemplates/>,
+                loader: expenseTemplatesFilteredByFieldLoader
+            },
+            {
+                path: 'schedules/field/:field/:value',
+                element: <ScheduledExpenses/>,
+                loader: scheduledExpensesFilteredByFieldLoader
             }
         ]
     }
