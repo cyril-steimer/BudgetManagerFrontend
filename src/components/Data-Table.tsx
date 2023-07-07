@@ -70,6 +70,7 @@ export interface TableParameters<T extends TableItem> {
     initialSortColumn?: ColumnSettings<T>;
     initialSortDirection?: SortDirection;
     computeTotal?: (values: T[]) => number;
+    renderTotal?: (value: number) => JSX.Element;
 }
 
 export default function DataTable<T extends TableItem>(
@@ -79,7 +80,8 @@ export default function DataTable<T extends TableItem>(
         filter,
         initialSortColumn,
         initialSortDirection,
-        computeTotal
+        computeTotal,
+        renderTotal
     }: TableParameters<T>
 ) {
     const [sortColumn, setSortColumn] = useState(initialSortColumn);
@@ -124,6 +126,8 @@ export default function DataTable<T extends TableItem>(
         .filter(value => filter === undefined || filter.length === 0 || matchesFilter(value, filter))
         .sort((a, b) => compare(a, b));
 
+    const total = computeTotal === undefined ? 0 : computeTotal(sortedFilteredValues);
+
     return (
         <TableContainer>
             <Table>
@@ -137,7 +141,7 @@ export default function DataTable<T extends TableItem>(
                     {computeTotal !== undefined &&
                         <SummaryTableRow>
                             <TableCell>Total</TableCell>
-                            <TableCell>{computeTotal(sortedFilteredValues)}</TableCell>
+                            <TableCell>{renderTotal === undefined ? total : renderTotal(total)}</TableCell>
                             {
                                 /*Create dummy empty cells for the other columns*/
                                 columns

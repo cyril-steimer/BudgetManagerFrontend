@@ -78,7 +78,7 @@ const tags = baseExpenseColumnSettings('tags', {
 
 function CurrencyCell({value}: {value: number}) {
     const currency = useContext(CurrencyContext);
-    return <div>{value.toString()} {currency}</div>;
+    return <div>{value.toFixed(2)} {currency}</div>;
 }
 
 export function ScheduledExpensesTable({expenses, filter}: ExpensesTableParameters<ScheduledExpense>) {
@@ -133,5 +133,6 @@ export function ExpensesTable({expenses, filter}: ExpensesTableParameters<Expens
         filter={filter}
         initialSortColumn={date}
         computeTotal={sumAmount}
+        renderTotal={value => (<CurrencyCell value={value}></CurrencyCell>)}
     />;
 }
