@@ -88,7 +88,7 @@ class BaseColumns {
             name: 'Tags',
             render: value => (
                 <div>
-                    {value.map(tag => <TagChip endpoint={endpoint} tag={tag.name}/>)}
+                    {value.map(tag => <TagChip key={tag.name} endpoint={endpoint} tag={tag.name}/>)}
                 </div>
             ),
             filter: (value, filter) => value.find(v => filterNamedObject(v, filter)) !== undefined
@@ -113,7 +113,6 @@ function TagChip({endpoint, tag}: {endpoint: ExpenseEndpoint, tag: string}) {
     const navigate = useNavigate();
     return <Chip
         label={tag}
-        key={tag}
         onClick={() => navigate(getFilterByFieldUrl(endpoint, 'tag', tag))}
         color='primary'
         variant='outlined'

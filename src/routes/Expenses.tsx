@@ -3,8 +3,8 @@ import {BaseExpense, Expense, ExpenseTemplate, ScheduledExpense} from '../model/
 import dayjs, {Dayjs} from 'dayjs';
 import {ListResponse} from '../model/responses';
 import {useState} from 'react';
-import {TextField, Typography} from '@mui/material';
 import {ExpensesTable, ExpenseTemplatesTable, ScheduledExpensesTable} from '../components/Expenses-Table';
+import {Header} from '../components/Header';
 
 function dateRangeQuery(fromInclusive: Dayjs, toExclusive: Dayjs): object {
     return {
@@ -146,8 +146,7 @@ function ExpensesComponent<E extends BaseExpense>({expenseType, renderTable}: Ex
 
     return (
         <div>
-            <Typography variant="h5">{title}</Typography>
-            <TextField type="text" value={filter} label="Filter" variant="outlined" onChange={e => setFilter(e.target.value)}/>
+            <Header filter={{filter, setFilter}}/>
             {renderTable(expenses.values, filter)}
         </div>
     );

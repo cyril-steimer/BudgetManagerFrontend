@@ -131,9 +131,14 @@ export interface TimeRangeParameters extends TimeRange {
     setActiveTimeRange: (range: TimeRange) => void;
 }
 
+export interface FilterParameters {
+    filter: string;
+    setFilter: (filter: string) => void;
+}
+
 export interface HeaderParameters {
     timeRange?: TimeRangeParameters;
-    setFilter?: (filter: string) => void;
+    filter?: FilterParameters;
 }
 
 function TimeRangeNavigation({timeRange}: {timeRange: TimeRangeParameters}) {
@@ -187,8 +192,7 @@ function TimeRangeNavigation({timeRange}: {timeRange: TimeRangeParameters}) {
     );
 }
 
-export function Header({timeRange, setFilter}: HeaderParameters) {
-    const [search, setSearch] = useState('');
+export function Header({timeRange, filter}: HeaderParameters) {
     const navigate = useNavigate();
 
     return (
@@ -199,7 +203,7 @@ export function Header({timeRange, setFilter}: HeaderParameters) {
                         variant='h6'
                         component='div'
                         sx = {{ flexGrow: 1, ':hover': { cursor: 'pointer' }  }}
-                        onClick={() => navigate('/expenses')}
+                        onClick={() => navigate('/')}
                     >
                         Dashboard
                     </Typography>
@@ -213,18 +217,15 @@ export function Header({timeRange, setFilter}: HeaderParameters) {
                         </Typography>
                     )}
                     {timeRange && <TimeRangeNavigation timeRange={timeRange}/>}
-                    {setFilter && 
+                    {filter && 
                         <Search>
                             <SearchIconWrapper>
                                 <SearchIcon />
                             </SearchIconWrapper>
                             <StyledInputBase
                                 placeholder='Search...'
-                                value={search}
-                                onChange={event => {
-                                    setSearch(event.target.value);
-                                    setFilter(event.target.value);
-                                }}
+                                value={filter.filter}
+                                onChange={event => filter.setFilter(event.target.value)}
                             />
                         </Search>
                     }
