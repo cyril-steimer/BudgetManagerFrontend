@@ -7,6 +7,7 @@ import NorthIcon from '@mui/icons-material/North';
 import SouthIcon from '@mui/icons-material/South';
 import {useIsNavigating} from '../hooks/hooks';
 import {useNavigate} from 'react-router-dom';
+import dayjs from 'dayjs';
 
 // Search: https://mui.com/material-ui/react-app-bar/#app-bar-with-search-field
 const Search = styled('div')(({ theme }) => ({
@@ -83,8 +84,12 @@ const JANUARY = 0;
 const DECEMBER = 11;
 
 function rangeString(params: TimeRange): string {
-    const monthPrefix = params.activeMonth === undefined ? '' : monthString(params.activeMonth) + ' ';
-    return monthPrefix + params.activeYear.toString();
+    if (params.activeMonth === undefined) {
+        return params.activeYear.toString();
+    }
+    const date = dayjs().month(params.activeMonth).toDate();
+    const monthName = date.toLocaleDateString(undefined, { month: 'long' });
+    return monthName + ' ' + params.activeYear.toString();
 }
 
 function previousRange(range: TimeRange): TimeRange {

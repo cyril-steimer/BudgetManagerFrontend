@@ -121,26 +121,11 @@ export async function filterExpenses(filter: string): Promise<ListResponse<Expen
     return await loadAllExpenses(`/api/v1/expenses/search/${filter}`);
 }
 
-function getTitle(params: Params, expenseType: string): string {
-    const year = params.year;
-    const month = params.month;
-    if (year !== undefined && month !== undefined) {
-        const date = dayjs().month(parseInt(month, 10) - 1).toDate();
-        const monthName = date.toLocaleDateString(undefined, {month: 'long'});
-        return `${expenseType} in ${monthName} ${year}`;
-    } else if (year !== undefined) {
-        return `${expenseType} in ${year}`;
-    }
-    return `All ${expenseType}`;
-}
-
 export interface ExpensesParameters<E extends BaseExpense> {
-    expenseType: 'Expenses' | 'Scheduled Expenses' | 'Expense Templates';
     renderTable: (expenses: E[], filter: string) => JSX.Element;
 }
 
-function ExpensesComponent<E extends BaseExpense>({expenseType, renderTable}: ExpensesParameters<E>) {
-    const title = getTitle(useParams(), expenseType);
+function ExpensesComponent<E extends BaseExpense>({renderTable}: ExpensesParameters<E>) {
     const expenses = useLoaderData() as ListResponse<E>;
     const [filter, setFilter] = useState('');
 
@@ -154,24 +139,24 @@ function ExpensesComponent<E extends BaseExpense>({expenseType, renderTable}: Ex
 
 export function Expenses() {
     return (
-        <ExpensesComponent expenseType="Expenses" renderTable={
-            (expenses: Expense[], filter) => <ExpensesTable expenses={expenses} filter={filter}/>
+        <ExpensesComponent renderTable={(expenses: Expense[], filter) =>
+            <ExpensesTable expenses={expenses} filter={filter}/>
         }/>
     );
 }
 
 export function ExpenseTemplates() {
     return (
-        <ExpensesComponent expenseType="Expense Templates" renderTable={
-            (expenses: ExpenseTemplate[], filter) => <ExpenseTemplatesTable expenses={expenses} filter={filter}/>
+        <ExpensesComponent renderTable={(expenses: ExpenseTemplate[], filter) =>
+            <ExpenseTemplatesTable expenses={expenses} filter={filter}/>
         }/>
     );
 }
 
 export function ScheduledExpenses() {
     return (
-        <ExpensesComponent expenseType="Scheduled Expenses" renderTable={
-            (expenses: ScheduledExpense[], filter) => <ScheduledExpensesTable expenses={expenses} filter={filter}/>
+        <ExpensesComponent renderTable={(expenses: ScheduledExpense[], filter) =>
+            <ScheduledExpensesTable expenses={expenses} filter={filter}/>
         }/>
     );
 }
