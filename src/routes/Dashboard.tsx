@@ -7,7 +7,9 @@ import {styled} from '@mui/material/styles';
 import {useState} from 'react';
 import {Expense} from '../model/expense';
 import {ExpensesTable} from '../components/Expenses-Table';
-import {ExpenseEndpoint} from '../endpoints/expense-endpoints';
+import {ExpenseEndpoint, ExpenseTemplateEndpoint, ScheduledExpenseEndpoint} from '../endpoints/expense-endpoints';
+import {Endpoint, isTimeBasedEndpoint, isViewAllEndpoint} from '../endpoints/endpoint';
+import {getMonthlyDataUrl, getYearlyDataUrl} from './Endpoint-Routes';
 
 const StyledCardHeader = styled(CardHeader)(({theme}) => ({
     [`&.${cardHeaderClasses.root}`]: {
@@ -49,21 +51,44 @@ function DashboardCard({title, text, disableButtons, buttons}: CardParameters) {
     );
 }
 
+function cardButtons<T>(endpoint: Endpoint<T>, viewAllText?: string): CardButton[] {
+    const now = dayjs();
+    const result: CardButton[] = [];
+    if (isTimeBasedEndpoint(endpoint)) {
+        result.push({
+            text: 'This Month',
+            url: getMonthlyDataUrl(endpoint, now.year(), now.month())
+        });
+        result.push({
+            text: 'This Year',
+            url: getYearlyDataUrl(endpoint, now.year())
+        });
+    }
+    if (isViewAllEndpoint(endpoint)) {
+        result.push({
+            text: viewAllText ?? 'All Time',
+            url: endpoint.viewAllPath
+        });
+    }
+    return result;
+}
+
 export default function Dashboard() {
     const [loadingExpenses, setLoadingExpenses] = useState(false);
     const [expenses, setExpenses] = useState<Expense[]>();
     const [search, setSearch] = useState('');
-    const now = dayjs();
 
     const disableButtons = useIsNavigating() || loadingExpenses;
-    const endpoint = new ExpenseEndpoint();
+    const expenseEndpoint = new ExpenseEndpoint();
+    const schedulesEndpoint = new ScheduledExpenseEndpoint();
+    const templatesEndpoint = new ExpenseTemplateEndpoint();
 
     async function searchExpenses() {
         if (search === '') {
             setExpenses(undefined);
         } else {
             setLoadingExpenses(true);
-            const expenses = await endpoint.loadDataForFilter(search);
+            const expenses = await expenseEndpoint.loadDataForFilter(search);
             setExpenses(expenses.values);
             setLoadingExpenses(false);
         }
@@ -97,18 +122,14 @@ export default function Dashboard() {
             </Grid2>
             {expenses && (
                 <Grid2 xs={12}>
-                    <ExpensesTable endpoint={endpoint} expenses={expenses}/>
+                    <ExpensesTable endpoint={expenseEndpoint} expenses={expenses}/>
                 </Grid2>
             )}
             <DashboardCard
                 title="Expenses"
                 text="View the list of all expenses during a certain time frame"
                 disableButtons={disableButtons}
-                buttons={[
-                    new CardButton('This Month', `/expenses/year/${now.year()}/month/${now.month()}`),
-                    new CardButton('This Year', `/expenses/year/${now.year()}`),
-                    new CardButton('All Time', '/expenses')
-                ]}
+                buttons={cardButtons(expenseEndpoint)}
             />
             <DashboardCard
                 title="Budget"
@@ -131,17 +152,13 @@ export default function Dashboard() {
                 title="Templates"
                 text="View the list of templates"
                 disableButtons={disableButtons}
-                buttons={[
-                    new CardButton('All Templates', '/templates')
-                ]}
+                buttons={cardButtons(templatesEndpoint, 'All Templates')}
             />
             <DashboardCard
                 title="Scheduled Expenses"
                 text="View the list of scheduled expenses"
                 disableButtons={disableButtons}
-                buttons={[
-                    new CardButton('All Scheduled Expenses', '/schedules')
-                ]}
+                buttons={cardButtons(schedulesEndpoint, 'All Scheduled Expenses')}
             />
         </Grid2>
     );
