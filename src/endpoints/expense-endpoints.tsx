@@ -21,12 +21,7 @@ abstract class BasicExpenseEndpoint<T extends BaseExpense> implements ViewAllEnd
     }
     
     async loadAllData(): Promise<ListResponse<T>> {
-        const url = `/api/v1/${this.endpoint}`;
-        const response = await fetch(url, {
-            method: 'get'
-        });
-        // TODO Check the response for errors
-        return await response.json() as ListResponse<T>;
+        return this.loadAllDataAtUrl(`/api/v1/${this.endpoint}`);
     }
 
     async loadDataForSearch(field: string, value: string): Promise<ListResponse<T>> {
@@ -35,7 +30,9 @@ abstract class BasicExpenseEndpoint<T extends BaseExpense> implements ViewAllEnd
         return await this.searchData(query);
     }
 
-    async searchData(query: object): Promise<ListResponse<T>> {
+    abstract renderData(data: ListResponse<T>, filter: string): JSX.Element;
+
+    protected async searchData(query: object): Promise<ListResponse<T>> {
         const url = `/api/v1/${this.endpoint}/search?sort=date&dir=desc`;
         const response = await fetch(url, {
             method: 'post',
@@ -45,7 +42,13 @@ abstract class BasicExpenseEndpoint<T extends BaseExpense> implements ViewAllEnd
         return await response.json() as ListResponse<T>;  
     }
 
-    abstract renderData(data: ListResponse<T>, filter: string): JSX.Element;
+    protected async loadAllDataAtUrl(url: string): Promise<ListResponse<T>> {
+        const response = await fetch(url, {
+            method: 'get'
+        });
+        // TODO Check the response for errors
+        return await response.json() as ListResponse<T>;
+    }
 }
 
 export class ExpenseEndpoint extends BasicExpenseEndpoint<Expense> implements TimeBasedEndpoint<ListResponse<Expense>> {
@@ -62,6 +65,10 @@ export class ExpenseEndpoint extends BasicExpenseEndpoint<Expense> implements Ti
         const start = this.date(year, month);
         const end = start.add(1, month === undefined ? 'year' : 'month');
         return this.searchData(this.dateRangeQuery(start, end));
+    }
+
+    loadDataForFilter(filter: string): Promise<ListResponse<Expense>> {
+        return this.loadAllDataAtUrl(`/api/v1/${this.endpoint}/search/${encodeURIComponent(filter)}`);
     }
 
     private date(year: number, month?: number): dayjs.Dayjs {

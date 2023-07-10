@@ -6,7 +6,8 @@ import Grid2 from '@mui/material/Unstable_Grid2';
 import {styled} from '@mui/material/styles';
 import {useState} from 'react';
 import {Expense} from '../model/expense';
-import {filterExpenses} from './Endpoint-Routes';
+import {ExpensesTable} from '../components/Expenses-Table';
+import {ExpenseEndpoint} from '../endpoints/expense-endpoints';
 
 const StyledCardHeader = styled(CardHeader)(({theme}) => ({
     [`&.${cardHeaderClasses.root}`]: {
@@ -55,13 +56,14 @@ export default function Dashboard() {
     const now = dayjs();
 
     const disableButtons = useIsNavigating() || loadingExpenses;
+    const endpoint = new ExpenseEndpoint();
 
     async function searchExpenses() {
         if (search === '') {
             setExpenses(undefined);
         } else {
             setLoadingExpenses(true);
-            const expenses = await filterExpenses(search);
+            const expenses = await endpoint.loadDataForFilter(search);
             setExpenses(expenses.values);
             setLoadingExpenses(false);
         }
@@ -93,11 +95,11 @@ export default function Dashboard() {
                     Search Expenses
                 </Button>
             </Grid2>
-            {/* {expenses && (
+            {expenses && (
                 <Grid2 xs={12}>
-                    <ExpensesTable expenses={expenses}/>
+                    <ExpensesTable endpoint={endpoint} expenses={expenses}/>
                 </Grid2>
-            )} */}
+            )}
             <DashboardCard
                 title="Expenses"
                 text="View the list of all expenses during a certain time frame"

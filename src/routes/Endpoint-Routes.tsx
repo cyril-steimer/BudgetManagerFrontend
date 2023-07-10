@@ -1,18 +1,7 @@
 import {LoaderFunctionArgs, NavigateFunction, Params, useLoaderData, useNavigate, useParams} from 'react-router-dom';
-import {BaseExpense, Expense} from '../model/expense';
-import {ListResponse} from '../model/responses';
 import {useState} from 'react';
 import {Header, TimeRangeParameters} from '../components/Header';
 import { Endpoint, SimpleSearchEndpoint, TimeBasedEndpoint, ViewAllEndpoint } from '../endpoints/endpoint';
-
-// TODO Maybe put this in the endpoint too?
-async function loadAllExpenses<E extends BaseExpense>(url: string): Promise<ListResponse<E>> {
-    const response = await fetch(url, {
-        method: 'get'
-    });
-    // TODO Check the response for errors
-    return await response.json() as ListResponse<E>;
-}
 
 export type Loader<T> = (args: LoaderFunctionArgs) => Promise<T>;
 
@@ -65,10 +54,6 @@ export function simpleSearchLoader<T>(endpoint: SimpleSearchEndpoint<T>): Loader
 
 export function getSimpleSearchUrl<T>(endpoint: SimpleSearchEndpoint<T>, field: string, value: string): string {
     return `/${endpoint.simpleSearchPathPrefix}/${field}/${encodeURIComponent(value)}`;
-}
-
-export async function filterExpenses(filter: string): Promise<ListResponse<Expense>> {
-    return await loadAllExpenses(`/api/v1/expenses/search/${filter}`);
 }
 
 function getTimeRangeParameters<T>(endpoint: TimeBasedEndpoint<T>, navigate: NavigateFunction, params: Params<string>): TimeRangeParameters | undefined {
