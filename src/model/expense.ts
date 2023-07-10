@@ -44,6 +44,14 @@ export function scheduleToString(schedule: WeeklySchedule | MonthlySchedule): st
     return `Weekly on ${weekly.dayOfWeek}`;
 }
 
-export function sumAmount(expenses: Expense[]): number {
-    return expenses.reduce((total, expense) => total + expense.amount.amount, 0);
+export function sumExpenses(expenses: Expense[]): number {
+    return sumAmount(expenses.map(exp => exp.amount));
+}
+
+export function sumAmount(amounts: Amount[]): number {
+    return sumValues(amounts.map(amt => amt.amount));
+}
+
+export function sumValues(values: number[]): number {
+    return values.reduce((total, value) => total + value, 0);
 }

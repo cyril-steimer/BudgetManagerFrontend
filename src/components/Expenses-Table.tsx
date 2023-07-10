@@ -46,21 +46,21 @@ class BaseColumns {
             name: 'Name',
             render: value => value.name,
             filter: filterNamedObject,
-            compare: compareNamedObject
+            compare: compareNamedObject,
+            renderSummary: _ => <b>Total</b>
         });
 
         this.amount = baseExpenseColumnSettings('amount', {
             name: 'Amount',
-            render: value => (
-                <CurrencyCell value={value.amount}></CurrencyCell>
-            ),
-            compare: compareAmount
+            render: value => <CurrencyCell value={value.amount}/>,
+            compare: compareAmount,
+            renderSummary: values => <CurrencyCell value={sumAmount(values)}/>
         });
 
         this.category = baseExpenseColumnSettings('category', {
             name: 'Category',
             render: value => (
-                <FilterCell getSearchUrl={getSearchUrl} field='category' value={value?.name ?? ''}></FilterCell> 
+                <FilterCell getSearchUrl={getSearchUrl} field='category' value={value?.name ?? ''}/>
             ),
             filter: filterNamedObject,
             compare: compareNamedObject
@@ -69,7 +69,7 @@ class BaseColumns {
         this.method = baseExpenseColumnSettings('method', {
             name: 'Method',
             render: value => (
-                <FilterCell getSearchUrl={getSearchUrl} field='method' value={value.name ?? ''}></FilterCell>
+                <FilterCell getSearchUrl={getSearchUrl} field='method' value={value.name ?? ''}/>
             ),
             filter: filterNamedObject,
             compare: compareNamedObject
@@ -78,7 +78,7 @@ class BaseColumns {
         this.author = baseExpenseColumnSettings('author', {
             name: 'Author',
             render: value => (
-                <FilterCell getSearchUrl={getSearchUrl} field='author' value={value.name ?? ''}></FilterCell>
+                <FilterCell getSearchUrl={getSearchUrl} field='author' value={value.name ?? ''}/>
             ),
             filter: filterNamedObject,
             compare: compareNamedObject
@@ -169,7 +169,6 @@ export function ExpensesTable({endpoint, expenses, filter}: ExpensesTableParamet
         columns={columns}
         filter={filter}
         initialSortColumn={date}
-        computeTotal={sumAmount}
-        renderTotal={value => (<CurrencyCell value={value}></CurrencyCell>)}
+        addSummaryRow
     />;
 }
