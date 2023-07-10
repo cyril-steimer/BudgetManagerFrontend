@@ -24,7 +24,18 @@ export class BudgetInPeriodEndpoint implements Endpoint<BudgetInPeriodWithExpens
             let filteredExpenses = expenses.filter(exp => exp.category.name === budget.category.name);
             budgetsWithExpenses.push(new BudgetInPeriodWithExpenses(budget, filteredExpenses));
         }
-        // TODO Unbudgeted expenses
+        const allCategories = budgets.map(b => b.category.name);
+        const notBudgeted = expenses.filter(e => allCategories.indexOf(e.category.name) < 0);
+        if (notBudgeted.length > 0) {
+            budgetsWithExpenses.push(new BudgetInPeriodWithExpenses({
+                amount: {
+                    amount: 0
+                },
+                category: {
+                    name: 'Not Budgeted'
+                }
+            }, notBudgeted));
+        }
         return budgetsWithExpenses;
     }
     
