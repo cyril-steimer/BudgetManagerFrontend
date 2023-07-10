@@ -38,6 +38,9 @@ export function dateStructFromISO8601String(string: string): DateStruct {
     };
 }
 
+export const JANUARY = 0;
+export const DECEMBER = 11;
+
 export function compareDateStruct(a: DateStruct | undefined, b: DateStruct | undefined): number {
     if (a === undefined && b === undefined) {
         return 0;
@@ -47,4 +50,20 @@ export function compareDateStruct(a: DateStruct | undefined, b: DateStruct | und
         return 1;
     }
     return dateStructToDayJsObject(a).valueOf() - dateStructToDayJsObject(b).valueOf();
+}
+
+export function compareAmount(a: Amount, b: Amount): number {
+    return compareNumber(a.amount, b.amount);
+}
+
+export function compareNumber(a: number, b: number): number {
+    return a - b;
+}
+
+export function compareNamedObject(a: NamedObject, b: NamedObject): number {
+    return compareString(a.name, b.name);
+}
+
+export function compareString(a: string, b: string): number {
+    return a.localeCompare(b);
 }

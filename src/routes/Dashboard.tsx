@@ -10,6 +10,7 @@ import {ExpensesTable} from '../components/Expenses-Table';
 import {ExpenseEndpoint, ExpenseTemplateEndpoint, ScheduledExpenseEndpoint} from '../endpoints/expense-endpoints';
 import {Endpoint, isTimeBasedEndpoint, isViewAllEndpoint} from '../endpoints/endpoint';
 import {getMonthlyDataUrl, getYearlyDataUrl} from './Endpoint-Routes';
+import {BudgetInPeriodEndpoint} from '../endpoints/budget-endpoints';
 
 const StyledCardHeader = styled(CardHeader)(({theme}) => ({
     [`&.${cardHeaderClasses.root}`]: {
@@ -80,8 +81,6 @@ export default function Dashboard() {
 
     const disableButtons = useIsNavigating() || loadingExpenses;
     const expenseEndpoint = new ExpenseEndpoint();
-    const schedulesEndpoint = new ScheduledExpenseEndpoint();
-    const templatesEndpoint = new ExpenseTemplateEndpoint();
 
     async function searchExpenses() {
         if (search === '') {
@@ -135,10 +134,7 @@ export default function Dashboard() {
                 title="Budget"
                 text="Check the state of your budget during the current month or year"
                 disableButtons={disableButtons}
-                buttons={[
-                    new CardButton('This Month', '/missing'),
-                    new CardButton('This Year', '/missing')
-                ]}
+                buttons={cardButtons(new BudgetInPeriodEndpoint())}
             />
             <DashboardCard
                 title="Import/Export"
@@ -152,13 +148,13 @@ export default function Dashboard() {
                 title="Templates"
                 text="View the list of templates"
                 disableButtons={disableButtons}
-                buttons={cardButtons(templatesEndpoint, 'All Templates')}
+                buttons={cardButtons(new ExpenseTemplateEndpoint(), 'All Templates')}
             />
             <DashboardCard
                 title="Scheduled Expenses"
                 text="View the list of scheduled expenses"
                 disableButtons={disableButtons}
-                buttons={cardButtons(schedulesEndpoint, 'All Scheduled Expenses')}
+                buttons={cardButtons(new ScheduledExpenseEndpoint(), 'All Scheduled Expenses')}
             />
         </Grid2>
     );

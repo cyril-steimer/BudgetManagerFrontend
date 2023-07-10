@@ -57,7 +57,7 @@ function DataTableRow<T>({value, columns}: TableRowParameters<T>) {
     );
 }
 
-interface TableItem {
+export interface TableItem {
     id: string;
 }
 
@@ -73,7 +73,7 @@ export interface TableParameters<T extends TableItem> {
     renderTotal?: (value: number) => JSX.Element;
 }
 
-export default function DataTable<T extends TableItem>(
+export function DataTable<T extends TableItem>(
     {
         values,
         columns,

@@ -8,6 +8,7 @@ import SouthIcon from '@mui/icons-material/South';
 import {useIsNavigating} from '../hooks/hooks';
 import {useNavigate} from 'react-router-dom';
 import dayjs from 'dayjs';
+import {DECEMBER, JANUARY} from '../model/common';
 
 // Search: https://mui.com/material-ui/react-app-bar/#app-bar-with-search-field
 const Search = styled('div')(({ theme }) => ({
@@ -48,9 +49,6 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
         },
     },
 }));
-
-const JANUARY = 0;
-const DECEMBER = 11;
 
 function rangeString(params: TimeRange): string {
     if (params.activeMonth === undefined) {

@@ -1,14 +1,13 @@
 import {BaseExpense, Expense, ExpenseTemplate, ScheduledExpense, scheduleToString, sumAmount} from '../model/expense';
-import DataTable, {ColumnSettings, ColumnSettingsInterface} from './Data-Table';
-import {compareDateStruct, dateStructToISO8601String, NamedObject} from '../model/common';
+import {DataTable, ColumnSettings, ColumnSettingsInterface} from './Data-Table';
+import {compareAmount, compareDateStruct, compareNamedObject, dateStructToISO8601String, NamedObject} from '../model/common';
 import {Chip} from '@mui/material';
-import {useContext} from 'react';
-import {CurrencyContext} from '../context/contexts';
 import {Link, useNavigate} from 'react-router-dom';
 import {useIsNavigating} from '../hooks/hooks';
 import {SimpleSearchEndpoint} from '../endpoints/endpoint';
 import {getSimpleSearchUrl} from '../routes/Endpoint-Routes';
 import {ListResponse} from '../model/responses';
+import {CurrencyCell} from './Common';
 
 function baseExpenseColumnSettings<K extends keyof BaseExpense>(key: K, settings: ColumnSettingsInterface<BaseExpense, K>): ColumnSettings<BaseExpense> {
     return ColumnSettings.of(key, settings);
@@ -24,10 +23,6 @@ function scheduledExpenseColumnSettings<K extends keyof ScheduledExpense>(key: K
 
 function filterNamedObject(value: NamedObject, filter: string): boolean {
     return value.name.toLowerCase().includes(filter.toLowerCase());
-}
-
-function compareNamedObject(a: NamedObject, b: NamedObject): number {
-    return a.name.localeCompare(b.name);
 }
 
 export interface ExpensesTableParameters<E extends BaseExpense> {
@@ -59,7 +54,7 @@ class BaseColumns {
             render: value => (
                 <CurrencyCell value={value.amount}></CurrencyCell>
             ),
-            compare: (a, b) => a.amount - b.amount
+            compare: compareAmount
         });
 
         this.category = baseExpenseColumnSettings('category', {
@@ -99,11 +94,6 @@ class BaseColumns {
             filter: (value, filter) => value.find(v => filterNamedObject(v, filter)) !== undefined
         });
     }
-}
-
-function CurrencyCell({value}: {value: number}) {
-    const currency = useContext(CurrencyContext);
-    return <span>{value.toFixed(2)} {currency}</span>;
 }
 
 function FilterCell({getSearchUrl, field, value}: {getSearchUrl: GetSearchUrl, field: string, value: string}) {

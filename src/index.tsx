@@ -19,8 +19,9 @@ import '@fontsource/roboto/700.css';
 import {CurrencyContext} from './context/contexts';
 import {ExpenseEndpoint, ExpenseTemplateEndpoint, ScheduledExpenseEndpoint} from './endpoints/expense-endpoints';
 import {Endpoint, isSimpleSearchEndpoint, isTimeBasedEndpoint, isViewAllEndpoint} from './endpoints/endpoint';
+import {BudgetInPeriodEndpoint} from './endpoints/budget-endpoints';
 
-const endpoints = [new ExpenseEndpoint(), new ScheduledExpenseEndpoint(), new ExpenseTemplateEndpoint()];
+const endpoints: Endpoint<any>[] = [new ExpenseEndpoint(), new ScheduledExpenseEndpoint(), new ExpenseTemplateEndpoint(), new BudgetInPeriodEndpoint()];
 
 function routeObjects<T>(endpoint: Endpoint<T>): RouteObject[] {
     const result: RouteObject[] = [];
