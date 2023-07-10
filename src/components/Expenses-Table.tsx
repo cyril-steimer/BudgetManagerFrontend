@@ -6,7 +6,9 @@ import {useContext} from 'react';
 import {CurrencyContext} from '../context/contexts';
 import {Link, useNavigate} from 'react-router-dom';
 import {useIsNavigating} from '../hooks/hooks';
-import {ExpenseEndpoint, getFilterByFieldUrl} from '../routes/Expenses';
+import {SimpleSearchEndpoint} from '../endpoints/endpoint';
+import {getSimpleSearchUrl} from '../routes/Endpoint-Routes';
+import {ListResponse} from '../model/responses';
 
 function baseExpenseColumnSettings<K extends keyof BaseExpense>(key: K, settings: ColumnSettingsInterface<BaseExpense, K>): ColumnSettings<BaseExpense> {
     return ColumnSettings.of(key, settings);
@@ -29,9 +31,12 @@ function compareNamedObject(a: NamedObject, b: NamedObject): number {
 }
 
 export interface ExpensesTableParameters<E extends BaseExpense> {
+    endpoint: SimpleSearchEndpoint<ListResponse<E>>;
     expenses: E[];
     filter?: string;
 }
+
+type GetSearchUrl = (field: string, value: string) => string;
 
 class BaseColumns {
     readonly name: ColumnSettings<BaseExpense>;
@@ -41,7 +46,7 @@ class BaseColumns {
     readonly author: ColumnSettings<BaseExpense>;
     readonly tags: ColumnSettings<BaseExpense>;
 
-    constructor(endpoint: ExpenseEndpoint) {
+    constructor(getSearchUrl: GetSearchUrl) {
         this.name = baseExpenseColumnSettings('name', {
             name: 'Name',
             render: value => value.name,
@@ -60,7 +65,7 @@ class BaseColumns {
         this.category = baseExpenseColumnSettings('category', {
             name: 'Category',
             render: value => (
-                <FilterCell endpoint={endpoint} field='category' value={value?.name ?? ''}></FilterCell> 
+                <FilterCell getSearchUrl={getSearchUrl} field='category' value={value?.name ?? ''}></FilterCell> 
             ),
             filter: filterNamedObject,
             compare: compareNamedObject
@@ -69,7 +74,7 @@ class BaseColumns {
         this.method = baseExpenseColumnSettings('method', {
             name: 'Method',
             render: value => (
-                <FilterCell endpoint={endpoint} field='method' value={value.name ?? ''}></FilterCell>
+                <FilterCell getSearchUrl={getSearchUrl} field='method' value={value.name ?? ''}></FilterCell>
             ),
             filter: filterNamedObject,
             compare: compareNamedObject
@@ -78,7 +83,7 @@ class BaseColumns {
         this.author = baseExpenseColumnSettings('author', {
             name: 'Author',
             render: value => (
-                <FilterCell endpoint={endpoint} field='author' value={value.name ?? ''}></FilterCell>
+                <FilterCell getSearchUrl={getSearchUrl} field='author' value={value.name ?? ''}></FilterCell>
             ),
             filter: filterNamedObject,
             compare: compareNamedObject
@@ -88,7 +93,7 @@ class BaseColumns {
             name: 'Tags',
             render: value => (
                 <div>
-                    {value.map(tag => <TagChip key={tag.name} endpoint={endpoint} tag={tag.name}/>)}
+                    {value.map(tag => <TagChip key={tag.name} getSearchUrl={getSearchUrl} tag={tag.name}/>)}
                 </div>
             ),
             filter: (value, filter) => value.find(v => filterNamedObject(v, filter)) !== undefined
@@ -101,26 +106,26 @@ function CurrencyCell({value}: {value: number}) {
     return <span>{value.toFixed(2)} {currency}</span>;
 }
 
-function FilterCell({endpoint, field, value}: {endpoint: ExpenseEndpoint, field: string, value: string}) {
+function FilterCell({getSearchUrl, field, value}: {getSearchUrl: GetSearchUrl, field: string, value: string}) {
     const isNavigating = useIsNavigating();
     if (isNavigating) {
         return <span>{value}</span>;
     }
-    return <Link to={getFilterByFieldUrl(endpoint, field, value)} >{value}</Link>;
+    return <Link to={getSearchUrl(field, value)} >{value}</Link>;
 }
 
-function TagChip({endpoint, tag}: {endpoint: ExpenseEndpoint, tag: string}) {
+function TagChip({getSearchUrl, tag}: {getSearchUrl: GetSearchUrl, tag: string}) {
     const navigate = useNavigate();
     return <Chip
         label={tag}
-        onClick={() => navigate(getFilterByFieldUrl(endpoint, 'tag', tag))}
+        onClick={() => navigate(getSearchUrl('tag', tag))}
         color='primary'
         variant='outlined'
         disabled={useIsNavigating()}
     />;
 }
 
-export function ScheduledExpensesTable({expenses, filter}: ExpensesTableParameters<ScheduledExpense>) {
+export function ScheduledExpensesTable({endpoint, expenses, filter}: ExpensesTableParameters<ScheduledExpense>) {
     const start = scheduledExpenseColumnSettings('startDate', {
         name: 'Start Date',
         render: dateStructToISO8601String,
@@ -136,7 +141,7 @@ export function ScheduledExpensesTable({expenses, filter}: ExpensesTableParamete
         render: scheduleToString
     });
 
-    const base = new BaseColumns('schedules');
+    const base = new BaseColumns((field, value) => getSimpleSearchUrl(endpoint, field, value));
     const columns = [base.name, base.amount, base.category, start, end, schedule, base.method, base.author, base.tags];
 
     return <DataTable
@@ -147,8 +152,8 @@ export function ScheduledExpensesTable({expenses, filter}: ExpensesTableParamete
     />;
 }
 
-export function ExpenseTemplatesTable({expenses, filter}: ExpensesTableParameters<ExpenseTemplate>) {
-    const base = new BaseColumns('templates');
+export function ExpenseTemplatesTable({endpoint, expenses, filter}: ExpensesTableParameters<ExpenseTemplate>) {
+    const base = new BaseColumns((field, value) => getSimpleSearchUrl(endpoint, field, value));
     const columns = [base.name, base.amount, base.category, base.method, base.author, base.tags];
 
     return <DataTable
@@ -159,14 +164,14 @@ export function ExpenseTemplatesTable({expenses, filter}: ExpensesTableParameter
     />;
 }
 
-export function ExpensesTable({expenses, filter}: ExpensesTableParameters<Expense>) {
+export function ExpensesTable({endpoint, expenses, filter}: ExpensesTableParameters<Expense>) {
     const date = expenseColumnSettings('date', {
         name: 'Date',
         render: dateStructToISO8601String,
         compare: compareDateStruct
     });
 
-    const base = new BaseColumns('expenses');
+    const base = new BaseColumns((field, value) => getSimpleSearchUrl(endpoint, field, value));
     const columns = [base.name, base.amount, base.category, date, base.method, base.author, base.tags];
 
     return <DataTable

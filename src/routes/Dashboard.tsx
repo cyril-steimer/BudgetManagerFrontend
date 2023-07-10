@@ -6,8 +6,7 @@ import Grid2 from '@mui/material/Unstable_Grid2';
 import {styled} from '@mui/material/styles';
 import {useState} from 'react';
 import {Expense} from '../model/expense';
-import {ExpensesTable} from '../components/Expenses-Table';
-import {filterExpenses} from './Expenses';
+import {filterExpenses} from './Endpoint-Routes';
 
 const StyledCardHeader = styled(CardHeader)(({theme}) => ({
     [`&.${cardHeaderClasses.root}`]: {
@@ -94,11 +93,11 @@ export default function Dashboard() {
                     Search Expenses
                 </Button>
             </Grid2>
-            {expenses && (
+            {/* {expenses && (
                 <Grid2 xs={12}>
                     <ExpensesTable expenses={expenses}/>
                 </Grid2>
-            )}
+            )} */}
             <DashboardCard
                 title="Expenses"
                 text="View the list of all expenses during a certain time frame"
