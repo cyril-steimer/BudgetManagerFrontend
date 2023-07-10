@@ -1,8 +1,12 @@
+import {useState} from "react";
 import {BudgetInPeriodWithExpenses} from "../model/budget";
 import {compareAmount, compareNamedObject, compareNumber} from "../model/common";
 import {sumAmount, sumExpenses, sumValues} from "../model/expense";
 import {CurrencyCell} from "./Common";
 import {ColumnSettings, DataTable, TableItem} from "./Data-Table";
+import {Dialog, DialogContent, DialogTitle} from "@mui/material";
+import {ExpensesTable} from "./Expenses-Table";
+import {ExpenseEndpoint} from "../endpoints/expense-endpoints";
 
 class BudgetInPeriodTableItem implements TableItem {
     readonly id: string;
@@ -40,13 +44,37 @@ export function BudgetTable({budgets}: BudgetTableParameters) {
         renderSummary: budgets => <CurrencyCell value={sumAmount(budgets.map(b => b.budget.amount))}/>
     });
 
+    const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
+    const [budgetForDetails, setBudgetForDetails] = useState<BudgetInPeriodWithExpenses | undefined>();
+
     return (
-        <DataTable
-            values={tableItems}
-            columns={[name, spent, budget]}
-            initialSortColumn={budget}
-            initialSortDirection='desc'
-            addSummaryRow
-        />       
+        <div>
+            <DataTable
+                values={tableItems}
+                columns={[name, spent, budget]}
+                initialSortColumn={budget}
+                initialSortDirection='desc'
+                onClickRow={row => {
+                    setBudgetForDetails(row.budget);
+                    setOpenDetailsDialog(true);
+                }}
+                addSummaryRow
+            />
+            <Dialog
+                open={openDetailsDialog}
+                onClose={() => setOpenDetailsDialog(false)}
+                maxWidth='xl'
+            >
+                <DialogTitle>
+                    {budgetForDetails?.budget.category.name}
+                </DialogTitle>
+                <DialogContent>
+                    <ExpensesTable
+                        endpoint={new ExpenseEndpoint()}
+                        expenses={budgetForDetails?.expenses ?? []}
+                    />
+                </DialogContent>
+            </Dialog>
+        </div>
     );
 }

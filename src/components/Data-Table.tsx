@@ -42,11 +42,12 @@ export class ColumnSettings<T> {
 interface TableRowParameters<T> {
     value: T;
     columns: ColumnSettings<T>[];
+    onClick: (value: T) => void;
 }
 
-function DataTableRow<T>({value, columns}: TableRowParameters<T>) {
+function DataTableRow<T>({value, columns, onClick}: TableRowParameters<T>) {
     return (
-        <StyledTableRow>
+        <StyledTableRow onClick={() => onClick(value)}>
             {columns.map(c => <TableCell key={c.id}>{c.render(value)}</TableCell>)}
         </StyledTableRow>
     );
@@ -86,6 +87,7 @@ export interface TableParameters<T extends TableItem> {
     initialSortColumn?: ColumnSettings<T>;
     initialSortDirection?: SortDirection;
     addSummaryRow?: boolean;
+    onClickRow?: (value: T) => void;
 }
 
 export function DataTable<T extends TableItem>(
@@ -95,7 +97,8 @@ export function DataTable<T extends TableItem>(
         filter,
         initialSortColumn,
         initialSortDirection,
-        addSummaryRow
+        addSummaryRow,
+        onClickRow
     }: TableParameters<T>
 ) {
     const [sortColumn, setSortColumn] = useState(initialSortColumn);
@@ -151,7 +154,14 @@ export function DataTable<T extends TableItem>(
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {sortedFilteredValues.map(value => <DataTableRow value={value} columns={columns} key={value.id}/>)}
+                    {sortedFilteredValues.map(value => (
+                        <DataTableRow
+                            value={value}
+                            columns={columns}
+                            onClick={value => onClickRow !== undefined && onClickRow(value)}
+                            key={value.id}
+                        />
+                    ))}
                     {addSummaryRow && canAddSummaryRow !== undefined && 
                         <DataTableSummaryRow values={sortedFilteredValues} columns={columns}/>
                     }
