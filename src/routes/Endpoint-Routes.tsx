@@ -1,12 +1,18 @@
 import {LoaderFunctionArgs, NavigateFunction, Params, useLoaderData, useNavigate, useParams} from 'react-router-dom';
 import {useState} from 'react';
 import {Header, TimeRangeParameters} from '../components/Header';
-import { Endpoint, SimpleSearchEndpoint, TimeBasedEndpoint, ViewAllEndpoint } from '../endpoints/endpoint';
+import {Endpoint, SimpleSearchEndpoint, TimeBasedEndpoint, ViewAllEndpoint, isViewAllEndpoint} from '../endpoints/endpoint';
+import {Chip} from '@mui/material';
+import {useIsNavigating} from '../hooks/hooks';
 
 export type Loader<T> = (args: LoaderFunctionArgs) => Promise<T>;
 
 export function viewAllLoader<T>(endpoint: ViewAllEndpoint<T>): Loader<T> {
     return () => endpoint.loadAllData();
+}
+
+export function getViewAllDataUrl<T>(endpoint: ViewAllEndpoint<T>): string {
+    return `/${endpoint.viewAllPath}`;
 }
 
 export function yearlyLoader<T>(endpoint: TimeBasedEndpoint<T>): Loader<T> {
@@ -78,6 +84,15 @@ function getTimeRangeParameters<T>(endpoint: TimeBasedEndpoint<T>, navigate: Nav
     return parameters;
 }
 
+function getSimpleFilter(params: Params<string>): [string, string] | undefined {
+    const field = params.field;
+    const value = params.value;
+    if (field !== undefined && value !== undefined) {
+        return [field, value];
+    }
+    return undefined;
+}
+
 interface EndpointContentWrapperParameters<T> {
     endpoint: Endpoint<T>;
     timeRange?: TimeRangeParameters;
@@ -87,10 +102,26 @@ interface EndpointContentWrapperParameters<T> {
 function EndpointContentWrapper<T>({endpoint, timeRange, simpleFilter}: EndpointContentWrapperParameters<T>) {
     const data = useLoaderData() as T;
     const [filter, setFilter] = useState('');
+    const navigate = useNavigate();
+    const isNavigating = useIsNavigating();
+
+    let clearSimpleFilter: (() => void) | undefined;
+    if (isViewAllEndpoint(endpoint)) {
+        clearSimpleFilter = () => navigate(getViewAllDataUrl(endpoint));
+    }
 
     return (
         <div>
             <Header filter={endpoint.supportsFiltering ? {filter, setFilter} : undefined} timeRange={timeRange}/>
+            {simpleFilter !== undefined &&
+
+                <Chip
+                    label={`${simpleFilter[0]} = ${simpleFilter[1]}`}
+                    sx={{marginTop: '10px', marginBottom: '10px'}}
+                    onDelete={clearSimpleFilter}
+                    disabled={isNavigating}
+                />
+            }
             {endpoint.renderData(data, filter)}
         </div>
     );
@@ -106,6 +137,6 @@ export function TimeBasedWrapper<T>({endpoint}: {endpoint: TimeBasedEndpoint<T>}
 }
 
 export function SimpleSearchWrapper<T>({endpoint}: {endpoint: SimpleSearchEndpoint<T>}) {
-    // TODO Render the simple search somehow! (Although that should be handled by the endpoint)
-    return <EndpointContentWrapper endpoint={endpoint}/>
+    const simpleFilter = getSimpleFilter(useParams());
+    return <EndpointContentWrapper endpoint={endpoint} simpleFilter={simpleFilter}/>
 }
