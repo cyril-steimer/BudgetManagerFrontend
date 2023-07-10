@@ -49,15 +49,14 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     },
 }));
 
-const JANUARY = 1;
-const DECEMBER = 12;
+const JANUARY = 0;
+const DECEMBER = 11;
 
 function rangeString(params: TimeRange): string {
     if (params.activeMonth === undefined) {
         return params.activeYear.toString();
     }
-    // dayjs has 0-indexed months
-    const date = dayjs().month(params.activeMonth - 1).toDate();
+    const date = dayjs().month(params.activeMonth).toDate();
     const monthName = date.toLocaleDateString(undefined, { month: 'long' });
     return monthName + ' ' + params.activeYear.toString();
 }
@@ -87,7 +86,7 @@ function drillUpRange(range: TimeRange): TimeRange | undefined {
 
 function drillDownRanges(range: TimeRange): TimeRange[] {
     if (range.activeMonth === undefined) {
-        return Array.from(Array(DECEMBER)).map((_, month) => new SimpleTimeRange(range.activeYear, month + 1));
+        return Array.from(Array(DECEMBER + 1)).map((_, month) => new SimpleTimeRange(range.activeYear, month));
     }
     return [];
 }

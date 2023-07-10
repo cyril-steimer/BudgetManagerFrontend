@@ -13,7 +13,7 @@ function dateRangeQuery(fromInclusive: Dayjs, toExclusive: Dayjs): object {
                 date: {
                     date: {
                         year: fromInclusive.year(),
-                        month: fromInclusive.month() + 1,
+                        month: fromInclusive.month() + 1, // Months in the Backend are 1-based
                         day: fromInclusive.date()
                     },
                     comparison: '>='
@@ -23,7 +23,7 @@ function dateRangeQuery(fromInclusive: Dayjs, toExclusive: Dayjs): object {
                 date: {
                     date: {
                         year: toExclusive.year(),
-                        month: toExclusive.month() + 1,
+                        month: toExclusive.month() + 1, // Months in the Backend are 1-based
                         day: toExclusive.date()
                     },
                     comparison: '<'
@@ -53,7 +53,7 @@ export async function monthlyExpensesLoader({params}: LoaderFunctionArgs): Promi
     const year = params.year;
     const month = params.month;
     if (year !== undefined && month !== undefined) {
-        const from = dayjs().year(parseInt(year)).month(parseInt(month) - 1).date(1);
+        const from = dayjs().year(parseInt(year)).month(parseInt(month)).date(1);
         const to = from.add(1, 'month');
         return await search('expenses', dateRangeQuery(from, to));
     }

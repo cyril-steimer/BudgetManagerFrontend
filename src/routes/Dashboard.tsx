@@ -104,7 +104,7 @@ export default function Dashboard() {
                 text="View the list of all expenses during a certain time frame"
                 disableButtons={disableButtons}
                 buttons={[
-                    new CardButton('This Month', `/expenses/year/${now.year()}/month/${now.month() + 1}`),
+                    new CardButton('This Month', `/expenses/year/${now.year()}/month/${now.month()}`),
                     new CardButton('This Year', `/expenses/year/${now.year()}`),
                     new CardButton('All Time', '/expenses')
                 ]}

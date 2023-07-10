@@ -23,16 +23,17 @@ export function dateStructToISO8601String(date: DateStruct | undefined): string 
 }
 
 export function dateStructToDayJsObject(date: DateStruct): dayjs.Dayjs {
-    // month is zero-indexed in JavaScript
+     // Months in the Backend are 1-based
     const jsDate = new Date(date.year, date.month - 1, date.day);
     return dayjs(jsDate);
 }
 
 export function dateStructFromISO8601String(string: string): DateStruct {
     const dateObject = dayjs(string);
+    // Months in the Backend are 1-based
     return {
         year: dateObject.year(),
-        month: dateObject.month() + 1, // month is zero-indexed in dayjs
+        month: dateObject.month() + 1,
         day: dateObject.date()
     };
 }
