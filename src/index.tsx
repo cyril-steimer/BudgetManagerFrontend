@@ -24,6 +24,7 @@ import {ModifyingEndpoint, QueryingEndpoint, isSimpleSearchEndpoint, isTimeBased
 import {BudgetInPeriodEndpoint} from './endpoints/budget-endpoints';
 import {LocalizationProvider} from '@mui/x-date-pickers';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
+import 'dayjs/locale/de-ch';
 
 const queryingEndpoints: QueryingEndpoint<any>[] = [new ExpenseEndpoint(), new ScheduledExpenseEndpoint(), new ExpenseTemplateEndpoint(), new BudgetInPeriodEndpoint()];
 const modifyingEndpoints: ModifyingEndpoint<any>[] = [new ExpenseEndpoint()];
@@ -90,7 +91,7 @@ const root = ReactDOM.createRoot(
 root.render(
     <React.StrictMode>
         <CurrencyContext.Provider value='CHF'>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale='de-ch'>
                 <RouterProvider router={router}/>
             </LocalizationProvider>
         </CurrencyContext.Provider>

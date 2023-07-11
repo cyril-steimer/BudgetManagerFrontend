@@ -1,7 +1,7 @@
 import {DatePicker} from '@mui/x-date-pickers/DatePicker';
 import {DateStruct, dateStructToDayJsObject, dayJsObjectToDateStruct} from "../model/common";
 import dayjs from  "dayjs";
-import {InputAdornment, TextField} from '@mui/material';
+import {Autocomplete, InputAdornment, TextField, TextFieldProps} from '@mui/material';
 import {useContext} from 'react';
 import {CurrencyContext} from '../context/contexts';
 
@@ -42,8 +42,6 @@ const numberRegex = /^[0-9]+(\.[0-9]+)?$/;
 export function CurrencyAmountInput({label, value, setValue, disabled, setValid}: CurrencyAmountInputParameters) {
     const isValid = numberRegex.test(value);
     const helperText = isValid ? undefined : 'Please enter a positive number';
-    setValid?.(isValid);
-
     const currency = useContext(CurrencyContext);
 
     return (
@@ -51,7 +49,10 @@ export function CurrencyAmountInput({label, value, setValue, disabled, setValid}
             fullWidth
             label={label}
             value={value}
-            onChange={event => setValue(event.target.value)}
+            onChange={event => {
+                setValue(event.target.value);
+                setValid?.(numberRegex.test(event.target.value));
+            }}
             margin='normal'
             error={!isValid}
             helperText={helperText}
@@ -65,21 +66,47 @@ export function CurrencyAmountInput({label, value, setValue, disabled, setValid}
 
 export interface TextInputParameters extends BasicInputParameters {
     errorText?: string;
+    options?: string[];
 }
 
-export function TextInput({label, value, setValue, disabled, errorText}: TextInputParameters) {
+export const commonTextFieldProperties: TextFieldProps = {
+    fullWidth: true,
+    margin: 'normal'
+};
+
+export function TextInput({label, value, setValue, disabled, errorText, options}: TextInputParameters) {
     const hasError = errorText !== undefined;
 
+    const textFieldProperties: TextFieldProps = {
+        ...commonTextFieldProperties,
+        label: label,
+        error: hasError,
+        helperText: errorText,
+        disabled: disabled
+    };
+
+    if (options !== undefined && options.length > 0) {
+        return (
+            <Autocomplete
+                fullWidth
+                freeSolo
+                value={value}
+                onChange={(_, newValue) => setValue(newValue ?? '')}
+                options={options}
+                renderInput={(params) => (
+                    <TextField
+                        {...params}
+                        {...textFieldProperties}
+                    />
+                )}
+            />
+        );
+    }
     return (
         <TextField
-            fullWidth
-            label={label}
+            {...textFieldProperties}
             value={value}
             onChange={event => setValue(event.target.value)}
-            margin='normal'
-            error={hasError}
-            helperText={errorText}
-            disabled={disabled}
         />
     );
 }

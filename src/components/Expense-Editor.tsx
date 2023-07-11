@@ -1,15 +1,15 @@
 import {Expense} from "../model/expense";
-import {useState} from "react";
-import {Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Stack, Typography} from "@mui/material";
+import {useEffect, useState} from "react";
+import {Autocomplete, Box, Button, Stack, TextField} from "@mui/material";
 import {NamedObject} from "../model/common";
-import {DateStructPicker, CurrencyAmountInput, TextInput} from "./Editor";
-import AddIcon from "@mui/icons-material/Add";
+import {DateStructPicker, CurrencyAmountInput, TextInput, commonTextFieldProperties} from "./Editor";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SendIcon from '@mui/icons-material/Send';
 import {useIsNavigating} from "../hooks/hooks";
 import {useNavigate} from "react-router-dom";
 import {ModifyingEndpoint} from "../endpoints/endpoint";
 import {submitData} from "../routes/Endpoint-Routes";
+import {getAllAuthors, getAllPaymentMethods, getAllTags} from "../endpoints/helpers";
 
 function namedObject(value: string): NamedObject {
     return {
@@ -22,6 +22,9 @@ interface ExpenseEditorParameters {
     initialExpense: Expense;
 }
 
+function loadAutocompleteData(loaderFunc: () => Promise<string[]>, setData: (values: string[]) => void) {
+    loaderFunc().then(promise => setData(promise)); // TODO Error handling
+}
 
 export function ExpenseEditor({endpoint, initialExpense}: ExpenseEditorParameters) {
 
@@ -32,40 +35,18 @@ export function ExpenseEditor({endpoint, initialExpense}: ExpenseEditorParameter
     const [author, setAuthor] = useState(initialExpense.author.name);
     const [tags, setTags] = useState(initialExpense.tags.map(t => t.name));
 
+    const [authorOptions, setAuthorOptions] = useState<string[]>();
+    const [paymentMethodOptions, setPaymentMethodOptions] = useState<string[]>();
+    const [tagOptions, setTagOptions] = useState<string[]>();
+
     const [amountValid, setAmountValid] = useState(true);
 
-    const [currentTag, setCurrentTag] = useState('');
-    const [openAddTag, setOpenAddTag] = useState(false);
-
-    const isNewTag = tags.find(tag => tag === currentTag) === undefined;
-    const canAddTag = currentTag !== '' && isNewTag;
-
     const nameError = name === '' ? 'This field is mandatory' : undefined;
-    const tagError = isNewTag ? undefined : 'This tag was already used';
     const anyError = nameError !== undefined || !amountValid;
 
     const [isSubmitting, setSubmitting] = useState(false);
     const isNavigating = useIsNavigating() || isSubmitting;
     const navigate = useNavigate();
-
-    function addTag() {
-        if (!canAddTag) {
-            return;
-        }
-        const newTags = [...tags];
-        newTags.push(currentTag);
-        setCurrentTag('');
-        setTags(newTags);
-    }
-
-    function deleteTag(tag: string) {
-        const newTags = tags.filter(t => t !== tag);
-        setTags(newTags);
-    }
-
-    function closeAddTagDialog() {
-        setOpenAddTag(false);
-    }
 
     async function submitExpense() {
         const expense: Expense = {
@@ -81,6 +62,10 @@ export function ExpenseEditor({endpoint, initialExpense}: ExpenseEditorParameter
         await submitData(endpoint, 'post', expense, setSubmitting);
         navigate(-1); // Go back to the previous page
     }
+
+    useEffect(() => loadAutocompleteData(getAllAuthors, setAuthorOptions), []);
+    useEffect(() => loadAutocompleteData(getAllPaymentMethods, setPaymentMethodOptions), []);
+    useEffect(() => loadAutocompleteData(getAllTags, setTagOptions), []);
 
     return (
         <Box component='form'>
@@ -109,49 +94,30 @@ export function ExpenseEditor({endpoint, initialExpense}: ExpenseEditorParameter
                 value={method}
                 setValue={setMethod}
                 disabled={isNavigating}
+                options={paymentMethodOptions}
             />
             <TextInput
                 label='Author'
                 value={author}
                 setValue={setAuthor}
                 disabled={isNavigating}
+                options={authorOptions}
             />
-            <Typography 
-                variant='body1'
-                sx={{marginTop: '10px', marginBottom: '10px'}}
-            >
-                Tags
-            </Typography>
-            <Stack direction='row' spacing={1}>
-                {tags.map(tag => (
-                    <Chip key={tag} label={tag} onDelete={() => deleteTag(tag)} variant='outlined' disabled={isNavigating}/>
-                ))}
-                <IconButton onClick={() => setOpenAddTag(true)} disabled={isNavigating}>
-                    <AddIcon/>
-                </IconButton>
-            </Stack>
-            <Dialog open={openAddTag} onClose={closeAddTagDialog}>
-                <DialogTitle>Add Tag</DialogTitle>
-                <DialogContent>
-                    <TextInput
-                        label='Tag'
-                        value={currentTag}
-                        setValue={setCurrentTag}
-                        errorText={tagError}
+            <Autocomplete
+                multiple
+                freeSolo
+                fullWidth
+                value={tags}
+                onChange={(_, newValues) => setTags(newValues)}
+                options={tagOptions ?? []}
+                renderInput={(params) => (
+                    <TextField
+                        {...params}
+                        {...commonTextFieldProperties}
+                        label='Tags'
                     />
-                </DialogContent>
-                <DialogActions>
-                    <Button
-                        disabled={!canAddTag}
-                        onClick={() => {
-                            addTag();
-                            closeAddTagDialog();
-                        }}
-                    >
-                        Add Tag
-                    </Button>
-                </DialogActions>
-            </Dialog>
+                )}
+            />
             <Stack sx={{marginTop: '20px'}} direction='row' spacing={1}>
                 <Button
                     startIcon={<ArrowBackIcon/>}
