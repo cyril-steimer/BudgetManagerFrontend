@@ -1,8 +1,8 @@
 import {Expense} from "../model/expense";
 import {useState} from "react";
-import {Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Stack, TextField, Typography} from "@mui/material";
+import {Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Stack, Typography} from "@mui/material";
 import {NamedObject} from "../model/common";
-import {DateStructPicker} from "./Editor";
+import {DateStructPicker, NumberInput, TextInput} from "./Editor";
 import AddIcon from "@mui/icons-material/Add";
 
 function namedObject(value: string): NamedObject {
@@ -16,12 +16,24 @@ export function ExpenseEditor({initialExpense}: {initialExpense: Expense}) {
     const [currentTag, setCurrentTag] = useState('');
     const [openAddTag, setOpenAddTag] = useState(false);
 
-    const canAddTag = currentTag !== '' && expense.tags.find(tag => tag.name === currentTag) === undefined;
+    // TODO to currency string?
+    const [amount, setAmount] = useState(initialExpense.amount.amount.toString());
+
+    const isNewTag = expense.tags.find(tag => tag.name === currentTag) === undefined;
+    const canAddTag = currentTag !== '' && isNewTag;
+
+    function validateMandatory(value: string): string | undefined {
+        return value === '' ? 'This field is mandatory' : undefined;
+    }
 
     function set<K extends keyof Expense>(key: K, value: Expense[K]) {
         const copy = {...expense};
         copy[key] = value;
         setExpense(copy);
+    }
+
+    function validateTag(tag: string): string | undefined {
+        return isNewTag ? undefined : 'This tag was already used';
     }
 
     function addTag() {
@@ -45,38 +57,31 @@ export function ExpenseEditor({initialExpense}: {initialExpense: Expense}) {
 
     return (
         <Box component='form'>
-            <TextField
-                fullWidth
+            <TextInput
                 label='Name'
                 value={expense.name.name}
-                onChange={event => set('name', namedObject(event.target.value))}
-                margin='normal'
+                setValue={value => set('name', namedObject(value))}
+                validate={validateMandatory}
             />
-            <TextField
-                fullWidth
+            <NumberInput
                 label='Amount'
-                value={expense.amount.amount}
-                onChange={event => set('amount', { amount: parseFloat(event.target.value) })}
-                margin='normal'
+                value={amount}
+                setValue={setAmount}
             />
             <DateStructPicker
                 label='Date'
                 value={expense.date}
                 setValue={value => set('date', value)}
             />
-            <TextField
-                fullWidth
+            <TextInput
                 label='Payment Method'
                 value={expense.method.name}
-                onChange={event => set('method', namedObject(event.target.value))}
-                margin='normal'
+                setValue={value => set('method', namedObject(value))}
             />
-            <TextField
-                fullWidth
+            <TextInput
                 label='Author'
                 value={expense.author.name}
-                onChange={event => set('author', namedObject(event.target.value))}
-                margin='normal'
+                setValue={value => set('author', namedObject(value))}
             />
             <Typography 
                 variant='body1'
@@ -95,12 +100,11 @@ export function ExpenseEditor({initialExpense}: {initialExpense: Expense}) {
             <Dialog open={openAddTag} onClose={closeAddTagDialog}>
                 <DialogTitle>Add Tag</DialogTitle>
                 <DialogContent>
-                    <TextField
-                        fullWidth
-                        variant='standard'
+                    <TextInput
                         label='Tag'
                         value={currentTag}
-                        onChange={event => setCurrentTag(event.target.value)}
+                        setValue={setCurrentTag}
+                        validate={validateTag}
                     />
                 </DialogContent>
                 <DialogActions>
