@@ -1,7 +1,9 @@
 import {DatePicker} from '@mui/x-date-pickers/DatePicker';
 import {DateStruct, dateStructToDayJsObject, dayJsObjectToDateStruct} from "../model/common";
 import dayjs from  "dayjs";
-import {TextField} from '@mui/material';
+import {InputAdornment, TextField} from '@mui/material';
+import {useContext} from 'react';
+import {CurrencyContext} from '../context/contexts';
 
 export interface DateStructPickerParameters {
     label: string;
@@ -31,16 +33,18 @@ export interface BasicInputParameters {
     disabled?: boolean;
 }
 
-export interface NumberInputParameters extends BasicInputParameters {
+export interface CurrencyAmountInputParameters extends BasicInputParameters {
     setValid?: (valid: boolean) => void;
 }
 
 const numberRegex = /^[0-9]+(\.[0-9]+)?$/;
 
-export function NumberInput({label, value, setValue, disabled, setValid}: NumberInputParameters) {
+export function CurrencyAmountInput({label, value, setValue, disabled, setValid}: CurrencyAmountInputParameters) {
     const isValid = numberRegex.test(value);
     const helperText = isValid ? undefined : 'Please enter a positive number';
     setValid?.(isValid);
+
+    const currency = useContext(CurrencyContext);
 
     return (
         <TextField
@@ -52,6 +56,9 @@ export function NumberInput({label, value, setValue, disabled, setValid}: Number
             error={!isValid}
             helperText={helperText}
             disabled={disabled}
+            InputProps={{
+                startAdornment: <InputAdornment position='start'>{currency}</InputAdornment>
+            }}
         />
     );
 }

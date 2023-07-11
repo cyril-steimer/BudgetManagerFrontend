@@ -2,7 +2,7 @@ import {Expense} from "../model/expense";
 import {useState} from "react";
 import {Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Stack, Typography} from "@mui/material";
 import {NamedObject} from "../model/common";
-import {DateStructPicker, NumberInput, TextInput} from "./Editor";
+import {DateStructPicker, CurrencyAmountInput, TextInput} from "./Editor";
 import AddIcon from "@mui/icons-material/Add";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SendIcon from '@mui/icons-material/Send';
@@ -91,7 +91,7 @@ export function ExpenseEditor({endpoint, initialExpense}: ExpenseEditorParameter
                 errorText={nameError}
                 disabled={isNavigating}
             />
-            <NumberInput
+            <CurrencyAmountInput
                 label='Amount'
                 value={amount}
                 setValue={setAmount}
