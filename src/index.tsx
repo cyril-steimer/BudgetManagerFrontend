@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom/client';
 import {createBrowserRouter, RouteObject, RouterProvider} from 'react-router-dom';
 import Root from './routes/Root';
 import {
+    addLoader,
+    AddWrapper,
     monthlyLoader,
     simpleSearchLoader,
     SimpleSearchWrapper,
@@ -18,12 +20,15 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import {CurrencyContext} from './context/contexts';
 import {ExpenseEndpoint, ExpenseTemplateEndpoint, ScheduledExpenseEndpoint} from './endpoints/expense-endpoints';
-import {Endpoint, isSimpleSearchEndpoint, isTimeBasedEndpoint, isViewAllEndpoint} from './endpoints/endpoint';
+import {ModifyingEndpoint, QueryingEndpoint, isSimpleSearchEndpoint, isTimeBasedEndpoint, isViewAllEndpoint} from './endpoints/endpoint';
 import {BudgetInPeriodEndpoint} from './endpoints/budget-endpoints';
+import {LocalizationProvider} from '@mui/x-date-pickers';
+import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
 
-const endpoints: Endpoint<any>[] = [new ExpenseEndpoint(), new ScheduledExpenseEndpoint(), new ExpenseTemplateEndpoint(), new BudgetInPeriodEndpoint()];
+const queryingEndpoints: QueryingEndpoint<any>[] = [new ExpenseEndpoint(), new ScheduledExpenseEndpoint(), new ExpenseTemplateEndpoint(), new BudgetInPeriodEndpoint()];
+const modifyingEndpoints: ModifyingEndpoint<any>[] = [new ExpenseEndpoint()];
 
-function routeObjects<T>(endpoint: Endpoint<T>): RouteObject[] {
+function queryingRouteObjects<T>(endpoint: QueryingEndpoint<T>): RouteObject[] {
     const result: RouteObject[] = [];
     if (isViewAllEndpoint(endpoint)) {
         result.push({
@@ -54,11 +59,23 @@ function routeObjects<T>(endpoint: Endpoint<T>): RouteObject[] {
     return result;
 }
 
+function modifyingRouteObjects<T>(endpoint: ModifyingEndpoint<T>): RouteObject[] {
+    return [
+        {
+            path: endpoint.addPath,
+            element: <AddWrapper endpoint={endpoint}/>,
+            loader: addLoader(endpoint)
+            // TODO Do we need an action here?
+        }
+    ];
+}
+
 const allRouteObjects: RouteObject[] = [{
     index: true,
     element: <Dashboard/>
 }];
-allRouteObjects.push(...endpoints.flatMap(endpoint => routeObjects(endpoint)));
+allRouteObjects.push(...queryingEndpoints.flatMap(endpoint => queryingRouteObjects(endpoint)));
+allRouteObjects.push(...modifyingEndpoints.flatMap(endpoint => modifyingRouteObjects(endpoint)));
 
 const router = createBrowserRouter([
     {
@@ -74,7 +91,9 @@ const root = ReactDOM.createRoot(
 root.render(
     <React.StrictMode>
         <CurrencyContext.Provider value='CHF'>
-            <RouterProvider router={router}/>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <RouterProvider router={router}/>
+            </LocalizationProvider>
         </CurrencyContext.Provider>
     </React.StrictMode>
 );

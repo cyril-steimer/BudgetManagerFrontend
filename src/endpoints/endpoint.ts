@@ -1,9 +1,9 @@
 /**
- * An endpoint in the frontend/backend.
+ * A querying endpoint in the frontend/backend.
  * 
  * @param <T> The type of data for the endpoint.
  */
-export interface Endpoint<T> {
+export interface QueryingEndpoint<T> {
     readonly supportsTimeBasedNavigation: boolean;
     readonly supportsViewAll: boolean;
     readonly supportsSimpleSearch: boolean;
@@ -15,7 +15,7 @@ export interface Endpoint<T> {
 /**
  * An endpoint which supports time-based navigation, i.e. based on month/year.
  */
-export interface TimeBasedEndpoint<T> extends Endpoint<T> {
+export interface TimeBasedEndpoint<T> extends QueryingEndpoint<T> {
     readonly timeBasedPathPrefix: string;
     loadDataForTime(year: number, month?: number): Promise<T>;
 }
@@ -23,27 +23,38 @@ export interface TimeBasedEndpoint<T> extends Endpoint<T> {
 /**
  * An endpoint which supports viewing all data.
  */
-export interface ViewAllEndpoint<T> extends Endpoint<T> {
+export interface ViewAllEndpoint<T> extends QueryingEndpoint<T> {
     readonly viewAllPath: string;
     loadAllData(): Promise<T>;
 }
 
 /**
+ * A modifying endpoint in the frontend/backend.
+ */
+export interface ModifyingEndpoint<T> {
+    readonly addText: string;
+    readonly addPath: string;
+
+    createStarterObject(): T;
+    renderEditor(object: T): JSX.Element;
+}
+
+/**
  * An endpoint which supports simple search, where some field is compared with some value.
  */
-export interface SimpleSearchEndpoint<T> extends Endpoint<T> {
+export interface SimpleSearchEndpoint<T> extends QueryingEndpoint<T> {
     readonly simpleSearchPathPrefix: string;
     loadDataForSearch(field: string, value: string): Promise<T>;
 }
 
-export function isTimeBasedEndpoint<T>(endpoint: Endpoint<T>): endpoint is TimeBasedEndpoint<T> {
+export function isTimeBasedEndpoint<T>(endpoint: QueryingEndpoint<T>): endpoint is TimeBasedEndpoint<T> {
     return endpoint.supportsTimeBasedNavigation;
 }
 
-export function isViewAllEndpoint<T>(endpoint: Endpoint<T>): endpoint is ViewAllEndpoint<T> {
+export function isViewAllEndpoint<T>(endpoint: QueryingEndpoint<T>): endpoint is ViewAllEndpoint<T> {
     return endpoint.supportsViewAll;
 }
 
-export function isSimpleSearchEndpoint<T>(endpoint: Endpoint<T>): endpoint is SimpleSearchEndpoint<T> {
+export function isSimpleSearchEndpoint<T>(endpoint: QueryingEndpoint<T>): endpoint is SimpleSearchEndpoint<T> {
     return endpoint.supportsSimpleSearch;
 }

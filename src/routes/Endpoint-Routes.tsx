@@ -1,8 +1,8 @@
 import {LoaderFunctionArgs, NavigateFunction, Params, useLoaderData, useNavigate, useParams} from 'react-router-dom';
 import {useState} from 'react';
 import {Header, TimeRangeParameters} from '../components/Header';
-import {Endpoint, SimpleSearchEndpoint, TimeBasedEndpoint, ViewAllEndpoint, isViewAllEndpoint} from '../endpoints/endpoint';
-import {Chip} from '@mui/material';
+import {ModifyingEndpoint, QueryingEndpoint, SimpleSearchEndpoint, TimeBasedEndpoint, ViewAllEndpoint, isViewAllEndpoint} from '../endpoints/endpoint';
+import {Chip, Typography} from '@mui/material';
 import {useIsNavigating} from '../hooks/hooks';
 
 export type Loader<T> = (args: LoaderFunctionArgs) => Promise<T>;
@@ -62,6 +62,14 @@ export function getSimpleSearchUrl<T>(endpoint: SimpleSearchEndpoint<T>, field: 
     return `/${endpoint.simpleSearchPathPrefix}/${field}/${encodeURIComponent(value)}`;
 }
 
+export function addLoader<T>(endpoint: ModifyingEndpoint<T>): Loader<T> {
+    return () => Promise.resolve(endpoint.createStarterObject());
+}
+
+export function getAddUrl<T>(endpoint: ModifyingEndpoint<T>): string {
+    return `/${endpoint.addPath}`;
+}
+
 function getTimeRangeParameters<T>(endpoint: TimeBasedEndpoint<T>, navigate: NavigateFunction, params: Params<string>): TimeRangeParameters | undefined {
     const year = params.year;
     const month = params.month;
@@ -94,7 +102,7 @@ function getSimpleFilter(params: Params<string>): [string, string] | undefined {
 }
 
 interface EndpointContentWrapperParameters<T> {
-    endpoint: Endpoint<T>;
+    endpoint: QueryingEndpoint<T>;
     timeRange?: TimeRangeParameters;
     simpleFilter?: [string, string];
 }
@@ -139,4 +147,18 @@ export function TimeBasedWrapper<T>({endpoint}: {endpoint: TimeBasedEndpoint<T>}
 export function SimpleSearchWrapper<T>({endpoint}: {endpoint: SimpleSearchEndpoint<T>}) {
     const simpleFilter = getSimpleFilter(useParams());
     return <EndpointContentWrapper endpoint={endpoint} simpleFilter={simpleFilter}/>
+}
+
+export function AddWrapper<T>({endpoint}: {endpoint: ModifyingEndpoint<T>}) {
+    const data = useLoaderData() as T;
+
+    return (
+        <div>
+            <Header/>
+            <Typography variant='h5' sx={{marginTop: '20px', marginBottom: '20px'}}>
+                {endpoint.addText}
+            </Typography>
+            {endpoint.renderEditor(data)}
+        </div>
+    );
 }

@@ -2,10 +2,10 @@ import {BudgetTable} from "../components/Budget-Table";
 import {BudgetInPeriod, BudgetInPeriodWithExpenses} from "../model/budget";
 import {DECEMBER, JANUARY} from "../model/common";
 import {ListResponse} from "../model/responses";
-import {Endpoint, TimeBasedEndpoint} from "./endpoint";
+import {QueryingEndpoint, TimeBasedEndpoint} from "./endpoint";
 import {ExpenseEndpoint} from "./expense-endpoints";
 
-export class BudgetInPeriodEndpoint implements Endpoint<BudgetInPeriodWithExpenses[]>, TimeBasedEndpoint<BudgetInPeriodWithExpenses[]> {
+export class BudgetInPeriodEndpoint implements QueryingEndpoint<BudgetInPeriodWithExpenses[]>, TimeBasedEndpoint<BudgetInPeriodWithExpenses[]> {
     readonly supportsTimeBasedNavigation = true;
     readonly supportsViewAll = false;
     readonly supportsSimpleSearch = false;

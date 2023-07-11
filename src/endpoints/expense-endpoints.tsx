@@ -1,10 +1,12 @@
 import dayjs from "dayjs";
 import {BaseExpense, Expense, ExpenseTemplate, ScheduledExpense} from "../model/expense";
 import {ListResponse} from "../model/responses";
-import {SimpleSearchEndpoint, TimeBasedEndpoint, ViewAllEndpoint} from "./endpoint";
+import {ModifyingEndpoint, SimpleSearchEndpoint, TimeBasedEndpoint, ViewAllEndpoint} from "./endpoint";
 import {ExpenseTemplatesTable, ExpensesTable, ScheduledExpensesTable} from "../components/Expenses-Table";
+import {dayJsObjectToDateStruct} from "../model/common";
+import { ExpenseEditor } from "../components/Expense-Editor";
 
-abstract class BasicExpenseEndpoint<T extends BaseExpense> implements ViewAllEndpoint<ListResponse<T>>, SimpleSearchEndpoint<ListResponse<T>> {
+abstract class BasicExpenseEndpoint<T extends BaseExpense> implements ViewAllEndpoint<ListResponse<T>>, SimpleSearchEndpoint<ListResponse<T>>, ModifyingEndpoint<T> {
 
     readonly supportsViewAll = true;
     readonly supportsSimpleSearch = true;
@@ -14,10 +16,13 @@ abstract class BasicExpenseEndpoint<T extends BaseExpense> implements ViewAllEnd
     readonly timeBasedPathPrefix: string;
     readonly simpleSearchPathPrefix: string;
 
-    constructor(readonly endpoint: string, readonly supportsTimeBasedNavigation: boolean) {
+    readonly addPath: string;
+
+    constructor(readonly endpoint: string, readonly addText: string, readonly supportsTimeBasedNavigation: boolean) {
         this.viewAllPath = endpoint;
         this.timeBasedPathPrefix = endpoint;
         this.simpleSearchPathPrefix = `${endpoint}/field`;
+        this.addPath = `add/${endpoint}`;
     }
     
     async loadAllData(): Promise<ListResponse<T>> {
@@ -30,7 +35,16 @@ abstract class BasicExpenseEndpoint<T extends BaseExpense> implements ViewAllEnd
         return await this.searchData(query);
     }
 
+    async loadExistingObject(id: string): Promise<T> {
+        const url = `/api/v1/${this.endpoint}/field/id/${id}?single=true`;
+        return await this.loadAllDataAtUrl(url);
+    }
+
     abstract renderData(data: ListResponse<T>, filter: string): JSX.Element;
+    
+    abstract createStarterObject(): T;
+
+    abstract renderEditor(object: T): JSX.Element;
 
     protected async searchData(query: object): Promise<ListResponse<T>> {
         const url = `/api/v1/${this.endpoint}/search?sort=date&dir=desc`;
@@ -42,19 +56,19 @@ abstract class BasicExpenseEndpoint<T extends BaseExpense> implements ViewAllEnd
         return await response.json() as ListResponse<T>;  
     }
 
-    protected async loadAllDataAtUrl(url: string): Promise<ListResponse<T>> {
+    protected async loadAllDataAtUrl<U>(url: string): Promise<U> {
         const response = await fetch(url, {
             method: 'get'
         });
         // TODO Check the response for errors
-        return await response.json() as ListResponse<T>;
+        return await response.json() as U;
     }
 }
 
 export class ExpenseEndpoint extends BasicExpenseEndpoint<Expense> implements TimeBasedEndpoint<ListResponse<Expense>> {
 
     constructor() {
-        super('expenses', true);
+        super('expenses', 'Add Expense', true);
     }
 
     renderData(data: ListResponse<Expense>, filter: string): JSX.Element {
@@ -70,6 +84,36 @@ export class ExpenseEndpoint extends BasicExpenseEndpoint<Expense> implements Ti
     loadDataForFilter(filter: string): Promise<ListResponse<Expense>> {
         return this.loadAllDataAtUrl(`/api/v1/${this.endpoint}/search/${encodeURIComponent(filter)}`);
     }
+
+    createStarterObject(): Expense {
+        const now = dayjs();
+        return {
+            id: '',
+            name: {
+                name: ''
+            },
+            amount: {
+                amount: 0
+            },
+            category: {
+                name: ''
+            },
+            date: dayJsObjectToDateStruct(now),
+            method: {
+                name: ''
+            },
+            author: {
+                name: ''
+            },
+            tags: []
+        };
+    }
+    
+    renderEditor(object: Expense): JSX.Element {
+        return <ExpenseEditor initialExpense={object}/>
+    }
+
+    // TODO The endpoint probably also needs to know how to publish something! (Both add and edit)
 
     private date(year: number, month?: number): dayjs.Dayjs {
         return dayjs().year(year).month(month ?? 0).date(1);
@@ -106,7 +150,15 @@ export class ExpenseEndpoint extends BasicExpenseEndpoint<Expense> implements Ti
 export class ScheduledExpenseEndpoint extends BasicExpenseEndpoint<ScheduledExpense> {
 
     constructor() {
-        super('schedules', false);
+        super('schedules', 'Add Scheduled Expense', false);
+    }
+
+    createStarterObject(): ScheduledExpense {
+        return null!;
+    }
+
+    renderEditor(object: ScheduledExpense): JSX.Element {
+        return null!;
     }
 
     renderData(data: ListResponse<ScheduledExpense>, filter: string): JSX.Element {
@@ -117,7 +169,15 @@ export class ScheduledExpenseEndpoint extends BasicExpenseEndpoint<ScheduledExpe
 export class ExpenseTemplateEndpoint extends BasicExpenseEndpoint<ExpenseTemplate> {
 
     constructor() {
-        super('templates', false);
+        super('templates', 'Add Expense Template', false);
+    }
+
+    createStarterObject(): ExpenseTemplate {
+        return null!;
+    }
+
+    renderEditor(object: ExpenseTemplate): JSX.Element {
+        return null!
     }
 
     renderData(data: ListResponse<ExpenseTemplate>, filter: string): JSX.Element {

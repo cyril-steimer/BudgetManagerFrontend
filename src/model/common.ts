@@ -28,6 +28,14 @@ export function dateStructToDayJsObject(date: DateStruct): dayjs.Dayjs {
     return dayjs(jsDate);
 }
 
+export function dayJsObjectToDateStruct(date: dayjs.Dayjs): DateStruct {
+    return {
+        day: date.date(),
+        month: date.month() + 1, // Months in the Backend are 1-based
+        year: date.year()
+    };
+}
+
 export function dateStructFromISO8601String(string: string): DateStruct {
     const dateObject = dayjs(string);
     // Months in the Backend are 1-based

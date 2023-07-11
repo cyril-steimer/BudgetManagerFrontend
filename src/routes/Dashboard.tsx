@@ -1,16 +1,17 @@
 import {useNavigate} from 'react-router-dom';
 import dayjs from 'dayjs';
 import {useIsNavigating} from '../hooks/hooks';
-import {Button, Card, CardActions, CardContent, CardHeader, cardHeaderClasses, TextField, Typography} from '@mui/material';
+import {Button, Card, CardActions, CardContent, CardHeader, cardHeaderClasses, Fab, Menu, MenuItem, TextField, Typography} from '@mui/material';
 import Grid2 from '@mui/material/Unstable_Grid2';
 import {styled} from '@mui/material/styles';
 import {useState} from 'react';
 import {Expense} from '../model/expense';
 import {ExpensesTable} from '../components/Expenses-Table';
 import {ExpenseEndpoint, ExpenseTemplateEndpoint, ScheduledExpenseEndpoint} from '../endpoints/expense-endpoints';
-import {Endpoint, isTimeBasedEndpoint, isViewAllEndpoint} from '../endpoints/endpoint';
-import {getMonthlyDataUrl, getYearlyDataUrl} from './Endpoint-Routes';
+import {ModifyingEndpoint, QueryingEndpoint, isTimeBasedEndpoint, isViewAllEndpoint} from '../endpoints/endpoint';
+import {getAddUrl, getMonthlyDataUrl, getYearlyDataUrl} from './Endpoint-Routes';
 import {BudgetInPeriodEndpoint} from '../endpoints/budget-endpoints';
+import AddIcon from '@mui/icons-material/Add';
 
 const StyledCardHeader = styled(CardHeader)(({theme}) => ({
     [`&.${cardHeaderClasses.root}`]: {
@@ -52,7 +53,7 @@ function DashboardCard({title, text, disableButtons, buttons}: CardParameters) {
     );
 }
 
-function cardButtons<T>(endpoint: Endpoint<T>, viewAllText?: string): CardButton[] {
+function cardButtons<T>(endpoint: QueryingEndpoint<T>, viewAllText?: string): CardButton[] {
     const now = dayjs();
     const result: CardButton[] = [];
     if (isTimeBasedEndpoint(endpoint)) {
@@ -74,6 +75,16 @@ function cardButtons<T>(endpoint: Endpoint<T>, viewAllText?: string): CardButton
     return result;
 }
 
+function AddMenuItem<T>({endpoint}: {endpoint: ModifyingEndpoint<T>}) {
+    const navigate = useNavigate();
+
+    return (
+        <MenuItem onClick={() => navigate(getAddUrl(endpoint))}>
+            {endpoint.addText}
+        </MenuItem>
+    );
+}
+
 export default function Dashboard() {
     const [loadingExpenses, setLoadingExpenses] = useState(false);
     const [expenses, setExpenses] = useState<Expense[]>();
@@ -93,69 +104,89 @@ export default function Dashboard() {
         }
     }
 
+    const [addMenuAnchor, setAddMenuAnchor] = useState<HTMLElement | undefined>();
+    const openAddMenu = addMenuAnchor !== undefined;
+    const closeAddMenu = () => setAddMenuAnchor(undefined);
+
     return (
-        <Grid2 container spacing={2}>
-            <Grid2 xs={9}>
-                <TextField
-                    fullWidth={true}
-                    size="small"
-                    variant="outlined"
-                    label="Search"
-                    placeholder="Expense name, category, amount, etc."
-                    type="text"
-                    value={search}
-                    onChange={e => setSearch(e.target.value)}
+        <div>
+            <Grid2 container spacing={2}>
+                <Grid2 xs={9}>
+                    <TextField
+                        fullWidth={true}
+                        size="small"
+                        variant="outlined"
+                        label="Search"
+                        placeholder="Expense name, category, amount, etc."
+                        type="text"
+                        value={search}
+                        onChange={e => setSearch(e.target.value)}
+                    />
+                </Grid2>
+                <Grid2 xs={3}>
+                    <Button
+                        sx={{height: '100%'}}
+                        fullWidth={true}
+                        type="button"
+                        variant="outlined"
+                        onClick={searchExpenses}
+                        disabled={disableButtons}
+                    >
+                        Search Expenses
+                    </Button>
+                </Grid2>
+                {expenses && (
+                    <Grid2 xs={12}>
+                        <ExpensesTable endpoint={expenseEndpoint} expenses={expenses}/>
+                    </Grid2>
+                )}
+                <DashboardCard
+                    title="Expenses"
+                    text="View the list of all expenses during a certain time frame"
+                    disableButtons={disableButtons}
+                    buttons={cardButtons(expenseEndpoint)}
+                />
+                <DashboardCard
+                    title="Budget"
+                    text="Check the state of your budget during the current month or year"
+                    disableButtons={disableButtons}
+                    buttons={cardButtons(new BudgetInPeriodEndpoint())}
+                />
+                <DashboardCard
+                    title="Import/Export"
+                    text="Import or export all expense/budget data. The data can then be used in another instance of the budget manager"
+                    disableButtons={disableButtons}
+                    buttons={[
+                        new CardButton('Import/Export', '/missing')
+                    ]}
+                />
+                <DashboardCard
+                    title="Templates"
+                    text="View the list of templates"
+                    disableButtons={disableButtons}
+                    buttons={cardButtons(new ExpenseTemplateEndpoint(), 'All Templates')}
+                />
+                <DashboardCard
+                    title="Scheduled Expenses"
+                    text="View the list of scheduled expenses"
+                    disableButtons={disableButtons}
+                    buttons={cardButtons(new ScheduledExpenseEndpoint(), 'All Scheduled Expenses')}
                 />
             </Grid2>
-            <Grid2 xs={3}>
-                <Button
-                    sx={{height: '100%'}}
-                    fullWidth={true}
-                    type="button"
-                    variant="outlined"
-                    onClick={searchExpenses}
-                    disabled={disableButtons}
-                >
-                    Search Expenses
-                </Button>
-            </Grid2>
-            {expenses && (
-                <Grid2 xs={12}>
-                    <ExpensesTable endpoint={expenseEndpoint} expenses={expenses}/>
-                </Grid2>
-            )}
-            <DashboardCard
-                title="Expenses"
-                text="View the list of all expenses during a certain time frame"
-                disableButtons={disableButtons}
-                buttons={cardButtons(expenseEndpoint)}
-            />
-            <DashboardCard
-                title="Budget"
-                text="Check the state of your budget during the current month or year"
-                disableButtons={disableButtons}
-                buttons={cardButtons(new BudgetInPeriodEndpoint())}
-            />
-            <DashboardCard
-                title="Import/Export"
-                text="Import or export all expense/budget data. The data can then be used in another instance of the budget manager"
-                disableButtons={disableButtons}
-                buttons={[
-                    new CardButton('Import/Export', '/missing')
-                ]}
-            />
-            <DashboardCard
-                title="Templates"
-                text="View the list of templates"
-                disableButtons={disableButtons}
-                buttons={cardButtons(new ExpenseTemplateEndpoint(), 'All Templates')}
-            />
-            <DashboardCard
-                title="Scheduled Expenses"
-                text="View the list of scheduled expenses"
-                disableButtons={disableButtons}
-                buttons={cardButtons(new ScheduledExpenseEndpoint(), 'All Scheduled Expenses')}
-            />
-        </Grid2>
+            <Fab
+                color='primary'
+                sx={{position: 'absolute', bottom: 16, right: 16}}
+                onClick={event => setAddMenuAnchor(event.currentTarget)}
+            >
+                <AddIcon/>
+            </Fab>
+            <Menu
+                open={openAddMenu}
+                anchorEl={addMenuAnchor}
+                onClose={closeAddMenu}
+            >
+                <AddMenuItem endpoint={expenseEndpoint}/>
+            </Menu>
+        </div>
     );
 }
