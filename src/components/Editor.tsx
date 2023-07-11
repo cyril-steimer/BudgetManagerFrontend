@@ -1,7 +1,7 @@
 import {DatePicker} from '@mui/x-date-pickers/DatePicker';
 import {DateStruct, dateStructToDayJsObject, dayJsObjectToDateStruct} from "../model/common";
 import dayjs from  "dayjs";
-import {Autocomplete, InputAdornment, TextField, TextFieldProps} from '@mui/material';
+import {Autocomplete, FormControl, FormHelperText, InputAdornment, InputLabel, MenuItem, Select, TextField, TextFieldProps} from '@mui/material';
 import {useContext} from 'react';
 import {CurrencyContext} from '../context/contexts';
 
@@ -40,7 +40,11 @@ export interface CurrencyAmountInputParameters extends BasicInputParameters {
 const numberRegex = /^[0-9]+(\.[0-9]+)?$/;
 
 export function CurrencyAmountInput({label, value, setValue, disabled, setValid}: CurrencyAmountInputParameters) {
-    const isValid = numberRegex.test(value);
+    function validate(val: string): boolean {
+        return numberRegex.test(value) && parseFloat(val) > 0;
+    }
+
+    const isValid = validate(value);
     const helperText = isValid ? undefined : 'Please enter a positive number';
     const currency = useContext(CurrencyContext);
 
@@ -51,7 +55,7 @@ export function CurrencyAmountInput({label, value, setValue, disabled, setValid}
             value={value}
             onChange={event => {
                 setValue(event.target.value);
-                setValid?.(numberRegex.test(event.target.value));
+                setValid?.(validate(event.target.value));
             }}
             margin='normal'
             error={!isValid}
@@ -90,6 +94,7 @@ export function TextInput({label, value, setValue, disabled, errorText, options}
             <Autocomplete
                 fullWidth
                 freeSolo
+                autoSelect
                 value={value}
                 onChange={(_, newValue) => setValue(newValue ?? '')}
                 options={options}
@@ -108,5 +113,33 @@ export function TextInput({label, value, setValue, disabled, errorText, options}
             value={value}
             onChange={event => setValue(event.target.value)}
         />
+    );
+}
+
+export interface DropdownParameters extends BasicInputParameters {
+    errorText?: string;
+    options: string[];
+}
+
+export function Dropdown({label, value, setValue, disabled, errorText, options}: DropdownParameters) {
+    const hasError = errorText !== undefined;
+
+    return (
+        <FormControl
+            fullWidth
+            margin='normal'
+            error={hasError}
+        >
+            <InputLabel>{label}</InputLabel>
+            <Select
+                label={label}
+                value={value}
+                onChange={event => setValue(event.target.value)}
+                disabled={disabled}
+            >
+                {options.map(option => <MenuItem key={option} value={option}>{option}</MenuItem>)}
+            </Select>
+            <FormHelperText>{errorText}</FormHelperText>
+        </FormControl>
     );
 }

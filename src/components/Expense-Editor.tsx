@@ -2,14 +2,14 @@ import {Expense} from "../model/expense";
 import {useEffect, useState} from "react";
 import {Autocomplete, Box, Button, Stack, TextField} from "@mui/material";
 import {NamedObject} from "../model/common";
-import {DateStructPicker, CurrencyAmountInput, TextInput, commonTextFieldProperties} from "./Editor";
+import {DateStructPicker, CurrencyAmountInput, TextInput, commonTextFieldProperties, Dropdown} from "./Editor";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SendIcon from '@mui/icons-material/Send';
 import {useIsNavigating} from "../hooks/hooks";
 import {useNavigate} from "react-router-dom";
 import {ModifyingEndpoint} from "../endpoints/endpoint";
 import {submitData} from "../routes/Endpoint-Routes";
-import {getAllAuthors, getAllPaymentMethods, getAllTags} from "../endpoints/helpers";
+import {getAllAuthors, getAllBudgetCategories, getAllPaymentMethods, getAllTags} from "../endpoints/helpers";
 
 function namedObject(value: string): NamedObject {
     return {
@@ -30,19 +30,22 @@ export function ExpenseEditor({endpoint, initialExpense}: ExpenseEditorParameter
 
     const [name, setName] = useState(initialExpense.name.name);
     const [amount, setAmount] = useState(initialExpense.amount.amount.toFixed(2));
+    const [category, setCategory] = useState(initialExpense.category.name);
     const [date, setDate] = useState(initialExpense.date);
     const [method, setMethod] = useState(initialExpense.method.name);
     const [author, setAuthor] = useState(initialExpense.author.name);
     const [tags, setTags] = useState(initialExpense.tags.map(t => t.name));
 
+    const [categoryOptions, setCategoryOptions] = useState<string[]>([]);
     const [authorOptions, setAuthorOptions] = useState<string[]>();
     const [paymentMethodOptions, setPaymentMethodOptions] = useState<string[]>();
     const [tagOptions, setTagOptions] = useState<string[]>();
 
     const [amountValid, setAmountValid] = useState(true);
 
+    const categoryError = category === '' ? 'This field is mandatory' : undefined;
     const nameError = name === '' ? 'This field is mandatory' : undefined;
-    const anyError = nameError !== undefined || !amountValid;
+    const anyError = categoryError !== undefined || nameError !== undefined || !amountValid;
 
     const [isSubmitting, setSubmitting] = useState(false);
     const isNavigating = useIsNavigating() || isSubmitting;
@@ -53,7 +56,7 @@ export function ExpenseEditor({endpoint, initialExpense}: ExpenseEditorParameter
             id: initialExpense.id,
             name: namedObject(name),
             amount: { amount: parseFloat(amount) },
-            category: namedObject('not a category!'), // TODO We need to support editing the category!
+            category: namedObject(category),
             date: date,
             method: namedObject(method),
             author: namedObject(author),
@@ -63,6 +66,7 @@ export function ExpenseEditor({endpoint, initialExpense}: ExpenseEditorParameter
         navigate(-1); // Go back to the previous page
     }
 
+    useEffect(() => loadAutocompleteData(getAllBudgetCategories, setCategoryOptions), []);
     useEffect(() => loadAutocompleteData(getAllAuthors, setAuthorOptions), []);
     useEffect(() => loadAutocompleteData(getAllPaymentMethods, setPaymentMethodOptions), []);
     useEffect(() => loadAutocompleteData(getAllTags, setTagOptions), []);
@@ -82,6 +86,14 @@ export function ExpenseEditor({endpoint, initialExpense}: ExpenseEditorParameter
                 setValue={setAmount}
                 setValid={setAmountValid}
                 disabled={isNavigating}
+            />
+            <Dropdown
+                label='Category'
+                value={category}
+                setValue={setCategory}
+                options={categoryOptions}
+                disabled={isNavigating}
+                errorText={categoryError}
             />
             <DateStructPicker
                 label='Date'

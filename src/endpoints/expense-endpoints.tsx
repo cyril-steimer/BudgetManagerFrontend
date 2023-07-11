@@ -95,7 +95,7 @@ export class ExpenseEndpoint extends BasicExpenseEndpoint<Expense> implements Ti
                 name: ''
             },
             amount: {
-                amount: 0
+                amount: 1
             },
             category: {
                 name: ''
@@ -114,8 +114,6 @@ export class ExpenseEndpoint extends BasicExpenseEndpoint<Expense> implements Ti
     renderEditor(object: Expense): JSX.Element {
         return <ExpenseEditor endpoint={this} initialExpense={object}/>
     }
-
-    // TODO The endpoint probably also needs to know how to publish something! (Both add and edit)
 
     private date(year: number, month?: number): dayjs.Dayjs {
         return dayjs().year(year).month(month ?? 0).date(1);
