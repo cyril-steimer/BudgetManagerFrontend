@@ -35,6 +35,8 @@ export interface ModifyingEndpoint<T> {
     readonly addText: string;
     readonly addPath: string;
 
+    readonly modifyingApiEndpoint: string;
+
     createStarterObject(): T;
     renderEditor(object: T): JSX.Element;
 }

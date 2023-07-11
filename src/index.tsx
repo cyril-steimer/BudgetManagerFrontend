@@ -65,7 +65,6 @@ function modifyingRouteObjects<T>(endpoint: ModifyingEndpoint<T>): RouteObject[]
             path: endpoint.addPath,
             element: <AddWrapper endpoint={endpoint}/>,
             loader: addLoader(endpoint)
-            // TODO Do we need an action here?
         }
     ];
 }

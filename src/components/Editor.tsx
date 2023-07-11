@@ -3,13 +3,14 @@ import {DateStruct, dateStructToDayJsObject, dayJsObjectToDateStruct} from "../m
 import dayjs from  "dayjs";
 import {TextField} from '@mui/material';
 
-export interface DateStructPickerArguments {
+export interface DateStructPickerParameters {
     label: string;
     value: DateStruct;
     setValue: (newValue: DateStruct) => void;
+    disabled?: boolean;
 }
 
-export function DateStructPicker({label, value, setValue}: DateStructPickerArguments) {
+export function DateStructPicker({label, value, setValue, disabled}: DateStructPickerParameters) {
     const now = dayjs();
 
     return (
@@ -18,23 +19,28 @@ export function DateStructPicker({label, value, setValue}: DateStructPickerArgum
             label={label}
             value={dateStructToDayJsObject(value)}
             onChange={newValue => setValue(dayJsObjectToDateStruct(newValue ?? now))}
+            disabled={disabled}
         />
     );
 }
 
-export interface BasicInputArguments {
+export interface BasicInputParameters {
     label: string;
     value: string;
     setValue: (newValue: string) => void;
+    disabled?: boolean;
 }
 
-export type NumberInputArguments = BasicInputArguments;
+export interface NumberInputParameters extends BasicInputParameters {
+    setValid?: (valid: boolean) => void;
+}
 
 const numberRegex = /^[0-9]+(\.[0-9]+)?$/;
 
-export function NumberInput({label, value, setValue}: NumberInputArguments) {
+export function NumberInput({label, value, setValue, disabled, setValid}: NumberInputParameters) {
     const isValid = numberRegex.test(value);
     const helperText = isValid ? undefined : 'Please enter a positive number';
+    setValid?.(isValid);
 
     return (
         <TextField
@@ -45,17 +51,17 @@ export function NumberInput({label, value, setValue}: NumberInputArguments) {
             margin='normal'
             error={!isValid}
             helperText={helperText}
+            disabled={disabled}
         />
     );
 }
 
-export interface TextInputArguments extends BasicInputArguments {
-    validate?: (value: string) => string | undefined;
+export interface TextInputParameters extends BasicInputParameters {
+    errorText?: string;
 }
 
-export function TextInput({label, value, setValue, validate}: TextInputArguments) {
-    const helperText = validate === undefined ? undefined : validate(value);
-    const hasError = helperText !== undefined;
+export function TextInput({label, value, setValue, disabled, errorText}: TextInputParameters) {
+    const hasError = errorText !== undefined;
 
     return (
         <TextField
@@ -65,7 +71,8 @@ export function TextInput({label, value, setValue, validate}: TextInputArguments
             onChange={event => setValue(event.target.value)}
             margin='normal'
             error={hasError}
-            helperText={helperText}
+            helperText={errorText}
+            disabled={disabled}
         />
     );
 }

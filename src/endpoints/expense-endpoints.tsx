@@ -17,12 +17,14 @@ abstract class BasicExpenseEndpoint<T extends BaseExpense> implements ViewAllEnd
     readonly simpleSearchPathPrefix: string;
 
     readonly addPath: string;
+    readonly modifyingApiEndpoint: string;
 
     constructor(readonly endpoint: string, readonly addText: string, readonly supportsTimeBasedNavigation: boolean) {
         this.viewAllPath = endpoint;
         this.timeBasedPathPrefix = endpoint;
         this.simpleSearchPathPrefix = `${endpoint}/field`;
         this.addPath = `add/${endpoint}`;
+        this.modifyingApiEndpoint = `/api/v1/${endpoint}`;
     }
     
     async loadAllData(): Promise<ListResponse<T>> {
@@ -110,7 +112,7 @@ export class ExpenseEndpoint extends BasicExpenseEndpoint<Expense> implements Ti
     }
     
     renderEditor(object: Expense): JSX.Element {
-        return <ExpenseEditor initialExpense={object}/>
+        return <ExpenseEditor endpoint={this} initialExpense={object}/>
     }
 
     // TODO The endpoint probably also needs to know how to publish something! (Both add and edit)

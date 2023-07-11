@@ -4,6 +4,12 @@ import {Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Ic
 import {NamedObject} from "../model/common";
 import {DateStructPicker, NumberInput, TextInput} from "./Editor";
 import AddIcon from "@mui/icons-material/Add";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import SendIcon from '@mui/icons-material/Send';
+import {useIsNavigating} from "../hooks/hooks";
+import {useNavigate} from "react-router-dom";
+import {ModifyingEndpoint} from "../endpoints/endpoint";
+import {submitData} from "../routes/Endpoint-Routes";
 
 function namedObject(value: string): NamedObject {
     return {
@@ -11,77 +17,104 @@ function namedObject(value: string): NamedObject {
     };
 }
 
-export function ExpenseEditor({initialExpense}: {initialExpense: Expense}) {
-    const [expense, setExpense] = useState(initialExpense);
+interface ExpenseEditorParameters {
+    endpoint: ModifyingEndpoint<Expense>;
+    initialExpense: Expense;
+}
+
+
+export function ExpenseEditor({endpoint, initialExpense}: ExpenseEditorParameters) {
+
+    const [name, setName] = useState(initialExpense.name.name);
+    const [amount, setAmount] = useState(initialExpense.amount.amount.toFixed(2));
+    const [date, setDate] = useState(initialExpense.date);
+    const [method, setMethod] = useState(initialExpense.method.name);
+    const [author, setAuthor] = useState(initialExpense.author.name);
+    const [tags, setTags] = useState(initialExpense.tags.map(t => t.name));
+
+    const [amountValid, setAmountValid] = useState(true);
+
     const [currentTag, setCurrentTag] = useState('');
     const [openAddTag, setOpenAddTag] = useState(false);
 
-    // TODO to currency string?
-    const [amount, setAmount] = useState(initialExpense.amount.amount.toString());
-
-    const isNewTag = expense.tags.find(tag => tag.name === currentTag) === undefined;
+    const isNewTag = tags.find(tag => tag === currentTag) === undefined;
     const canAddTag = currentTag !== '' && isNewTag;
 
-    function validateMandatory(value: string): string | undefined {
-        return value === '' ? 'This field is mandatory' : undefined;
-    }
+    const nameError = name === '' ? 'This field is mandatory' : undefined;
+    const tagError = isNewTag ? undefined : 'This tag was already used';
+    const anyError = nameError !== undefined || !amountValid;
 
-    function set<K extends keyof Expense>(key: K, value: Expense[K]) {
-        const copy = {...expense};
-        copy[key] = value;
-        setExpense(copy);
-    }
-
-    function validateTag(tag: string): string | undefined {
-        return isNewTag ? undefined : 'This tag was already used';
-    }
+    const [isSubmitting, setSubmitting] = useState(false);
+    const isNavigating = useIsNavigating() || isSubmitting;
+    const navigate = useNavigate();
 
     function addTag() {
         if (!canAddTag) {
             return;
         }
-        const newTags = [...expense.tags];
-        newTags.push(namedObject(currentTag));
+        const newTags = [...tags];
+        newTags.push(currentTag);
         setCurrentTag('');
-        set('tags', newTags);
+        setTags(newTags);
     }
 
-    function deleteTag(tag: NamedObject) {
-        const newTags = [...expense.tags].filter(t => t.name !== tag.name);
-        set('tags', newTags);
+    function deleteTag(tag: string) {
+        const newTags = tags.filter(t => t !== tag);
+        setTags(newTags);
     }
 
     function closeAddTagDialog() {
         setOpenAddTag(false);
     }
 
+    async function submitExpense() {
+        const expense: Expense = {
+            id: initialExpense.id,
+            name: namedObject(name),
+            amount: { amount: parseFloat(amount) },
+            category: namedObject('not a category!'), // TODO We need to support editing the category!
+            date: date,
+            method: namedObject(method),
+            author: namedObject(author),
+            tags: tags.map(tag => namedObject(tag))
+        };
+        await submitData(endpoint, 'post', expense, setSubmitting);
+        navigate(-1); // Go back to the previous page
+    }
+
     return (
         <Box component='form'>
             <TextInput
                 label='Name'
-                value={expense.name.name}
-                setValue={value => set('name', namedObject(value))}
-                validate={validateMandatory}
+                value={name}
+                setValue={setName}
+                errorText={nameError}
+                disabled={isNavigating}
             />
             <NumberInput
                 label='Amount'
                 value={amount}
                 setValue={setAmount}
+                setValid={setAmountValid}
+                disabled={isNavigating}
             />
             <DateStructPicker
                 label='Date'
-                value={expense.date}
-                setValue={value => set('date', value)}
+                value={date}
+                setValue={setDate}
+                disabled={isNavigating}
             />
             <TextInput
                 label='Payment Method'
-                value={expense.method.name}
-                setValue={value => set('method', namedObject(value))}
+                value={method}
+                setValue={setMethod}
+                disabled={isNavigating}
             />
             <TextInput
                 label='Author'
-                value={expense.author.name}
-                setValue={value => set('author', namedObject(value))}
+                value={author}
+                setValue={setAuthor}
+                disabled={isNavigating}
             />
             <Typography 
                 variant='body1'
@@ -90,10 +123,10 @@ export function ExpenseEditor({initialExpense}: {initialExpense: Expense}) {
                 Tags
             </Typography>
             <Stack direction='row' spacing={1}>
-                {expense.tags.map(tag => (
-                    <Chip key={tag.name} label={tag.name} onDelete={() => deleteTag(tag)} variant='outlined'/>
+                {tags.map(tag => (
+                    <Chip key={tag} label={tag} onDelete={() => deleteTag(tag)} variant='outlined' disabled={isNavigating}/>
                 ))}
-                <IconButton onClick={() => setOpenAddTag(true)}>
+                <IconButton onClick={() => setOpenAddTag(true)} disabled={isNavigating}>
                     <AddIcon/>
                 </IconButton>
             </Stack>
@@ -104,7 +137,7 @@ export function ExpenseEditor({initialExpense}: {initialExpense: Expense}) {
                         label='Tag'
                         value={currentTag}
                         setValue={setCurrentTag}
-                        validate={validateTag}
+                        errorText={tagError}
                     />
                 </DialogContent>
                 <DialogActions>
@@ -119,6 +152,24 @@ export function ExpenseEditor({initialExpense}: {initialExpense: Expense}) {
                     </Button>
                 </DialogActions>
             </Dialog>
+            <Stack sx={{marginTop: '20px'}} direction='row' spacing={1}>
+                <Button
+                    startIcon={<ArrowBackIcon/>}
+                    variant='outlined'
+                    disabled={isNavigating}
+                    onClick={() => navigate(-1)}
+                >
+                    Back
+                </Button>
+                <Button
+                    endIcon={<SendIcon/>}
+                    variant='contained'
+                    disabled={isNavigating || anyError}
+                    onClick={submitExpense}
+                >
+                    Submit
+                </Button>
+            </Stack>
         </Box>
     );
 }

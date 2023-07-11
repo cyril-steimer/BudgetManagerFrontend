@@ -70,6 +70,23 @@ export function getAddUrl<T>(endpoint: ModifyingEndpoint<T>): string {
     return `/${endpoint.addPath}`;
 }
 
+export async function submitData<T>(
+    endpoint: ModifyingEndpoint<T>,
+    method: 'post' | 'put' | 'delete',
+    data: T,
+    setSubmitting: (submitting: boolean) => void
+) {
+    setSubmitting(true);
+    await fetch(endpoint.modifyingApiEndpoint, {
+        method: method,
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    });
+    setSubmitting(false);
+}
+
 function getTimeRangeParameters<T>(endpoint: TimeBasedEndpoint<T>, navigate: NavigateFunction, params: Params<string>): TimeRangeParameters | undefined {
     const year = params.year;
     const month = params.month;
