@@ -47,12 +47,11 @@ function cast<T extends ExpenseTypes>(type: T, parameters: BaseExpenseEditorPara
     return undefined;
 }
 
-type AllExpenses = Expense & ScheduledExpense & ExpenseTemplate;
-type ExpenseUnion = {
-    [Property in keyof AllExpenses]: AllExpenses[Property]
+type FullExpense = {
+    [Property in keyof (Expense & ScheduledExpense & ExpenseTemplate)]: (Expense & ScheduledExpense & ExpenseTemplate)[Property]
 }
 
-function createExpense<T extends ExpenseTypes>(type: T, values: ExpenseUnion): ExpenseImplementation<T> {
+function createExpense<T extends ExpenseTypes>(type: T, values: FullExpense): ExpenseImplementation<T> {
     const baseExpense: BaseExpense = {
         id: values.id,
         name: values.name,
@@ -87,7 +86,7 @@ function createExpense<T extends ExpenseTypes>(type: T, values: ExpenseUnion): E
     throw new Error(`Unexpected expense type: ${type}`);
 }
 
-function BaseExpenseEditor(parameters: BaseExpenseEditorParameters<ExpenseTypes>) {
+function BaseExpenseEditor<T extends ExpenseTypes>(parameters: BaseExpenseEditorParameters<T>) {
 
     const [name, setName] = useState(parameters.initialExpense.name.name);
     const [amount, setAmount] = useState(parameters.initialExpense.amount.amount.toFixed(2));
