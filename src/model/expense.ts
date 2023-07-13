@@ -8,7 +8,6 @@ export interface BaseExpense {
     method: NamedObject;
     author: NamedObject;
     tags: NamedObject[];
-
 }
 
 export interface Expense extends BaseExpense {
@@ -27,7 +26,7 @@ export interface MonthlySchedule {
     dayOfMonth: number;
 }
 
-export interface ScheduledExpense extends Expense {
+export interface ScheduledExpense extends BaseExpense {
     startDate: DateStruct;
     endDate?: DateStruct;
     schedule: WeeklySchedule | MonthlySchedule;

@@ -46,6 +46,10 @@ export function dateStructFromISO8601String(string: string): DateStruct {
     };
 }
 
+export function dateStructNow(): DateStruct {
+    return dayJsObjectToDateStruct(dayjs());
+}
+
 export const JANUARY = 0;
 export const DECEMBER = 11;
 

@@ -3,8 +3,30 @@ import {BaseExpense, Expense, ExpenseTemplate, ScheduledExpense} from "../model/
 import {ListResponse} from "../model/responses";
 import {ModifyingEndpoint, SimpleSearchEndpoint, TimeBasedEndpoint, ViewAllEndpoint} from "./endpoint";
 import {ExpenseTemplatesTable, ExpensesTable, ScheduledExpensesTable} from "../components/Expenses-Table";
-import {dayJsObjectToDateStruct} from "../model/common";
-import { ExpenseEditor } from "../components/Expense-Editor";
+import {dateStructNow} from "../model/common";
+import {ExpenseEditor, ExpenseTemplateEditor} from "../components/Expense-Editor";
+
+function emptyBaseExpense(): BaseExpense {
+    return {
+        id: '',
+        name: {
+            name: ''
+        },
+        amount: {
+            amount: 1
+        },
+        category: {
+            name: ''
+        },
+        method: {
+            name: ''
+        },
+        author: {
+            name: ''
+        },
+        tags: []
+    };
+}
 
 abstract class BasicExpenseEndpoint<T extends BaseExpense> implements ViewAllEndpoint<ListResponse<T>>, SimpleSearchEndpoint<ListResponse<T>>, ModifyingEndpoint<T> {
 
@@ -88,26 +110,9 @@ export class ExpenseEndpoint extends BasicExpenseEndpoint<Expense> implements Ti
     }
 
     createStarterObject(): Expense {
-        const now = dayjs();
         return {
-            id: '',
-            name: {
-                name: ''
-            },
-            amount: {
-                amount: 1
-            },
-            category: {
-                name: ''
-            },
-            date: dayJsObjectToDateStruct(now),
-            method: {
-                name: ''
-            },
-            author: {
-                name: ''
-            },
-            tags: []
+            ...emptyBaseExpense(),
+            date: dateStructNow()
         };
     }
     
@@ -173,11 +178,11 @@ export class ExpenseTemplateEndpoint extends BasicExpenseEndpoint<ExpenseTemplat
     }
 
     createStarterObject(): ExpenseTemplate {
-        return null!;
+        return emptyBaseExpense();
     }
 
     renderEditor(object: ExpenseTemplate): JSX.Element {
-        return null!
+        return <ExpenseTemplateEditor endpoint={this} initialExpense={object}/>;
     }
 
     renderData(data: ListResponse<ExpenseTemplate>, filter: string): JSX.Element {

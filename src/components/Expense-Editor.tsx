@@ -1,7 +1,7 @@
-import {Expense} from "../model/expense";
+import {BaseExpense, Expense, ExpenseTemplate, ScheduledExpense} from "../model/expense";
 import {useEffect, useState} from "react";
 import {Autocomplete, Box, Button, Stack, TextField} from "@mui/material";
-import {NamedObject} from "../model/common";
+import {NamedObject, dateStructNow} from "../model/common";
 import {DateStructPicker, CurrencyAmountInput, TextInput, commonTextFieldProperties, Dropdown} from "./Editor";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SendIcon from '@mui/icons-material/Send';
@@ -17,24 +17,85 @@ function namedObject(value: string): NamedObject {
     };
 }
 
-interface ExpenseEditorParameters {
-    endpoint: ModifyingEndpoint<Expense>;
-    initialExpense: Expense;
-}
-
 function loadAutocompleteData(loaderFunc: () => Promise<string[]>, setData: (values: string[]) => void) {
     loaderFunc().then(promise => setData(promise)); // TODO Error handling
 }
 
-export function ExpenseEditor({endpoint, initialExpense}: ExpenseEditorParameters) {
+type TemplateType = 'template';
+type ScheduleType = 'schedule';
+type ExpenseType = 'expense';
+type ExpenseTypes = TemplateType | ScheduleType | ExpenseType;
 
-    const [name, setName] = useState(initialExpense.name.name);
-    const [amount, setAmount] = useState(initialExpense.amount.amount.toFixed(2));
-    const [category, setCategory] = useState(initialExpense.category.name);
-    const [date, setDate] = useState(initialExpense.date);
-    const [method, setMethod] = useState(initialExpense.method.name);
-    const [author, setAuthor] = useState(initialExpense.author.name);
-    const [tags, setTags] = useState(initialExpense.tags.map(t => t.name));
+type ExpenseImplementation<ExpenseTypes> = ExpenseTypes extends TemplateType
+    ? ExpenseTemplate
+    : (ExpenseTypes extends ScheduleType ? ScheduledExpense : Expense);
+
+interface BaseExpenseEditorParameters<T extends ExpenseTypes> {
+    endpoint: ModifyingEndpoint<ExpenseImplementation<T>>;
+    initialExpense: ExpenseImplementation<T>;
+    type: T;
+}
+
+function test<T extends ExpenseTypes>(type: T, parameters: BaseExpenseEditorParameters<ExpenseTypes>): parameters is BaseExpenseEditorParameters<T> {
+    return parameters.type === type;
+}
+
+function cast<T extends ExpenseTypes>(type: T, parameters: BaseExpenseEditorParameters<ExpenseTypes>): BaseExpenseEditorParameters<T> | undefined {
+    if (test(type, parameters)) {
+        return parameters;
+    }
+    return undefined;
+}
+
+type AllExpenses = Expense & ScheduledExpense & ExpenseTemplate;
+type ExpenseUnion = {
+    [Property in keyof AllExpenses]: AllExpenses[Property]
+}
+
+function createExpense<T extends ExpenseTypes>(type: T, values: ExpenseUnion): ExpenseImplementation<T> {
+    const baseExpense: BaseExpense = {
+        id: values.id,
+        name: values.name,
+        amount: values.amount,
+        category: values.category,
+        author: values.author,
+        method: values.method,
+        tags: values.tags
+    };
+    switch (type) {
+        case 'expense': {
+            const expense: Expense = {
+                ...baseExpense,
+                date: values.date
+            };
+            return expense as ExpenseImplementation<T>;
+        }
+        case 'schedule': {
+            const schedule: ScheduledExpense = {
+                ...baseExpense,
+                schedule: values.schedule,
+                startDate: values.startDate,
+                endDate: values.endDate
+            };
+            return schedule as ExpenseImplementation<T>;
+        }
+        case 'template': {
+            const template: ExpenseTemplate = baseExpense;
+            return template as ExpenseImplementation<T>
+        }
+    }
+    throw new Error(`Unexpected expense type: ${type}`);
+}
+
+function BaseExpenseEditor(parameters: BaseExpenseEditorParameters<ExpenseTypes>) {
+
+    const [name, setName] = useState(parameters.initialExpense.name.name);
+    const [amount, setAmount] = useState(parameters.initialExpense.amount.amount.toFixed(2));
+    const [category, setCategory] = useState(parameters.initialExpense.category.name);
+    const [date, setDate] = useState(cast('expense', parameters)?.initialExpense.date ?? dateStructNow());
+    const [method, setMethod] = useState(parameters.initialExpense.method.name);
+    const [author, setAuthor] = useState(parameters.initialExpense.author.name);
+    const [tags, setTags] = useState(parameters.initialExpense.tags.map(t => t.name));
 
     const [categoryOptions, setCategoryOptions] = useState<string[]>([]);
     const [authorOptions, setAuthorOptions] = useState<string[]>();
@@ -52,17 +113,24 @@ export function ExpenseEditor({endpoint, initialExpense}: ExpenseEditorParameter
     const navigate = useNavigate();
 
     async function submitExpense() {
-        const expense: Expense = {
-            id: initialExpense.id,
+        const expense = createExpense(parameters.type, {
+            id: parameters.initialExpense.id,
             name: namedObject(name),
             amount: { amount: parseFloat(amount) },
             category: namedObject(category),
-            date: date,
             method: namedObject(method),
             author: namedObject(author),
-            tags: tags.map(tag => namedObject(tag))
-        };
-        await submitData(endpoint, 'post', expense, setSubmitting);
+            tags: tags.map(tag => namedObject(tag)),
+            // Expense
+            date: date,
+            // Scheduled Expense
+            startDate: dateStructNow(),
+            endDate: undefined,
+            schedule: {
+                dayOfWeek: 'MONDAY'
+            }
+        });
+        await submitData(parameters.endpoint, 'post', expense, setSubmitting);
         navigate(-1); // Go back to the previous page
     }
 
@@ -95,12 +163,14 @@ export function ExpenseEditor({endpoint, initialExpense}: ExpenseEditorParameter
                 disabled={isNavigating}
                 errorText={categoryError}
             />
-            <DateStructPicker
-                label='Date'
-                value={date}
-                setValue={setDate}
-                disabled={isNavigating}
-            />
+            {parameters.type === 'expense' &&
+                <DateStructPicker
+                    label='Date'
+                    value={date}
+                    setValue={setDate}
+                    disabled={isNavigating}
+                />
+            }
             <TextInput
                 label='Payment Method'
                 value={method}
@@ -150,4 +220,17 @@ export function ExpenseEditor({endpoint, initialExpense}: ExpenseEditorParameter
             </Stack>
         </Box>
     );
+}
+
+export interface ExpenseEditorParameters<E extends BaseExpense> {
+    endpoint: ModifyingEndpoint<E>;
+    initialExpense: E;
+}
+
+export function ExpenseEditor({endpoint, initialExpense}: ExpenseEditorParameters<Expense>) {
+    return <BaseExpenseEditor type='expense' endpoint={endpoint} initialExpense={initialExpense}/>
+}
+
+export function ExpenseTemplateEditor({endpoint, initialExpense}: ExpenseEditorParameters<ExpenseTemplate>) {
+    return <BaseExpenseEditor type='template' endpoint={endpoint} initialExpense={initialExpense}/>
 }

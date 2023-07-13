@@ -27,7 +27,7 @@ import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
 import 'dayjs/locale/de-ch';
 
 const queryingEndpoints: QueryingEndpoint<any>[] = [new ExpenseEndpoint(), new ScheduledExpenseEndpoint(), new ExpenseTemplateEndpoint(), new BudgetInPeriodEndpoint()];
-const modifyingEndpoints: ModifyingEndpoint<any>[] = [new ExpenseEndpoint()];
+const modifyingEndpoints: ModifyingEndpoint<any>[] = [new ExpenseEndpoint(), new ScheduledExpenseEndpoint(), new ExpenseTemplateEndpoint()];
 
 function queryingRouteObjects<T>(endpoint: QueryingEndpoint<T>): RouteObject[] {
     const result: RouteObject[] = [];

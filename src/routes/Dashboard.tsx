@@ -92,6 +92,7 @@ export default function Dashboard() {
 
     const disableButtons = useIsNavigating() || loadingExpenses;
     const expenseEndpoint = new ExpenseEndpoint();
+    const expenseTemplateEndpoint = new ExpenseTemplateEndpoint();
 
     async function searchExpenses() {
         if (search === '') {
@@ -164,7 +165,7 @@ export default function Dashboard() {
                     title="Templates"
                     text="View the list of templates"
                     disableButtons={disableButtons}
-                    buttons={cardButtons(new ExpenseTemplateEndpoint(), 'All Templates')}
+                    buttons={cardButtons(expenseTemplateEndpoint, 'All Templates')}
                 />
                 <DashboardCard
                     title="Scheduled Expenses"
@@ -186,6 +187,7 @@ export default function Dashboard() {
                 onClose={closeAddMenu}
             >
                 <AddMenuItem endpoint={expenseEndpoint}/>
+                <AddMenuItem endpoint={expenseTemplateEndpoint}/>
             </Menu>
         </div>
     );
