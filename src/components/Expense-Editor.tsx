@@ -1,4 +1,4 @@
-import {BaseExpense, Expense, ExpenseTemplate, ScheduledExpense} from "../model/expense";
+import {BaseExpense, Expense, ExpenseTemplate, Schedule, ScheduledExpense, allSchedules, isMonthlySchedule, isWeeklySchedule, scheduleToString} from "../model/expense";
 import {useEffect, useState} from "react";
 import {Autocomplete, Box, Button, Stack, TextField} from "@mui/material";
 import {NamedObject, compareDateStruct, dateStructNow} from "../model/common";
@@ -82,6 +82,17 @@ function createExpense<T extends ExpenseSelector>(type: T, values: FullExpense):
     throw new Error(`Unexpected expense type: ${type}`);
 }
 
+const defaultSchedule: Schedule = { dayOfMonth: 1 };
+
+function getScheduleGroup(schedule: Schedule): string {
+    if (isMonthlySchedule(schedule)) {
+        return 'Monthly Schedules';
+    } else if (isWeeklySchedule(schedule)) {
+        return 'Weekly Schedules';
+    }
+    throw new Error(`Unsupported schedule: ${JSON.stringify(schedule)}`);
+}
+
 function BaseExpenseEditor<T extends ExpenseSelector>({type, initialExpense, endpoint}: BaseExpenseEditorParameters<T>) {
 
     const [name, setName] = useState(initialExpense.name.name);
@@ -93,7 +104,9 @@ function BaseExpenseEditor<T extends ExpenseSelector>({type, initialExpense, end
     const [tags, setTags] = useState(initialExpense.tags.map(t => t.name));
     const [startDate, setStartDate] = useState(as('schedule', type, initialExpense)?.startDate ?? dateStructNow());
     const [endDate, setEndDate] = useState(as('schedule', type, initialExpense)?.endDate);
-    const [schedule, setSchedule] = useState(as('schedule', type, initialExpense)?.schedule ?? { dayOfMonth: 1 })
+    const [schedule, setSchedule] = useState(as('schedule', type, initialExpense)?.schedule ?? defaultSchedule)
+
+
 
     const [categoryOptions, setCategoryOptions] = useState<string[]>(['woohoo']);
     const [authorOptions, setAuthorOptions] = useState<string[]>();
@@ -188,6 +201,23 @@ function BaseExpenseEditor<T extends ExpenseSelector>({type, initialExpense, end
                     minDate={startDate}
                     helperText={dateError ? 'Start Date must be before End Date' : undefined}
                     disabled={isNavigating}
+                />
+            }
+            {type === 'schedule' &&
+                <Autocomplete
+                    fullWidth
+                    value={schedule}
+                    onChange={(_, newValue) => setSchedule(newValue ?? defaultSchedule)}
+                    options={allSchedules()}
+                    groupBy={schedule => getScheduleGroup(schedule)}
+                    getOptionLabel={schedule => scheduleToString(schedule)}
+                    renderInput={(params) => (
+                        <TextField
+                            {...params}
+                            {...commonTextFieldProperties}
+                            label='Schedule'
+                        />
+                    )}
                 />
             }
             <TextInput
