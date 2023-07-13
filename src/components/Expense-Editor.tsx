@@ -1,7 +1,7 @@
 import {BaseExpense, Expense, ExpenseTemplate, ScheduledExpense} from "../model/expense";
 import {useEffect, useState} from "react";
 import {Autocomplete, Box, Button, Stack, TextField} from "@mui/material";
-import {NamedObject, dateStructNow} from "../model/common";
+import {NamedObject, compareDateStruct, dateStructNow} from "../model/common";
 import {DateStructPicker, CurrencyAmountInput, TextInput, commonTextFieldProperties, Dropdown} from "./Editor";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SendIcon from '@mui/icons-material/Send';
@@ -24,25 +24,21 @@ function loadAutocompleteData(loaderFunc: () => Promise<string[]>, setData: (val
 type TemplateType = 'template';
 type ScheduleType = 'schedule';
 type ExpenseType = 'expense';
-type ExpenseTypes = TemplateType | ScheduleType | ExpenseType;
+type ExpenseSelector = TemplateType | ScheduleType | ExpenseType;
 
 type ExpenseImplementation<ExpenseTypes> = ExpenseTypes extends TemplateType
     ? ExpenseTemplate
     : (ExpenseTypes extends ScheduleType ? ScheduledExpense : Expense);
 
-interface BaseExpenseEditorParameters<T extends ExpenseTypes> {
+interface BaseExpenseEditorParameters<T extends ExpenseSelector> {
     endpoint: ModifyingEndpoint<ExpenseImplementation<T>>;
     initialExpense: ExpenseImplementation<T>;
     type: T;
 }
 
-function test<T extends ExpenseTypes>(type: T, parameters: BaseExpenseEditorParameters<ExpenseTypes>): parameters is BaseExpenseEditorParameters<T> {
-    return parameters.type === type;
-}
-
-function cast<T extends ExpenseTypes>(type: T, parameters: BaseExpenseEditorParameters<ExpenseTypes>): BaseExpenseEditorParameters<T> | undefined {
-    if (test(type, parameters)) {
-        return parameters;
+function as<T extends ExpenseSelector>(expected: T, actual: ExpenseSelector, expense: ExpenseImplementation<ExpenseSelector>): ExpenseImplementation<T> | undefined {
+    if (expected === actual) {
+        return expense as ExpenseImplementation<T>;
     }
     return undefined;
 }
@@ -51,7 +47,7 @@ type FullExpense = {
     [Property in keyof (Expense & ScheduledExpense & ExpenseTemplate)]: (Expense & ScheduledExpense & ExpenseTemplate)[Property]
 }
 
-function createExpense<T extends ExpenseTypes>(type: T, values: FullExpense): ExpenseImplementation<T> {
+function createExpense<T extends ExpenseSelector>(type: T, values: FullExpense): ExpenseImplementation<T> {
     const baseExpense: BaseExpense = {
         id: values.id,
         name: values.name,
@@ -86,17 +82,20 @@ function createExpense<T extends ExpenseTypes>(type: T, values: FullExpense): Ex
     throw new Error(`Unexpected expense type: ${type}`);
 }
 
-function BaseExpenseEditor<T extends ExpenseTypes>(parameters: BaseExpenseEditorParameters<T>) {
+function BaseExpenseEditor<T extends ExpenseSelector>({type, initialExpense, endpoint}: BaseExpenseEditorParameters<T>) {
 
-    const [name, setName] = useState(parameters.initialExpense.name.name);
-    const [amount, setAmount] = useState(parameters.initialExpense.amount.amount.toFixed(2));
-    const [category, setCategory] = useState(parameters.initialExpense.category.name);
-    const [date, setDate] = useState(cast('expense', parameters)?.initialExpense.date ?? dateStructNow());
-    const [method, setMethod] = useState(parameters.initialExpense.method.name);
-    const [author, setAuthor] = useState(parameters.initialExpense.author.name);
-    const [tags, setTags] = useState(parameters.initialExpense.tags.map(t => t.name));
+    const [name, setName] = useState(initialExpense.name.name);
+    const [amount, setAmount] = useState(initialExpense.amount.amount.toFixed(2));
+    const [category, setCategory] = useState(initialExpense.category.name);
+    const [date, setDate] = useState(as('expense', type, initialExpense)?.date ?? dateStructNow());
+    const [method, setMethod] = useState(initialExpense.method.name);
+    const [author, setAuthor] = useState(initialExpense.author.name);
+    const [tags, setTags] = useState(initialExpense.tags.map(t => t.name));
+    const [startDate, setStartDate] = useState(as('schedule', type, initialExpense)?.startDate ?? dateStructNow());
+    const [endDate, setEndDate] = useState(as('schedule', type, initialExpense)?.endDate);
+    const [schedule, setSchedule] = useState(as('schedule', type, initialExpense)?.schedule ?? { dayOfMonth: 1 })
 
-    const [categoryOptions, setCategoryOptions] = useState<string[]>([]);
+    const [categoryOptions, setCategoryOptions] = useState<string[]>(['woohoo']);
     const [authorOptions, setAuthorOptions] = useState<string[]>();
     const [paymentMethodOptions, setPaymentMethodOptions] = useState<string[]>();
     const [tagOptions, setTagOptions] = useState<string[]>();
@@ -105,15 +104,16 @@ function BaseExpenseEditor<T extends ExpenseTypes>(parameters: BaseExpenseEditor
 
     const categoryError = category === '' ? 'This field is mandatory' : undefined;
     const nameError = name === '' ? 'This field is mandatory' : undefined;
-    const anyError = categoryError !== undefined || nameError !== undefined || !amountValid;
+    const dateError = endDate !== undefined && compareDateStruct(startDate, endDate) > 0;
+    const anyError = categoryError !== undefined || nameError !== undefined || !amountValid || dateError;
 
     const [isSubmitting, setSubmitting] = useState(false);
     const isNavigating = useIsNavigating() || isSubmitting;
     const navigate = useNavigate();
 
     async function submitExpense() {
-        const expense = createExpense(parameters.type, {
-            id: parameters.initialExpense.id,
+        const expense = createExpense(type, {
+            id: initialExpense.id,
             name: namedObject(name),
             amount: { amount: parseFloat(amount) },
             category: namedObject(category),
@@ -121,15 +121,13 @@ function BaseExpenseEditor<T extends ExpenseTypes>(parameters: BaseExpenseEditor
             author: namedObject(author),
             tags: tags.map(tag => namedObject(tag)),
             // Expense
-            date: date,
+            date,
             // Scheduled Expense
-            startDate: dateStructNow(),
-            endDate: undefined,
-            schedule: {
-                dayOfWeek: 'MONDAY'
-            }
+            startDate,
+            endDate,
+            schedule
         });
-        await submitData(parameters.endpoint, 'post', expense, setSubmitting);
+        await submitData(endpoint, 'post', expense, setSubmitting);
         navigate(-1); // Go back to the previous page
     }
 
@@ -162,11 +160,33 @@ function BaseExpenseEditor<T extends ExpenseTypes>(parameters: BaseExpenseEditor
                 disabled={isNavigating}
                 errorText={categoryError}
             />
-            {parameters.type === 'expense' &&
+            {type === 'expense' &&
                 <DateStructPicker
                     label='Date'
+                    required
                     value={date}
                     setValue={setDate}
+                    disabled={isNavigating}
+                />
+            }
+            {type === 'schedule' && 
+                <DateStructPicker
+                    label='Start Date'
+                    required
+                    value={startDate}
+                    setValue={setStartDate}
+                    maxDate={endDate}
+                    helperText={dateError ? 'Start Date must be before End Date' : undefined}
+                    disabled={isNavigating}
+                />
+            }
+            {type === 'schedule' && 
+                <DateStructPicker
+                    label='End Date'
+                    value={endDate}
+                    setValue={setEndDate}
+                    minDate={startDate}
+                    helperText={dateError ? 'Start Date must be before End Date' : undefined}
                     disabled={isNavigating}
                 />
             }
@@ -232,4 +252,8 @@ export function ExpenseEditor({endpoint, initialExpense}: ExpenseEditorParameter
 
 export function ExpenseTemplateEditor({endpoint, initialExpense}: ExpenseEditorParameters<ExpenseTemplate>) {
     return <BaseExpenseEditor type='template' endpoint={endpoint} initialExpense={initialExpense}/>
+}
+
+export function ScheduledExpenseEditor({endpoint, initialExpense}: ExpenseEditorParameters<ScheduledExpense>) {
+    return <BaseExpenseEditor type='schedule' endpoint={endpoint} initialExpense={initialExpense}/>
 }

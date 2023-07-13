@@ -93,6 +93,7 @@ export default function Dashboard() {
     const disableButtons = useIsNavigating() || loadingExpenses;
     const expenseEndpoint = new ExpenseEndpoint();
     const expenseTemplateEndpoint = new ExpenseTemplateEndpoint();
+    const scheduledExpenseEndpoint = new ScheduledExpenseEndpoint();
 
     async function searchExpenses() {
         if (search === '') {
@@ -171,7 +172,7 @@ export default function Dashboard() {
                     title="Scheduled Expenses"
                     text="View the list of scheduled expenses"
                     disableButtons={disableButtons}
-                    buttons={cardButtons(new ScheduledExpenseEndpoint(), 'All Scheduled Expenses')}
+                    buttons={cardButtons(scheduledExpenseEndpoint, 'All Scheduled Expenses')}
                 />
             </Grid2>
             <Fab
@@ -188,6 +189,7 @@ export default function Dashboard() {
             >
                 <AddMenuItem endpoint={expenseEndpoint}/>
                 <AddMenuItem endpoint={expenseTemplateEndpoint}/>
+                <AddMenuItem endpoint={scheduledExpenseEndpoint}/>
             </Menu>
         </div>
     );

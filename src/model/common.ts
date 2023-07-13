@@ -22,13 +22,23 @@ export function dateStructToISO8601String(date: DateStruct | undefined): string 
     return dateObject.format('YYYY-MM-DD');
 }
 
-export function dateStructToDayJsObject(date: DateStruct): dayjs.Dayjs {
+export function dateStructToDayJsObject(date: DateStruct): dayjs.Dayjs;
+export function dateStructToDayJsObject(date: DateStruct | undefined): dayjs.Dayjs | undefined;
+export function dateStructToDayJsObject(date: DateStruct | undefined): dayjs.Dayjs | undefined {
+    if (date === undefined) {
+        return undefined;
+    }
      // Months in the Backend are 1-based
     const jsDate = new Date(date.year, date.month - 1, date.day);
     return dayjs(jsDate);
 }
 
-export function dayJsObjectToDateStruct(date: dayjs.Dayjs): DateStruct {
+export function dayJsObjectToDateStruct(date: dayjs.Dayjs): DateStruct;
+export function dayJsObjectToDateStruct(date: dayjs.Dayjs | undefined): DateStruct | undefined;
+export function dayJsObjectToDateStruct(date: dayjs.Dayjs | undefined): DateStruct | undefined {
+    if (date === undefined) {
+        return undefined;
+    }
     return {
         day: date.date(),
         month: date.month() + 1, // Months in the Backend are 1-based

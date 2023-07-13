@@ -1,26 +1,47 @@
 import {DatePicker} from '@mui/x-date-pickers/DatePicker';
-import {DateStruct, dateStructToDayJsObject, dayJsObjectToDateStruct} from "../model/common";
+import {DateStruct, dateStructNow, dateStructToDayJsObject, dayJsObjectToDateStruct} from "../model/common";
 import dayjs from  "dayjs";
 import {Autocomplete, FormControl, FormHelperText, InputAdornment, InputLabel, MenuItem, Select, TextField, TextFieldProps} from '@mui/material';
 import {useContext} from 'react';
 import {CurrencyContext} from '../context/contexts';
 
-export interface DateStructPickerParameters {
+export type DateStructPickerValue<Required> = Required extends true
+    ? DateStruct
+    : DateStruct | undefined;
+
+export interface DateStructPickerParameters<Required extends boolean | undefined> {
     label: string;
-    value: DateStruct;
-    setValue: (newValue: DateStruct) => void;
+    value: DateStructPickerValue<Required>;
+    required?: Required;
+    setValue: (newValue: DateStructPickerValue<Required>) => void;
+    minDate?: DateStruct;
+    maxDate?: DateStruct;
+    helperText?: string;
     disabled?: boolean;
 }
 
-export function DateStructPicker({label, value, setValue, disabled}: DateStructPickerParameters) {
-    const now = dayjs();
+function convertValue(value: dayjs.Dayjs | null | undefined, required: boolean | undefined): DateStructPickerValue<false> {
+    if (value == null) {
+        return required === true ? dateStructNow() : undefined;
+    }
+    return dayJsObjectToDateStruct(value);
+}
 
+export function DateStructPicker<Required extends boolean | undefined>({label, value, required, setValue, minDate, maxDate, helperText, disabled}: DateStructPickerParameters<Required>) {
     return (
         <DatePicker
-            slotProps={{textField: { fullWidth: true, margin: 'normal' } }}
+            slotProps={{
+                textField: {
+                    fullWidth: true,
+                    margin: 'normal',
+                    helperText: helperText
+                }
+             }}
             label={label}
             value={dateStructToDayJsObject(value)}
-            onChange={newValue => setValue(dayJsObjectToDateStruct(newValue ?? now))}
+            onChange={newValue => setValue(convertValue(newValue, required) as DateStructPickerValue<Required>)}
+            minDate={dateStructToDayJsObject(minDate)}
+            maxDate={dateStructToDayJsObject(maxDate)}
             disabled={disabled}
         />
     );

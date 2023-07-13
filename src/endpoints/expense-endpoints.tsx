@@ -4,7 +4,7 @@ import {ListResponse} from "../model/responses";
 import {ModifyingEndpoint, SimpleSearchEndpoint, TimeBasedEndpoint, ViewAllEndpoint} from "./endpoint";
 import {ExpenseTemplatesTable, ExpensesTable, ScheduledExpensesTable} from "../components/Expenses-Table";
 import {dateStructNow} from "../model/common";
-import {ExpenseEditor, ExpenseTemplateEditor} from "../components/Expense-Editor";
+import {ExpenseEditor, ExpenseTemplateEditor, ScheduledExpenseEditor} from "../components/Expense-Editor";
 
 function emptyBaseExpense(): BaseExpense {
     return {
@@ -159,11 +159,18 @@ export class ScheduledExpenseEndpoint extends BasicExpenseEndpoint<ScheduledExpe
     }
 
     createStarterObject(): ScheduledExpense {
-        return null!;
+        return {
+            ...emptyBaseExpense(),
+            startDate: dateStructNow(),
+            endDate: undefined,
+            schedule: {
+                dayOfMonth: 1
+            }
+        };
     }
 
     renderEditor(object: ScheduledExpense): JSX.Element {
-        return null!;
+        return <ScheduledExpenseEditor endpoint={this} initialExpense={object}/>
     }
 
     renderData(data: ListResponse<ScheduledExpense>, filter: string): JSX.Element {
