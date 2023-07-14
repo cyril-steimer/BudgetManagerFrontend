@@ -33,16 +33,9 @@ type ExpenseImplementation<ExpenseTypes> = ExpenseTypes extends TemplateType
 
 interface BaseExpenseEditorParameters<T extends ExpenseSelector> {
     endpoint: ModifyingEndpoint<ExpenseImplementation<T>>;
-    initialExpense: ExpenseImplementation<T>;
+    initialExpense: InitialExpense;
     type: T;
     mode: EditorMode;
-}
-
-function as<T extends ExpenseSelector>(expected: T, actual: ExpenseSelector, expense: ExpenseImplementation<ExpenseSelector>): ExpenseImplementation<T> | undefined {
-    if (expected === actual) {
-        return expense as ExpenseImplementation<T>;
-    }
-    return undefined;
 }
 
 type FullExpense = {
@@ -97,18 +90,16 @@ function getScheduleGroup(schedule: Schedule): string {
 
 function BaseExpenseEditor<T extends ExpenseSelector>({type, initialExpense, endpoint, mode}: BaseExpenseEditorParameters<T>) {
 
-    const [name, setName] = useState(initialExpense.name.name);
-    const [amount, setAmount] = useState(initialExpense.amount.amount.toFixed(2));
-    const [category, setCategory] = useState(initialExpense.category.name);
-    const [date, setDate] = useState(as('expense', type, initialExpense)?.date ?? dateStructNow());
-    const [method, setMethod] = useState(initialExpense.method.name);
-    const [author, setAuthor] = useState(initialExpense.author.name);
-    const [tags, setTags] = useState(initialExpense.tags.map(t => t.name));
-    const [startDate, setStartDate] = useState(as('schedule', type, initialExpense)?.startDate ?? dateStructNow());
-    const [endDate, setEndDate] = useState(as('schedule', type, initialExpense)?.endDate);
-    const [schedule, setSchedule] = useState(as('schedule', type, initialExpense)?.schedule ?? defaultSchedule)
-
-
+    const [name, setName] = useState(initialExpense?.name?.name ?? '');
+    const [amount, setAmount] = useState((initialExpense?.amount?.amount ?? 0).toFixed(2));
+    const [category, setCategory] = useState(initialExpense?.category?.name ?? '');
+    const [date, setDate] = useState(initialExpense?.date ?? dateStructNow());
+    const [method, setMethod] = useState(initialExpense?.method?.name ?? '');
+    const [author, setAuthor] = useState(initialExpense?.author?.name ?? '');
+    const [tags, setTags] = useState((initialExpense?.tags ?? []).map(t => t.name));
+    const [startDate, setStartDate] = useState(initialExpense?.startDate ?? dateStructNow());
+    const [endDate, setEndDate] = useState(initialExpense?.endDate);
+    const [schedule, setSchedule] = useState(initialExpense?.schedule ?? defaultSchedule);
 
     const [categoryOptions, setCategoryOptions] = useState<string[]>(['woohoo']);
     const [authorOptions, setAuthorOptions] = useState<string[]>();
@@ -290,9 +281,17 @@ function BaseExpenseEditor<T extends ExpenseSelector>({type, initialExpense, end
     );
 }
 
+/**
+ * The `InitialExpense` type allows clients to specify an expense partially for the editor.
+ * This has two benefits:
+ * - Clients only need to specify what they really care about. Default values will be used for everything else.
+ * - It allows for conversion between different expense types, e.g. pre-filling all the fields for an expense from a template (except the date, which is missing in the template).
+ */
+export type InitialExpense = Partial<Omit<FullExpense, 'id'>> & Pick<Expense, 'id'>;
+
 export interface ExpenseEditorParameters<E extends BaseExpense> {
     endpoint: ModifyingEndpoint<E>;
-    initialExpense: E;
+    initialExpense: InitialExpense;
     mode: EditorMode;
 }
 

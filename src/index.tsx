@@ -67,7 +67,7 @@ function modifyingRouteObjects<T>(endpoint: ModifyingEndpoint<T>): RouteObject[]
         {
             path: endpoint.addPath,
             element: <EditWrapper endpoint={endpoint} mode='add'/>,
-            loader: addLoader(endpoint)
+            loader: addLoader()
         },
         {
             path: `${endpoint.editPathPrefix}/:id`,

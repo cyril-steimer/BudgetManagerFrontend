@@ -62,8 +62,8 @@ export function getSimpleSearchUrl<T>(endpoint: SimpleSearchEndpoint<T>, field: 
     return `/${endpoint.simpleSearchPathPrefix}/${field}/${encodeURIComponent(value)}`;
 }
 
-export function addLoader<T>(endpoint: ModifyingEndpoint<T>): Loader<T> {
-    return () => Promise.resolve(endpoint.createStarterObject());
+export function addLoader(): Loader<null> {
+    return () => Promise.resolve(null);
 }
 
 export function getAddUrl<T>(endpoint: ModifyingEndpoint<T>): string {
@@ -194,7 +194,7 @@ export function SimpleSearchWrapper<T>({endpoint}: {endpoint: SimpleSearchEndpoi
 }
 
 export function EditWrapper<T>({endpoint, mode}: {endpoint: ModifyingEndpoint<T>, mode: EditorMode}) {
-    const data = useLoaderData() as T;
+    const data = useLoaderData() as T | null;
 
     return (
         <div>
@@ -202,7 +202,7 @@ export function EditWrapper<T>({endpoint, mode}: {endpoint: ModifyingEndpoint<T>
             <Typography variant='h5' sx={{marginTop: '20px', marginBottom: '20px'}}>
                 {endpoint.addText}
             </Typography>
-            {endpoint.renderEditor(data, mode)}
+            {endpoint.renderEditor(data ?? undefined, mode)}
         </div>
     );
 }

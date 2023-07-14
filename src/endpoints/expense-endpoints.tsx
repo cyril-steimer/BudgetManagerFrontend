@@ -3,30 +3,9 @@ import {BaseExpense, Expense, ExpenseTemplate, ScheduledExpense} from "../model/
 import {ListResponse} from "../model/responses";
 import {EditorMode, ModifyingEndpoint, SimpleSearchEndpoint, TimeBasedEndpoint, ViewAllEndpoint} from "./endpoint";
 import {ExpenseTemplatesTable, ExpensesTable, ScheduledExpensesTable} from "../components/Expenses-Table";
-import {dateStructNow} from "../model/common";
-import {ExpenseEditor, ExpenseTemplateEditor, ScheduledExpenseEditor} from "../components/Expense-Editor";
+import {ExpenseEditor, ExpenseTemplateEditor, InitialExpense, ScheduledExpenseEditor} from "../components/Expense-Editor";
 
-function emptyBaseExpense(): BaseExpense {
-    return {
-        id: '',
-        name: {
-            name: ''
-        },
-        amount: {
-            amount: 1
-        },
-        category: {
-            name: ''
-        },
-        method: {
-            name: ''
-        },
-        author: {
-            name: ''
-        },
-        tags: []
-    };
-}
+const emptyInitialExpense: InitialExpense = { id: '' };
 
 abstract class BasicExpenseEndpoint<T extends BaseExpense> implements ViewAllEndpoint<ListResponse<T>>, SimpleSearchEndpoint<ListResponse<T>>, ModifyingEndpoint<T> {
 
@@ -67,10 +46,8 @@ abstract class BasicExpenseEndpoint<T extends BaseExpense> implements ViewAllEnd
     }
 
     abstract renderData(data: ListResponse<T>, filter: string): JSX.Element;
-    
-    abstract createStarterObject(): T;
 
-    abstract renderEditor(object: T, mode: EditorMode): JSX.Element;
+    abstract renderEditor(object: T | undefined, mode: EditorMode): JSX.Element;
 
     protected async searchData(query: object): Promise<ListResponse<T>> {
         const url = `/api/v1/${this.endpoint}/search?sort=date&dir=desc`;
@@ -110,16 +87,9 @@ export class ExpenseEndpoint extends BasicExpenseEndpoint<Expense> implements Ti
     loadDataForFilter(filter: string): Promise<ListResponse<Expense>> {
         return this.loadAllDataAtUrl(`/api/v1/${this.endpoint}/search/${encodeURIComponent(filter)}`);
     }
-
-    createStarterObject(): Expense {
-        return {
-            ...emptyBaseExpense(),
-            date: dateStructNow()
-        };
-    }
     
-    renderEditor(object: Expense, mode: EditorMode): JSX.Element {
-        return <ExpenseEditor endpoint={this} initialExpense={object} mode={mode}/>
+    renderEditor(object: Expense | undefined, mode: EditorMode): JSX.Element {
+        return <ExpenseEditor endpoint={this} initialExpense={object ??  emptyInitialExpense} mode={mode}/>
     }
 
     private date(year: number, month?: number): dayjs.Dayjs {
@@ -160,19 +130,8 @@ export class ScheduledExpenseEndpoint extends BasicExpenseEndpoint<ScheduledExpe
         super('schedules', 'Add Scheduled Expense', false);
     }
 
-    createStarterObject(): ScheduledExpense {
-        return {
-            ...emptyBaseExpense(),
-            startDate: dateStructNow(),
-            endDate: undefined,
-            schedule: {
-                dayOfMonth: 1
-            }
-        };
-    }
-
-    renderEditor(object: ScheduledExpense, mode: EditorMode): JSX.Element {
-        return <ScheduledExpenseEditor endpoint={this} initialExpense={object} mode={mode}/>
+    renderEditor(object: ScheduledExpense | undefined, mode: EditorMode): JSX.Element {
+        return <ScheduledExpenseEditor endpoint={this} initialExpense={object ?? emptyInitialExpense} mode={mode}/>
     }
 
     renderData(data: ListResponse<ScheduledExpense>, filter: string): JSX.Element {
@@ -186,12 +145,8 @@ export class ExpenseTemplateEndpoint extends BasicExpenseEndpoint<ExpenseTemplat
         super('templates', 'Add Expense Template', false);
     }
 
-    createStarterObject(): ExpenseTemplate {
-        return emptyBaseExpense();
-    }
-
-    renderEditor(object: Expense, mode: EditorMode): JSX.Element {
-        return <ExpenseTemplateEditor endpoint={this} initialExpense={object} mode={mode}/>;
+    renderEditor(object: Expense | undefined, mode: EditorMode): JSX.Element {
+        return <ExpenseTemplateEditor endpoint={this} initialExpense={object ?? emptyInitialExpense} mode={mode}/>;
     }
 
     renderData(data: ListResponse<ExpenseTemplate>, filter: string): JSX.Element {
