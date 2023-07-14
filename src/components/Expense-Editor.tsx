@@ -8,8 +8,9 @@ import SendIcon from '@mui/icons-material/Send';
 import {useIsNavigating} from "../hooks/hooks";
 import {useNavigate} from "react-router-dom";
 import {EditorMode, ModifyingEndpoint} from "../endpoints/endpoint";
-import {submitData} from "../routes/Endpoint-Routes";
+import {deleteData, submitData} from "../routes/Endpoint-Routes";
 import {getAllAuthors, getAllBudgetCategories, getAllPaymentMethods, getAllTags} from "../endpoints/helpers";
+import DeleteIcon from '@mui/icons-material/Delete';
 
 function namedObject(value: string): NamedObject {
     return {
@@ -145,6 +146,11 @@ function BaseExpenseEditor<T extends ExpenseSelector>({type, initialExpense, end
         await submitData(endpoint, httpMethod, expense, setSubmitting);
         navigate(-1); // Go back to the previous page
     }
+    
+    async function deleteExpense() {
+        await deleteData(endpoint, initialExpense.id, setSubmitting);
+        navigate(-1); // Go back to the previous page
+    }
 
     useEffect(() => loadAutocompleteData(getAllBudgetCategories, setCategoryOptions), []);
     useEffect(() => loadAutocompleteData(getAllAuthors, setAuthorOptions), []);
@@ -268,6 +274,17 @@ function BaseExpenseEditor<T extends ExpenseSelector>({type, initialExpense, end
                 >
                     Submit
                 </Button>
+                {mode === 'edit' && 
+                    <Button
+                        endIcon={<DeleteIcon/>}
+                        variant='outlined'
+                        color='error'
+                        disabled={isNavigating}
+                        onClick={deleteExpense}
+                >
+                    Delete
+                </Button>
+                }
             </Stack>
         </Box>
     );

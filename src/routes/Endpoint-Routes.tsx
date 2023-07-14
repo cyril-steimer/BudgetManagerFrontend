@@ -87,10 +87,10 @@ export function getEditUrl<T>(endpoint: ModifyingEndpoint<T>, id: string): strin
 
 export async function submitData<T>(
     endpoint: ModifyingEndpoint<T>,
-    method: 'post' | 'put' | 'delete',
+    method: 'post' | 'put',
     data: T,
     setSubmitting: (submitting: boolean) => void
-) {
+): Promise<void> {
     setSubmitting(true);
     await fetch(endpoint.modifyingApiEndpoint, {
         method: method,
@@ -98,6 +98,18 @@ export async function submitData<T>(
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(data)
+    });
+    setSubmitting(false);
+}
+
+export async function deleteData<T>(
+    endpoint: ModifyingEndpoint<T>,
+    id: string,
+    setSubmitting: (submitting: boolean) => void
+): Promise<void> {
+    setSubmitting(true);
+    await fetch(`${endpoint.modifyingApiEndpoint}?id=${encodeURIComponent(id)}`, {
+        method: 'delete'
     });
     setSubmitting(false);
 }
