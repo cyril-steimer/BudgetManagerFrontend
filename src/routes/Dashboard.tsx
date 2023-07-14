@@ -1,17 +1,16 @@
 import {useNavigate} from 'react-router-dom';
 import dayjs from 'dayjs';
 import {useIsNavigating} from '../hooks/hooks';
-import {Button, Card, CardActions, CardContent, CardHeader, cardHeaderClasses, Fab, Menu, MenuItem, TextField, Typography} from '@mui/material';
+import {Button, Card, CardActions, CardContent, CardHeader, cardHeaderClasses, TextField, Typography} from '@mui/material';
 import Grid2 from '@mui/material/Unstable_Grid2';
 import {styled} from '@mui/material/styles';
 import {useState} from 'react';
 import {Expense} from '../model/expense';
 import {ExpensesTable} from '../components/Expenses-Table';
 import {ExpenseEndpoint, ExpenseTemplateEndpoint, ScheduledExpenseEndpoint} from '../endpoints/expense-endpoints';
-import {ModifyingEndpoint, QueryingEndpoint, isTimeBasedEndpoint, isViewAllEndpoint} from '../endpoints/endpoint';
-import {getAddUrl, getMonthlyDataUrl, getYearlyDataUrl} from './Endpoint-Routes';
+import {QueryingEndpoint, isTimeBasedEndpoint, isViewAllEndpoint} from '../endpoints/endpoint';
+import {getMonthlyDataUrl, getYearlyDataUrl} from './Endpoint-Routes';
 import {BudgetInPeriodEndpoint} from '../endpoints/budget-endpoints';
-import AddIcon from '@mui/icons-material/Add';
 
 const StyledCardHeader = styled(CardHeader)(({theme}) => ({
     [`&.${cardHeaderClasses.root}`]: {
@@ -75,16 +74,6 @@ function cardButtons<T>(endpoint: QueryingEndpoint<T>, viewAllText?: string): Ca
     return result;
 }
 
-function AddMenuItem<T>({endpoint}: {endpoint: ModifyingEndpoint<T>}) {
-    const navigate = useNavigate();
-
-    return (
-        <MenuItem onClick={() => navigate(getAddUrl(endpoint))}>
-            {endpoint.addText}
-        </MenuItem>
-    );
-}
-
 export default function Dashboard() {
     const [loadingExpenses, setLoadingExpenses] = useState(false);
     const [expenses, setExpenses] = useState<Expense[]>();
@@ -105,10 +94,6 @@ export default function Dashboard() {
             setLoadingExpenses(false);
         }
     }
-
-    const [addMenuAnchor, setAddMenuAnchor] = useState<HTMLElement | undefined>();
-    const openAddMenu = addMenuAnchor !== undefined;
-    const closeAddMenu = () => setAddMenuAnchor(undefined);
 
     return (
         <div>
@@ -175,22 +160,6 @@ export default function Dashboard() {
                     buttons={cardButtons(scheduledExpenseEndpoint, 'All Scheduled Expenses')}
                 />
             </Grid2>
-            <Fab
-                color='primary'
-                sx={{position: 'absolute', bottom: 16, right: 16}}
-                onClick={event => setAddMenuAnchor(event.currentTarget)}
-            >
-                <AddIcon/>
-            </Fab>
-            <Menu
-                open={openAddMenu}
-                anchorEl={addMenuAnchor}
-                onClose={closeAddMenu}
-            >
-                <AddMenuItem endpoint={expenseEndpoint}/>
-                <AddMenuItem endpoint={expenseTemplateEndpoint}/>
-                <AddMenuItem endpoint={scheduledExpenseEndpoint}/>
-            </Menu>
         </div>
     );
 }
