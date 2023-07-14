@@ -5,6 +5,7 @@ import AddIcon from '@mui/icons-material/Add';
 import {useState} from 'react';
 import {getAddUrl} from './Endpoint-Routes';
 import {ModifyingEndpoint} from '../endpoints/endpoint';
+import {BudgetEndpoint} from '../endpoints/budget-endpoints';
 
 function AddMenuItem<T>({endpoint, close}: {endpoint: ModifyingEndpoint<T>, close: () => void}) {
     const navigate = useNavigate();
@@ -29,6 +30,7 @@ export default function Root() {
     const expenseEndpoint = new ExpenseEndpoint();
     const expenseTemplateEndpoint = new ExpenseTemplateEndpoint();
     const scheduledExpenseEndpoint = new ScheduledExpenseEndpoint();
+    const budgetEndpoint = new BudgetEndpoint();
 
     return (
         <div>
@@ -48,6 +50,7 @@ export default function Root() {
                 <AddMenuItem endpoint={expenseEndpoint} close={closeAddMenu}/>
                 <AddMenuItem endpoint={expenseTemplateEndpoint} close={closeAddMenu}/>
                 <AddMenuItem endpoint={scheduledExpenseEndpoint} close={closeAddMenu}/>
+                <AddMenuItem endpoint={budgetEndpoint} close={closeAddMenu}/>
             </Menu>
         </div>
     );

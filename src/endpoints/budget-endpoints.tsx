@@ -1,11 +1,13 @@
+import {BudgetEditor} from "../components/Budget-Editor";
 import {BudgetTable} from "../components/Budget-Table";
-import {BudgetInPeriod, BudgetInPeriodWithExpenses} from "../model/budget";
+import {Budget, BudgetInPeriod, BudgetInPeriodWithExpenses} from "../model/budget";
 import {DECEMBER, JANUARY} from "../model/common";
 import {ListResponse} from "../model/responses";
-import {QueryingEndpoint, TimeBasedEndpoint} from "./endpoint";
+import {EditorMode, ModifyingEndpoint, QueryingEndpoint, TimeBasedEndpoint} from "./endpoint";
 import {ExpenseEndpoint} from "./expense-endpoints";
 
-export class BudgetInPeriodEndpoint implements QueryingEndpoint<BudgetInPeriodWithExpenses[]>, TimeBasedEndpoint<BudgetInPeriodWithExpenses[]> {
+export class BudgetEndpoint implements QueryingEndpoint<BudgetInPeriodWithExpenses[]>, TimeBasedEndpoint<BudgetInPeriodWithExpenses[]>, ModifyingEndpoint<Budget> {
+    
     readonly endpoint = 'budget';
     readonly supportsTimeBasedNavigation = true;
     readonly supportsViewAll = false;
@@ -13,8 +15,22 @@ export class BudgetInPeriodEndpoint implements QueryingEndpoint<BudgetInPeriodWi
     readonly supportsFiltering = false;
     readonly timeBasedPathPrefix = 'budget';
 
+    readonly addText = 'Add Budget';
+    readonly addPath = 'add/budget';
+    readonly editText = 'Edit Budget';
+    readonly editPathPrefix = 'edit/budget';
+    readonly modifyingApiEndpoint = '/api/v1/budget';
+
     renderData(data: BudgetInPeriodWithExpenses[], filter: string): JSX.Element {
         return <BudgetTable budgets={data}/>;
+    }
+
+    async loadExistingObject(id: string): Promise<Budget> {
+        throw new Error("Method not implemented.");
+    }
+
+    renderEditor(object: Partial<Budget>, mode: EditorMode): JSX.Element {
+        return <BudgetEditor endpoint={this} initialBudget={object} mode={mode}/>
     }
 
     async loadDataForTime(year: number, month?: number | undefined): Promise<BudgetInPeriodWithExpenses[]> {

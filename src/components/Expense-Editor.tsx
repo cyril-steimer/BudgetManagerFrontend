@@ -1,22 +1,13 @@
 import {BaseExpense, Expense, ExpenseTemplate, Schedule, ScheduledExpense, allSchedules, isMonthlySchedule, isWeeklySchedule, scheduleToString} from "../model/expense";
 import {useEffect, useState} from "react";
-import {Autocomplete, Box, Button, Stack, TextField} from "@mui/material";
-import {NamedObject, compareDateStruct, dateStructNow} from "../model/common";
-import {DateStructPicker, CurrencyAmountInput, TextInput, commonTextFieldProperties, Dropdown} from "./Editor";
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import SendIcon from '@mui/icons-material/Send';
+import {Autocomplete, Box, TextField} from "@mui/material";
+import {compareDateStruct, dateStructNow, namedObject} from "../model/common";
+import {DateStructPicker, CurrencyAmountInput, TextInput, commonTextFieldProperties, Dropdown, EditButtons} from "./Editor";
 import {useIsNavigating} from "../hooks/hooks";
 import {useNavigate} from "react-router-dom";
 import {EditorMode, ModifyingEndpoint} from "../endpoints/endpoint";
-import {deleteData, submitData} from "../routes/Endpoint-Routes";
+import { submitData} from "../routes/Endpoint-Routes";
 import {getAllAuthors, getAllBudgetCategories, getAllPaymentMethods, getAllTags} from "../endpoints/helpers";
-import DeleteIcon from '@mui/icons-material/Delete';
-
-function namedObject(value: string): NamedObject {
-    return {
-        name: value
-    };
-}
 
 function loadAutocompleteData(loaderFunc: () => Promise<string[]>, setData: (values: string[]) => void) {
     loaderFunc().then(promise => setData(promise.sort())); // TODO Error handling
@@ -107,7 +98,7 @@ function BaseExpenseEditor<T extends ExpenseSelector>({type, initialExpense, end
     const [tagOptions, setTagOptions] = useState<string[]>();
 
     let categoryOptions = categoryOptionsFromBackend;
-    if (categoryOptions.indexOf(category) < 0) {
+    if (categoryOptions.indexOf(category) < 0 && category !== '') {
         // Ensure the active category can always be selected
         categoryOptions = [...categoryOptions, category].sort();
     }
@@ -139,13 +130,7 @@ function BaseExpenseEditor<T extends ExpenseSelector>({type, initialExpense, end
             endDate,
             schedule
         });
-        const httpMethod = mode === 'add' ? 'post' : 'put';
-        await submitData(endpoint, httpMethod, expense, setSubmitting);
-        navigate(-1); // Go back to the previous page
-    }
-    
-    async function deleteExpense() {
-        await deleteData(endpoint, initialExpense.id, setSubmitting);
+        await submitData(endpoint, mode, expense, setSubmitting);
         navigate(-1); // Go back to the previous page
     }
 
@@ -166,8 +151,10 @@ function BaseExpenseEditor<T extends ExpenseSelector>({type, initialExpense, end
             <CurrencyAmountInput
                 label='Amount'
                 value={amount}
-                setValue={setAmount}
-                setValid={setAmountValid}
+                setValue={(value, valid) => {
+                    setAmount(value);
+                    setAmountValid(valid);
+                }}
                 disabled={isNavigating}
             />
             <Dropdown
@@ -255,35 +242,15 @@ function BaseExpenseEditor<T extends ExpenseSelector>({type, initialExpense, end
                     />
                 )}
             />
-            <Stack sx={{marginTop: '20px'}} direction='row' spacing={1}>
-                <Button
-                    startIcon={<ArrowBackIcon/>}
-                    variant='outlined'
-                    disabled={isNavigating}
-                    onClick={() => navigate(-1)}
-                >
-                    Back
-                </Button>
-                <Button
-                    endIcon={<SendIcon/>}
-                    variant='contained'
-                    disabled={isNavigating || anyError}
-                    onClick={submitExpense}
-                >
-                    Submit
-                </Button>
-                {mode === 'edit' && 
-                    <Button
-                        endIcon={<DeleteIcon/>}
-                        variant='outlined'
-                        color='error'
-                        disabled={isNavigating}
-                        onClick={deleteExpense}
-                >
-                    Delete
-                </Button>
-                }
-            </Stack>
+            <EditButtons
+                mode={mode}
+                endpoint={endpoint}
+                id={initialExpense.id}
+                hasError={anyError}
+                isNavigating={isNavigating}
+                setSubmitting={setSubmitting}
+                onSubmit={submitExpense}
+            />
         </Box>
     );
 }

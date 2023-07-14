@@ -1,4 +1,4 @@
-import {Amount, NamedObject} from "./common";
+import {Amount, MonthYear, NamedObject} from "./common";
 import {Expense} from "./expense";
 
 export interface BudgetInPeriod {
@@ -9,4 +9,18 @@ export interface BudgetInPeriod {
 export class BudgetInPeriodWithExpenses {
     constructor(readonly budget: BudgetInPeriod, readonly expenses: Expense[]) {
     }
+}
+
+export type BudgetAmountPeriod = 'monthly' | 'yearly';
+
+export interface BudgetAmount {
+    amount: Amount;
+    period: BudgetAmountPeriod,
+    from: MonthYear;
+    to: MonthYear;
+}
+
+export interface Budget {
+    category: NamedObject;
+    amounts: BudgetAmount[];
 }

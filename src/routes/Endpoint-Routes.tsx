@@ -91,10 +91,11 @@ export function getDuplicateUrl<T, U>(targetEndpoint: ModifyingEndpoint<T>, sour
 
 export async function submitData<T>(
     endpoint: ModifyingEndpoint<T>,
-    method: 'post' | 'put',
+    mode: EditorMode,
     data: T,
     setSubmitting: (submitting: boolean) => void
 ): Promise<void> {
+    const method = mode === 'add' ? 'post' : 'put';
     setSubmitting(true);
     await fetch(endpoint.modifyingApiEndpoint, {
         method: method,

@@ -22,16 +22,16 @@ import '@fontsource/roboto/700.css';
 import {CurrencyContext} from './context/contexts';
 import {ExpenseEndpoint, ExpenseTemplateEndpoint, ScheduledExpenseEndpoint} from './endpoints/expense-endpoints';
 import {ModifyingEndpoint, QueryingEndpoint, isSimpleSearchEndpoint, isTimeBasedEndpoint, isViewAllEndpoint} from './endpoints/endpoint';
-import {BudgetInPeriodEndpoint} from './endpoints/budget-endpoints';
+import {BudgetEndpoint} from './endpoints/budget-endpoints';
 import {LocalizationProvider} from '@mui/x-date-pickers';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
 import 'dayjs/locale/de-ch';
 import {Container} from '@mui/material';
 import {BaseExpense} from './model/expense';
 
-const queryingEndpoints: QueryingEndpoint<any>[] = [new ExpenseEndpoint(), new ScheduledExpenseEndpoint(), new ExpenseTemplateEndpoint(), new BudgetInPeriodEndpoint()];
+const queryingEndpoints: QueryingEndpoint<any>[] = [new ExpenseEndpoint(), new ScheduledExpenseEndpoint(), new ExpenseTemplateEndpoint(), new BudgetEndpoint()];
 const modifyingExpenseEndpoints: ModifyingEndpoint<BaseExpense>[] = [new ExpenseEndpoint(), new ScheduledExpenseEndpoint(), new ExpenseTemplateEndpoint()];
-const modifyingEndpoints: ModifyingEndpoint<any>[] = modifyingExpenseEndpoints;
+const modifyingEndpoints: ModifyingEndpoint<any>[] = [...modifyingExpenseEndpoints, new BudgetEndpoint()];
 
 function queryingRouteObjects<T>(endpoint: QueryingEndpoint<T>): RouteObject[] {
     const result: RouteObject[] = [];

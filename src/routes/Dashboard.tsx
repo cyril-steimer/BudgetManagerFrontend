@@ -10,7 +10,7 @@ import {ExpensesTable} from '../components/Expenses-Table';
 import {ExpenseEndpoint, ExpenseTemplateEndpoint, ScheduledExpenseEndpoint} from '../endpoints/expense-endpoints';
 import {QueryingEndpoint, isTimeBasedEndpoint, isViewAllEndpoint} from '../endpoints/endpoint';
 import {getMonthlyDataUrl, getYearlyDataUrl} from './Endpoint-Routes';
-import {BudgetInPeriodEndpoint} from '../endpoints/budget-endpoints';
+import {BudgetEndpoint} from '../endpoints/budget-endpoints';
 
 const StyledCardHeader = styled(CardHeader)(({theme}) => ({
     [`&.${cardHeaderClasses.root}`]: {
@@ -137,7 +137,7 @@ export default function Dashboard() {
                     title="Budget"
                     text="Check the state of your budget during the current month or year"
                     disableButtons={disableButtons}
-                    buttons={cardButtons(new BudgetInPeriodEndpoint())}
+                    buttons={cardButtons(new BudgetEndpoint())}
                 />
                 <DashboardCard
                     title="Import/Export"

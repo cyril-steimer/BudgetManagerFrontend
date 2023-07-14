@@ -4,6 +4,12 @@ export interface NamedObject {
     name: string;
 }
 
+export function namedObject(value: string): NamedObject {
+    return {
+        name: value
+    };
+}
+
 export interface Amount {
     amount: number;
 }
@@ -72,6 +78,38 @@ export function compareDateStruct(a: DateStruct | undefined, b: DateStruct | und
         return 1;
     }
     return dateStructToDayJsObject(a).valueOf() - dateStructToDayJsObject(b).valueOf();
+}
+
+export interface MonthYear {
+    month: number;
+    year: number;
+}
+
+export function dayJsObjectToMonthYear(date: dayjs.Dayjs): MonthYear;
+export function dayJsObjectToMonthYear(date: dayjs.Dayjs | undefined): MonthYear | undefined;
+export function dayJsObjectToMonthYear(date: dayjs.Dayjs | undefined): MonthYear | undefined {
+    if (date === undefined) {
+        return undefined;
+    }
+    return {
+        month: date.month() + 1, // Months in the Backend are 1-based
+        year: date.year()
+    };
+}
+
+export function monthYearToDayJsObject(monthYear: MonthYear): dayjs.Dayjs;
+export function monthYearToDayJsObject(monthYear: MonthYear | undefined): dayjs.Dayjs | undefined;
+export function monthYearToDayJsObject(monthYear: MonthYear | undefined): dayjs.Dayjs | undefined {
+    if (monthYear === undefined) {
+        return undefined;
+    }
+    // Months in the Backend are 1-based
+   const jsDate = new Date(monthYear.year, monthYear.month - 1, 1);
+   return dayjs(jsDate);
+}
+
+export function compareMonthYear(a: MonthYear, b: MonthYear): number {
+    return monthYearToDayJsObject(a).valueOf() - monthYearToDayJsObject(b).valueOf();
 }
 
 export function compareAmount(a: Amount, b: Amount): number {
