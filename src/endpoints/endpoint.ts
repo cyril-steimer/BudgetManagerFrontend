@@ -40,6 +40,8 @@ export type EditorMode = 'add' | 'edit';
 export interface ModifyingEndpoint<T> extends Endpoint {
     readonly addText: string;
     readonly addPath: string;
+
+    readonly editText: string;
     readonly editPathPrefix: string;
 
     readonly modifyingApiEndpoint: string;

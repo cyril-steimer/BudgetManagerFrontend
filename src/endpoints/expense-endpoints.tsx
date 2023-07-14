@@ -26,7 +26,7 @@ abstract class BasicExpenseEndpoint<T extends BaseExpense> implements ViewAllEnd
     readonly editPathPrefix: string;
     readonly modifyingApiEndpoint: string;
 
-    constructor(readonly endpoint: string, readonly addText: string, readonly supportsTimeBasedNavigation: boolean) {
+    constructor(readonly endpoint: string, readonly addText: string, readonly editText: string, readonly supportsTimeBasedNavigation: boolean) {
         this.viewAllPath = endpoint;
         this.timeBasedPathPrefix = endpoint;
         this.simpleSearchPathPrefix = `${endpoint}/field`;
@@ -76,7 +76,7 @@ abstract class BasicExpenseEndpoint<T extends BaseExpense> implements ViewAllEnd
 export class ExpenseEndpoint extends BasicExpenseEndpoint<Expense> implements TimeBasedEndpoint<ListResponse<Expense>> {
 
     constructor() {
-        super('expenses', 'Add Expense', true);
+        super('expenses', 'Add Expense', 'Edit Expense', true);
     }
 
     renderData(data: ListResponse<Expense>, filter: string): JSX.Element {
@@ -132,7 +132,7 @@ export class ExpenseEndpoint extends BasicExpenseEndpoint<Expense> implements Ti
 export class ScheduledExpenseEndpoint extends BasicExpenseEndpoint<ScheduledExpense> {
 
     constructor() {
-        super('schedules', 'Add Scheduled Expense', false);
+        super('schedules', 'Add Scheduled Expense', 'Edit Scheduled Expense', false);
     }
 
     renderEditor(object: Partial<ScheduledExpense>, mode: EditorMode): JSX.Element {
@@ -147,7 +147,7 @@ export class ScheduledExpenseEndpoint extends BasicExpenseEndpoint<ScheduledExpe
 export class ExpenseTemplateEndpoint extends BasicExpenseEndpoint<ExpenseTemplate> {
 
     constructor() {
-        super('templates', 'Add Expense Template', false);
+        super('templates', 'Add Expense Template', 'Edit Expense Template', false);
     }
 
     renderEditor(object: Partial<Expense>, mode: EditorMode): JSX.Element {

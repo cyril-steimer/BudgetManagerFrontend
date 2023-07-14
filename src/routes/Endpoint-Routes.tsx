@@ -204,7 +204,7 @@ export function EditWrapper<T>({endpoint, mode}: {endpoint: ModifyingEndpoint<T>
         <div>
             <Header/>
             <Typography variant='h5' sx={{marginTop: '20px', marginBottom: '20px'}}>
-                {endpoint.addText}
+                {mode === 'add' ? endpoint.addText : endpoint.editText}
             </Typography>
             {endpoint.renderEditor(data, mode)}
         </div>
