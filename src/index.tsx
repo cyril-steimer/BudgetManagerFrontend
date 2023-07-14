@@ -27,9 +27,11 @@ import {LocalizationProvider} from '@mui/x-date-pickers';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
 import 'dayjs/locale/de-ch';
 import {Container} from '@mui/material';
+import {BaseExpense} from './model/expense';
 
 const queryingEndpoints: QueryingEndpoint<any>[] = [new ExpenseEndpoint(), new ScheduledExpenseEndpoint(), new ExpenseTemplateEndpoint(), new BudgetInPeriodEndpoint()];
-const modifyingEndpoints: ModifyingEndpoint<any>[] = [new ExpenseEndpoint(), new ScheduledExpenseEndpoint(), new ExpenseTemplateEndpoint()];
+const modifyingExpenseEndpoints: ModifyingEndpoint<BaseExpense>[] = [new ExpenseEndpoint(), new ScheduledExpenseEndpoint(), new ExpenseTemplateEndpoint()];
+const modifyingEndpoints: ModifyingEndpoint<any>[] = modifyingExpenseEndpoints;
 
 function queryingRouteObjects<T>(endpoint: QueryingEndpoint<T>): RouteObject[] {
     const result: RouteObject[] = [];
@@ -77,12 +79,27 @@ function modifyingRouteObjects<T>(endpoint: ModifyingEndpoint<T>): RouteObject[]
     ];
 }
 
+function duplicatingRouteObjects<T extends BaseExpense>(endpoints: ModifyingEndpoint<T>[]): RouteObject[] {
+    const result: RouteObject[] = [];
+    for (let duplicationTarget of endpoints) {
+        for (let duplicationSource of endpoints) {
+            result.push({
+                path: `${duplicationTarget.addPath}/copy/${duplicationSource.endpoint}/:id`,
+                element: <EditWrapper endpoint={duplicationTarget} mode='add'/>,
+                loader: editLoader(duplicationSource)
+            });
+        }
+    }
+    return result;
+}
+
 const allRouteObjects: RouteObject[] = [{
     index: true,
     element: <Dashboard/>
 }];
 allRouteObjects.push(...queryingEndpoints.flatMap(endpoint => queryingRouteObjects(endpoint)));
 allRouteObjects.push(...modifyingEndpoints.flatMap(endpoint => modifyingRouteObjects(endpoint)));
+allRouteObjects.push(...duplicatingRouteObjects(modifyingExpenseEndpoints));
 
 const router = createBrowserRouter([
     {

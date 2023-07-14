@@ -1,14 +1,17 @@
 import {BaseExpense, Expense, ExpenseTemplate, ScheduledExpense, scheduleToString, sumAmount} from '../model/expense';
 import {DataTable, ColumnSettings, ColumnSettingsInterface} from './Data-Table';
 import {compareAmount, compareDateStruct, compareNamedObject, dateStructToISO8601String, NamedObject} from '../model/common';
-import {Chip, IconButton} from '@mui/material';
+import {Chip, IconButton, Menu, MenuItem, Tooltip} from '@mui/material';
 import {Link, NavigateFunction, useNavigate} from 'react-router-dom';
 import {useIsNavigating} from '../hooks/hooks';
 import {ModifyingEndpoint, SimpleSearchEndpoint} from '../endpoints/endpoint';
-import {getEditUrl, getSimpleSearchUrl} from '../routes/Endpoint-Routes';
+import {getDuplicateUrl, getEditUrl, getSimpleSearchUrl} from '../routes/Endpoint-Routes';
 import {ListResponse} from '../model/responses';
 import {CurrencyCell} from './Common';
 import EditIcon from '@mui/icons-material/Edit';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import {useState} from 'react';
+import {ExpenseEndpoint, ExpenseTemplateEndpoint, ScheduledExpenseEndpoint} from '../endpoints/expense-endpoints';
 
 function baseExpenseColumnSettings<K extends keyof BaseExpense>(key: K, settings: ColumnSettingsInterface<BaseExpense, K>): ColumnSettings<BaseExpense> {
     return ColumnSettings.of(key, settings);
@@ -34,6 +37,36 @@ export interface ExpensesTableParameters<E extends BaseExpense> {
     filter?: string;
 }
 
+function DuplicateButton<E extends BaseExpense>({sourceEndpoint, id}: {sourceEndpoint: Endpoint<E>, id: string}) {
+    const navigate = useNavigate();
+    const [menuAnchor, setMenuAnchor] = useState<HTMLElement | undefined>();
+    const openMenu = menuAnchor !== undefined;
+    const closeMenu = () => setMenuAnchor(undefined);
+    
+    const targetEndpoints = [new ExpenseEndpoint(), new ScheduledExpenseEndpoint(), new ExpenseTemplateEndpoint()];
+
+    return (
+        <span>
+            <Tooltip title='Duplicate'>
+                <IconButton onClick={event => setMenuAnchor(event.currentTarget)}>
+                    <ContentCopyIcon/>
+                </IconButton>
+            </Tooltip>
+            <Menu
+                open={openMenu}
+                anchorEl={menuAnchor}
+                onClose={closeMenu}
+            >
+                {targetEndpoints.map(targetEndpoint => (
+                    <MenuItem onClick={() => navigate(getDuplicateUrl(targetEndpoint, sourceEndpoint, id))}>
+                        {targetEndpoint.addText}
+                    </MenuItem>
+                ))}
+            </Menu>
+        </span>
+    );
+}
+
 type GetSearchUrl = (field: string, value: string) => string;
 
 class BaseColumns<E extends BaseExpense> {
@@ -44,6 +77,7 @@ class BaseColumns<E extends BaseExpense> {
     readonly author: ColumnSettings<E>;
     readonly tags: ColumnSettings<E>;
     readonly edit: ColumnSettings<E>;
+    readonly duplicate: ColumnSettings<E>;
 
     constructor(endpoint: Endpoint<E>, navigate: NavigateFunction) {
         const getSearchUrl = (field: string, value: string) => getSimpleSearchUrl(endpoint, field, value);
@@ -103,11 +137,18 @@ class BaseColumns<E extends BaseExpense> {
         this.edit = baseExpenseColumnSettings('id', {
             name: '',
             render: id => (
-                <IconButton onClick={() => navigate(getEditUrl(endpoint, id))}>
-                    <EditIcon/>
-                </IconButton>
+                <Tooltip title='Edit'>
+                    <IconButton onClick={() => navigate(getEditUrl(endpoint, id))}>
+                        <EditIcon/>
+                    </IconButton>
+                </Tooltip>
             )
-        })
+        });
+
+        this.duplicate = baseExpenseColumnSettings('id', {
+            name: '',
+            render: id => <DuplicateButton sourceEndpoint={endpoint} id={id}/>
+        });
     }
 }
 
@@ -147,7 +188,7 @@ export function ScheduledExpensesTable({endpoint, expenses, filter}: ExpensesTab
     });
 
     const base = new BaseColumns(endpoint, useNavigate());
-    const columns = [base.name, base.amount, base.category, start, end, schedule, base.method, base.author, base.tags, base.edit];
+    const columns = [base.name, base.amount, base.category, start, end, schedule, base.method, base.author, base.tags, base.edit, base.duplicate];
 
     return <DataTable
         values={expenses}
@@ -159,7 +200,7 @@ export function ScheduledExpensesTable({endpoint, expenses, filter}: ExpensesTab
 
 export function ExpenseTemplatesTable({endpoint, expenses, filter}: ExpensesTableParameters<ExpenseTemplate>) {
     const base = new BaseColumns(endpoint, useNavigate());
-    const columns = [base.name, base.amount, base.category, base.method, base.author, base.tags, base.edit];
+    const columns = [base.name, base.amount, base.category, base.method, base.author, base.tags, base.edit, base.duplicate];
 
     return <DataTable
         values={expenses}
@@ -177,7 +218,7 @@ export function ExpensesTable({endpoint, expenses, filter}: ExpensesTableParamet
     });
 
     const base = new BaseColumns(endpoint, useNavigate());
-    const columns = [base.name, base.amount, base.category, date, base.method, base.author, base.tags, base.edit];
+    const columns = [base.name, base.amount, base.category, date, base.method, base.author, base.tags, base.edit, base.duplicate];
 
     return <DataTable
         values={expenses}

@@ -1,9 +1,13 @@
+export interface Endpoint {
+    readonly endpoint: string;
+}
+
 /**
  * A querying endpoint in the frontend/backend.
  * 
  * @param <T> The type of data for the endpoint.
  */
-export interface QueryingEndpoint<T> {
+export interface QueryingEndpoint<T> extends Endpoint {
     readonly supportsTimeBasedNavigation: boolean;
     readonly supportsViewAll: boolean;
     readonly supportsSimpleSearch: boolean;
@@ -33,7 +37,7 @@ export type EditorMode = 'add' | 'edit';
 /**
  * A modifying endpoint in the frontend/backend.
  */
-export interface ModifyingEndpoint<T> {
+export interface ModifyingEndpoint<T> extends Endpoint {
     readonly addText: string;
     readonly addPath: string;
     readonly editPathPrefix: string;
