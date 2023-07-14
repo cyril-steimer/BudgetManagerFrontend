@@ -1,7 +1,7 @@
 import {LoaderFunctionArgs, NavigateFunction, Params, useLoaderData, useNavigate, useParams} from 'react-router-dom';
 import {useState} from 'react';
 import {Header, TimeRangeParameters} from '../components/Header';
-import {ModifyingEndpoint, QueryingEndpoint, SimpleSearchEndpoint, TimeBasedEndpoint, ViewAllEndpoint, isViewAllEndpoint} from '../endpoints/endpoint';
+import {EditorMode, ModifyingEndpoint, QueryingEndpoint, SimpleSearchEndpoint, TimeBasedEndpoint, ViewAllEndpoint, isViewAllEndpoint} from '../endpoints/endpoint';
 import {Chip, Typography} from '@mui/material';
 import {useIsNavigating} from '../hooks/hooks';
 
@@ -68,6 +68,21 @@ export function addLoader<T>(endpoint: ModifyingEndpoint<T>): Loader<T> {
 
 export function getAddUrl<T>(endpoint: ModifyingEndpoint<T>): string {
     return `/${endpoint.addPath}`;
+}
+
+export function editLoader<T>(endpoint: ModifyingEndpoint<T>): Loader<T> {
+    return ({params}: LoaderFunctionArgs) => {
+        const id = params.id;
+        if (id !== undefined) {
+            return endpoint.loadExistingObject(id);
+        }
+        // TODO Better error handling
+        throw new Error('Nope!');
+    };
+}
+
+export function getEditUrl<T>(endpoint: ModifyingEndpoint<T>, id: string): string {
+    return `/${endpoint.editPathPrefix}/${id}`;
 }
 
 export async function submitData<T>(
@@ -166,7 +181,7 @@ export function SimpleSearchWrapper<T>({endpoint}: {endpoint: SimpleSearchEndpoi
     return <EndpointContentWrapper endpoint={endpoint} simpleFilter={simpleFilter}/>
 }
 
-export function AddWrapper<T>({endpoint}: {endpoint: ModifyingEndpoint<T>}) {
+export function EditWrapper<T>({endpoint, mode}: {endpoint: ModifyingEndpoint<T>, mode: EditorMode}) {
     const data = useLoaderData() as T;
 
     return (
@@ -175,7 +190,7 @@ export function AddWrapper<T>({endpoint}: {endpoint: ModifyingEndpoint<T>}) {
             <Typography variant='h5' sx={{marginTop: '20px', marginBottom: '20px'}}>
                 {endpoint.addText}
             </Typography>
-            {endpoint.renderEditor(data)}
+            {endpoint.renderEditor(data, mode)}
         </div>
     );
 }

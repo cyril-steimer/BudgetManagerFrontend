@@ -28,17 +28,21 @@ export interface ViewAllEndpoint<T> extends QueryingEndpoint<T> {
     loadAllData(): Promise<T>;
 }
 
+export type EditorMode = 'add' | 'edit';
+
 /**
  * A modifying endpoint in the frontend/backend.
  */
 export interface ModifyingEndpoint<T> {
     readonly addText: string;
     readonly addPath: string;
+    readonly editPathPrefix: string;
 
     readonly modifyingApiEndpoint: string;
 
+    loadExistingObject(id: string): Promise<T>;
     createStarterObject(): T;
-    renderEditor(object: T): JSX.Element;
+    renderEditor(object: T, mode: EditorMode): JSX.Element;
 }
 
 /**

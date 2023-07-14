@@ -4,7 +4,8 @@ import {createBrowserRouter, RouteObject, RouterProvider} from 'react-router-dom
 import Root from './routes/Root';
 import {
     addLoader,
-    AddWrapper,
+    editLoader,
+    EditWrapper,
     monthlyLoader,
     simpleSearchLoader,
     SimpleSearchWrapper,
@@ -64,8 +65,13 @@ function modifyingRouteObjects<T>(endpoint: ModifyingEndpoint<T>): RouteObject[]
     return [
         {
             path: endpoint.addPath,
-            element: <AddWrapper endpoint={endpoint}/>,
+            element: <EditWrapper endpoint={endpoint} mode='add'/>,
             loader: addLoader(endpoint)
+        },
+        {
+            path: `${endpoint.editPathPrefix}/:id`,
+            element: <EditWrapper endpoint={endpoint} mode='edit'/>,
+            loader: editLoader(endpoint)
         }
     ];
 }

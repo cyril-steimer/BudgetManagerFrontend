@@ -7,7 +7,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SendIcon from '@mui/icons-material/Send';
 import {useIsNavigating} from "../hooks/hooks";
 import {useNavigate} from "react-router-dom";
-import {ModifyingEndpoint} from "../endpoints/endpoint";
+import {EditorMode, ModifyingEndpoint} from "../endpoints/endpoint";
 import {submitData} from "../routes/Endpoint-Routes";
 import {getAllAuthors, getAllBudgetCategories, getAllPaymentMethods, getAllTags} from "../endpoints/helpers";
 
@@ -34,6 +34,7 @@ interface BaseExpenseEditorParameters<T extends ExpenseSelector> {
     endpoint: ModifyingEndpoint<ExpenseImplementation<T>>;
     initialExpense: ExpenseImplementation<T>;
     type: T;
+    mode: EditorMode;
 }
 
 function as<T extends ExpenseSelector>(expected: T, actual: ExpenseSelector, expense: ExpenseImplementation<ExpenseSelector>): ExpenseImplementation<T> | undefined {
@@ -93,7 +94,7 @@ function getScheduleGroup(schedule: Schedule): string {
     throw new Error(`Unsupported schedule: ${JSON.stringify(schedule)}`);
 }
 
-function BaseExpenseEditor<T extends ExpenseSelector>({type, initialExpense, endpoint}: BaseExpenseEditorParameters<T>) {
+function BaseExpenseEditor<T extends ExpenseSelector>({type, initialExpense, endpoint, mode}: BaseExpenseEditorParameters<T>) {
 
     const [name, setName] = useState(initialExpense.name.name);
     const [amount, setAmount] = useState(initialExpense.amount.amount.toFixed(2));
@@ -140,7 +141,8 @@ function BaseExpenseEditor<T extends ExpenseSelector>({type, initialExpense, end
             endDate,
             schedule
         });
-        await submitData(endpoint, 'post', expense, setSubmitting);
+        const httpMethod = mode === 'add' ? 'post' : 'put';
+        await submitData(endpoint, httpMethod, expense, setSubmitting);
         navigate(-1); // Go back to the previous page
     }
 
@@ -274,16 +276,17 @@ function BaseExpenseEditor<T extends ExpenseSelector>({type, initialExpense, end
 export interface ExpenseEditorParameters<E extends BaseExpense> {
     endpoint: ModifyingEndpoint<E>;
     initialExpense: E;
+    mode: EditorMode;
 }
 
-export function ExpenseEditor({endpoint, initialExpense}: ExpenseEditorParameters<Expense>) {
-    return <BaseExpenseEditor type='expense' endpoint={endpoint} initialExpense={initialExpense}/>
+export function ExpenseEditor({endpoint, initialExpense, mode}: ExpenseEditorParameters<Expense>) {
+    return <BaseExpenseEditor type='expense' endpoint={endpoint} initialExpense={initialExpense} mode={mode}/>
 }
 
-export function ExpenseTemplateEditor({endpoint, initialExpense}: ExpenseEditorParameters<ExpenseTemplate>) {
-    return <BaseExpenseEditor type='template' endpoint={endpoint} initialExpense={initialExpense}/>
+export function ExpenseTemplateEditor({endpoint, initialExpense, mode}: ExpenseEditorParameters<ExpenseTemplate>) {
+    return <BaseExpenseEditor type='template' endpoint={endpoint} initialExpense={initialExpense} mode={mode}/>
 }
 
-export function ScheduledExpenseEditor({endpoint, initialExpense}: ExpenseEditorParameters<ScheduledExpense>) {
-    return <BaseExpenseEditor type='schedule' endpoint={endpoint} initialExpense={initialExpense}/>
+export function ScheduledExpenseEditor({endpoint, initialExpense, mode}: ExpenseEditorParameters<ScheduledExpense>) {
+    return <BaseExpenseEditor type='schedule' endpoint={endpoint} initialExpense={initialExpense} mode={mode}/>
 }

@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 import {BaseExpense, Expense, ExpenseTemplate, ScheduledExpense} from "../model/expense";
 import {ListResponse} from "../model/responses";
-import {ModifyingEndpoint, SimpleSearchEndpoint, TimeBasedEndpoint, ViewAllEndpoint} from "./endpoint";
+import {EditorMode, ModifyingEndpoint, SimpleSearchEndpoint, TimeBasedEndpoint, ViewAllEndpoint} from "./endpoint";
 import {ExpenseTemplatesTable, ExpensesTable, ScheduledExpensesTable} from "../components/Expenses-Table";
 import {dateStructNow} from "../model/common";
 import {ExpenseEditor, ExpenseTemplateEditor, ScheduledExpenseEditor} from "../components/Expense-Editor";
@@ -39,6 +39,7 @@ abstract class BasicExpenseEndpoint<T extends BaseExpense> implements ViewAllEnd
     readonly simpleSearchPathPrefix: string;
 
     readonly addPath: string;
+    readonly editPathPrefix: string;
     readonly modifyingApiEndpoint: string;
 
     constructor(readonly endpoint: string, readonly addText: string, readonly supportsTimeBasedNavigation: boolean) {
@@ -46,6 +47,7 @@ abstract class BasicExpenseEndpoint<T extends BaseExpense> implements ViewAllEnd
         this.timeBasedPathPrefix = endpoint;
         this.simpleSearchPathPrefix = `${endpoint}/field`;
         this.addPath = `add/${endpoint}`;
+        this.editPathPrefix = `edit/${endpoint}`;
         this.modifyingApiEndpoint = `/api/v1/${endpoint}`;
     }
     
@@ -68,7 +70,7 @@ abstract class BasicExpenseEndpoint<T extends BaseExpense> implements ViewAllEnd
     
     abstract createStarterObject(): T;
 
-    abstract renderEditor(object: T): JSX.Element;
+    abstract renderEditor(object: T, mode: EditorMode): JSX.Element;
 
     protected async searchData(query: object): Promise<ListResponse<T>> {
         const url = `/api/v1/${this.endpoint}/search?sort=date&dir=desc`;
@@ -116,8 +118,8 @@ export class ExpenseEndpoint extends BasicExpenseEndpoint<Expense> implements Ti
         };
     }
     
-    renderEditor(object: Expense): JSX.Element {
-        return <ExpenseEditor endpoint={this} initialExpense={object}/>
+    renderEditor(object: Expense, mode: EditorMode): JSX.Element {
+        return <ExpenseEditor endpoint={this} initialExpense={object} mode={mode}/>
     }
 
     private date(year: number, month?: number): dayjs.Dayjs {
@@ -169,8 +171,8 @@ export class ScheduledExpenseEndpoint extends BasicExpenseEndpoint<ScheduledExpe
         };
     }
 
-    renderEditor(object: ScheduledExpense): JSX.Element {
-        return <ScheduledExpenseEditor endpoint={this} initialExpense={object}/>
+    renderEditor(object: ScheduledExpense, mode: EditorMode): JSX.Element {
+        return <ScheduledExpenseEditor endpoint={this} initialExpense={object} mode={mode}/>
     }
 
     renderData(data: ListResponse<ScheduledExpense>, filter: string): JSX.Element {
@@ -188,8 +190,8 @@ export class ExpenseTemplateEndpoint extends BasicExpenseEndpoint<ExpenseTemplat
         return emptyBaseExpense();
     }
 
-    renderEditor(object: ExpenseTemplate): JSX.Element {
-        return <ExpenseTemplateEditor endpoint={this} initialExpense={object}/>;
+    renderEditor(object: Expense, mode: EditorMode): JSX.Element {
+        return <ExpenseTemplateEditor endpoint={this} initialExpense={object} mode={mode}/>;
     }
 
     renderData(data: ListResponse<ExpenseTemplate>, filter: string): JSX.Element {
