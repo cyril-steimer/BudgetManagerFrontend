@@ -25,6 +25,7 @@ abstract class BasicExpenseEndpoint<T extends BaseExpense> implements ViewAllEnd
     readonly addPath: string;
     readonly editPathPrefix: string;
     readonly modifyingApiEndpoint: string;
+    readonly idKey = 'id';
 
     constructor(readonly endpoint: string, readonly addText: string, readonly editText: string, readonly supportsTimeBasedNavigation: boolean) {
         this.viewAllPath = endpoint;

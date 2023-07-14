@@ -113,7 +113,7 @@ export async function deleteData<T>(
     setSubmitting: (submitting: boolean) => void
 ): Promise<void> {
     setSubmitting(true);
-    await fetch(`${endpoint.modifyingApiEndpoint}?id=${encodeURIComponent(id)}`, {
+    await fetch(`${endpoint.modifyingApiEndpoint}?${endpoint.idKey}=${encodeURIComponent(id)}`, {
         method: 'delete'
     });
     setSubmitting(false);

@@ -1,7 +1,7 @@
 import {useState} from "react";
 import {EditorMode, ModifyingEndpoint} from "../endpoints/endpoint";
 import {Budget, BudgetAmount, BudgetAmountPeriod} from "../model/budget";
-import {Box, Button, Grid, Stack, Typography} from "@mui/material";
+import {Box, Button, Grid, IconButton, Stack, Typography} from "@mui/material";
 import {CurrencyAmountInput, Dropdown, EditButtons, MonthYearPicker, TextInput, isValidAmount} from "./Editor";
 import {useIsNavigating} from "../hooks/hooks";
 import {useNavigate} from "react-router-dom";
@@ -9,6 +9,7 @@ import dayjs from "dayjs";
 import {DECEMBER, JANUARY, MonthYear, compareMonthYear, dayJsObjectToMonthYear, namedObject} from "../model/common";
 import AddIcon from '@mui/icons-material/Add';
 import {submitData} from "../routes/Endpoint-Routes";
+import DeleteIcon from '@mui/icons-material/Delete';
 
 export interface BudgetEditorParameters {
     endpoint: ModifyingEndpoint<Budget>;
@@ -89,6 +90,12 @@ export function BudgetEditor({endpoint, initialBudget, mode}: BudgetEditorParame
         setBudgetAmounts(newAmounts);
     }
 
+    function deleteBudgetAmount(index: number) {
+        const newAmounts = [...budgetAmounts];
+        newAmounts.splice(index, 1);
+        setBudgetAmounts(newAmounts);
+    }
+
     function Header({text}: {text: string}) {
         return (
             <Typography variant='body1' sx={{fontWeight: 'bold'}}>
@@ -144,7 +151,7 @@ export function BudgetEditor({endpoint, initialBudget, mode}: BudgetEditorParame
                     </Grid>
                 </Grid>
                 {budgetAmounts.map((amount, index) =>
-                    <Grid container key={index}>
+                    <Grid container key={index} columns={11} columnSpacing={2}>
                         <Grid xs={2} item>
                             <CurrencyAmountInput
                                 label='Amount'
@@ -162,7 +169,7 @@ export function BudgetEditor({endpoint, initialBudget, mode}: BudgetEditorParame
                                 disabled={isNavigating}
                             />
                         </Grid>
-                        <Grid xs={4} item>
+                        <Grid xs={3} item>
                             <MonthYearPicker
                                 required
                                 label='From'
@@ -173,7 +180,7 @@ export function BudgetEditor({endpoint, initialBudget, mode}: BudgetEditorParame
                                 disabled={isNavigating}
                             />
                         </Grid>
-                        <Grid xs={4} item>
+                        <Grid xs={3} item>
                             <MonthYearPicker
                                 required
                                 label='To'
@@ -183,6 +190,17 @@ export function BudgetEditor({endpoint, initialBudget, mode}: BudgetEditorParame
                                 helperText={amount.dateError}
                                 disabled={isNavigating}
                             />
+                        </Grid>
+                        <Grid xs={1} item>
+                            <IconButton
+                                sx={{
+                                    top: '50%',
+                                    transform: 'translateY(-50%)' // Center vertically
+                                }}
+                                onClick={() => deleteBudgetAmount(index)}
+                            >
+                                <DeleteIcon/>
+                            </IconButton>
                         </Grid>
                     </Grid>
                 )}

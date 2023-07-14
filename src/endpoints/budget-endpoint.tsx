@@ -20,6 +20,7 @@ export class BudgetEndpoint implements QueryingEndpoint<BudgetInPeriodWithExpens
     readonly editText = 'Edit Budget';
     readonly editPathPrefix = 'edit/budget';
     readonly modifyingApiEndpoint = '/api/v1/budget';
+    readonly idKey = 'category';
 
     renderData(data: BudgetInPeriodWithExpenses[], filter: string): JSX.Element {
         return <BudgetTable budgets={data}/>;

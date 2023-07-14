@@ -46,6 +46,8 @@ export interface ModifyingEndpoint<T> extends Endpoint {
 
     readonly modifyingApiEndpoint: string;
 
+    readonly idKey: string;
+
     loadExistingObject(id: string): Promise<T>;
     renderEditor(object: Partial<T>, mode: EditorMode): JSX.Element;
 }
