@@ -85,7 +85,7 @@ export function getEditUrl<T>(endpoint: ModifyingEndpoint<T>, id: string): strin
     return `/${endpoint.editPathPrefix}/${id}`;
 }
 
-export function getDuplicateUrl<T, U>(targetEndpoint: ModifyingEndpoint<T>, sourceEndpoint: ModifyingEndpoint<T>, id: string): string {
+export function getDuplicateUrl<T, U>(targetEndpoint: ModifyingEndpoint<T>, sourceEndpoint: ModifyingEndpoint<U>, id: string): string {
     return `/${targetEndpoint.addPath}/copy/${sourceEndpoint.endpoint}/${id}`;
 }
 

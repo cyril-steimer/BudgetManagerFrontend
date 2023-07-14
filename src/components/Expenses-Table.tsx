@@ -2,10 +2,10 @@ import {BaseExpense, Expense, ExpenseTemplate, ScheduledExpense, scheduleToStrin
 import {DataTable, ColumnSettings, ColumnSettingsInterface} from './Data-Table';
 import {compareAmount, compareDateStruct, compareNamedObject, dateStructToISO8601String, NamedObject} from '../model/common';
 import {Chip, IconButton, Menu, MenuItem, Tooltip} from '@mui/material';
-import {Link, NavigateFunction, useNavigate} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import {useIsNavigating} from '../hooks/hooks';
 import {ModifyingEndpoint, SimpleSearchEndpoint} from '../endpoints/endpoint';
-import {getDuplicateUrl, getEditUrl, getSimpleSearchUrl} from '../routes/Endpoint-Routes';
+import {getDuplicateUrl, getSimpleSearchUrl} from '../routes/Endpoint-Routes';
 import {ListResponse} from '../model/responses';
 import {CurrencyCell, EditButton} from './Common';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
