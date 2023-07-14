@@ -46,7 +46,12 @@ export function BudgetTable({budgets}: BudgetTableParameters) {
     });
     const edit = ColumnSettings.of<BudgetInPeriodTableItem, 'budget'>('budget', {
         name: '',
-        render: budget => <EditButton endpoint={endpoint} id={budget.budget.category.name}/>
+        render: budget => {
+            if (!budget.isReal) {
+                return <div></div>;
+            }
+            return <EditButton endpoint={endpoint} id={budget.budget.category.name}/>
+        }
     });
 
     const [openDetailsDialog, setOpenDetailsDialog] = useState(false);

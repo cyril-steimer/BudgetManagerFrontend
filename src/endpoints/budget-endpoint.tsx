@@ -41,7 +41,7 @@ export class BudgetEndpoint implements QueryingEndpoint<BudgetInPeriodWithExpens
         const budgetsWithExpenses: BudgetInPeriodWithExpenses[] = [];
         for (let budget of budgets) {
             let filteredExpenses = expenses.filter(exp => exp.category.name === budget.category.name);
-            budgetsWithExpenses.push(new BudgetInPeriodWithExpenses(budget, filteredExpenses));
+            budgetsWithExpenses.push(new BudgetInPeriodWithExpenses(budget, filteredExpenses, true));
         }
         const allCategories = budgets.map(b => b.category.name);
         const notBudgeted = expenses.filter(e => allCategories.indexOf(e.category.name) < 0);
@@ -53,7 +53,7 @@ export class BudgetEndpoint implements QueryingEndpoint<BudgetInPeriodWithExpens
                 category: {
                     name: 'Not Budgeted'
                 }
-            }, notBudgeted));
+            }, notBudgeted, false));
         }
         return budgetsWithExpenses;
     }

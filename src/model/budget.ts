@@ -7,7 +7,7 @@ export interface BudgetInPeriod {
 }
 
 export class BudgetInPeriodWithExpenses {
-    constructor(readonly budget: BudgetInPeriod, readonly expenses: Expense[]) {
+    constructor(readonly budget: BudgetInPeriod, readonly expenses: Expense[], readonly isReal: boolean) {
     }
 }
 
