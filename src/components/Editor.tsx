@@ -100,12 +100,12 @@ export interface CurrencyAmountInputParameters extends BasicInputParameters {
 
 const numberRegex = /^[0-9]+(\.[0-9]+)?$/;
 
-export function CurrencyAmountInput({label, value, setValue, disabled}: CurrencyAmountInputParameters) {
-    function validate(val: string): boolean {
-        return numberRegex.test(value) && parseFloat(val) > 0;
-    }
+export function isValidAmount(value: string): boolean {
+    return numberRegex.test(value) && parseFloat(value) > 0;
+}
 
-    const isValid = validate(value);
+export function CurrencyAmountInput({label, value, setValue, disabled}: CurrencyAmountInputParameters) {
+    const isValid = isValidAmount(value);
     const helperText = isValid ? undefined : 'Please enter a positive number';
     const currency = useContext(CurrencyContext);
 
@@ -114,7 +114,7 @@ export function CurrencyAmountInput({label, value, setValue, disabled}: Currency
             fullWidth
             label={label}
             value={value}
-            onChange={event => setValue(event.target.value, validate(event.target.value))}
+            onChange={event => setValue(event.target.value, isValidAmount(event.target.value))}
             margin='normal'
             error={!isValid}
             helperText={helperText}

@@ -26,7 +26,9 @@ export class BudgetEndpoint implements QueryingEndpoint<BudgetInPeriodWithExpens
     }
 
     async loadExistingObject(id: string): Promise<Budget> {
-        throw new Error("Method not implemented.");
+        const url = `/api/v1/budget/category/${encodeURIComponent(id)}`;
+        const response = await fetch(url);
+        return await response.json() as Budget;
     }
 
     renderEditor(object: Partial<Budget>, mode: EditorMode): JSX.Element {

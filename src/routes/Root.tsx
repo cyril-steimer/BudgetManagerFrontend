@@ -5,7 +5,7 @@ import AddIcon from '@mui/icons-material/Add';
 import {useState} from 'react';
 import {getAddUrl} from './Endpoint-Routes';
 import {ModifyingEndpoint} from '../endpoints/endpoint';
-import {BudgetEndpoint} from '../endpoints/budget-endpoints';
+import {BudgetEndpoint} from '../endpoints/budget-endpoint';
 
 function AddMenuItem<T>({endpoint, close}: {endpoint: ModifyingEndpoint<T>, close: () => void}) {
     const navigate = useNavigate();

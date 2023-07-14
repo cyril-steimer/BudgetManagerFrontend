@@ -2,11 +2,11 @@ import {BaseExpense, Expense, ExpenseTemplate, Schedule, ScheduledExpense, allSc
 import {useEffect, useState} from "react";
 import {Autocomplete, Box, TextField} from "@mui/material";
 import {compareDateStruct, dateStructNow, namedObject} from "../model/common";
-import {DateStructPicker, CurrencyAmountInput, TextInput, commonTextFieldProperties, Dropdown, EditButtons} from "./Editor";
+import {DateStructPicker, CurrencyAmountInput, TextInput, commonTextFieldProperties, Dropdown, EditButtons, isValidAmount} from "./Editor";
 import {useIsNavigating} from "../hooks/hooks";
 import {useNavigate} from "react-router-dom";
 import {EditorMode, ModifyingEndpoint} from "../endpoints/endpoint";
-import { submitData} from "../routes/Endpoint-Routes";
+import {submitData} from "../routes/Endpoint-Routes";
 import {getAllAuthors, getAllBudgetCategories, getAllPaymentMethods, getAllTags} from "../endpoints/helpers";
 
 function loadAutocompleteData(loaderFunc: () => Promise<string[]>, setData: (values: string[]) => void) {
@@ -103,7 +103,7 @@ function BaseExpenseEditor<T extends ExpenseSelector>({type, initialExpense, end
         categoryOptions = [...categoryOptions, category].sort();
     }
 
-    const [amountValid, setAmountValid] = useState(true);
+    const [amountValid, setAmountValid] = useState(isValidAmount(amount));
 
     const categoryError = category === '' ? 'This field is mandatory' : undefined;
     const nameError = name === '' ? 'This field is mandatory' : undefined;

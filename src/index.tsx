@@ -22,7 +22,7 @@ import '@fontsource/roboto/700.css';
 import {CurrencyContext} from './context/contexts';
 import {ExpenseEndpoint, ExpenseTemplateEndpoint, ScheduledExpenseEndpoint} from './endpoints/expense-endpoints';
 import {ModifyingEndpoint, QueryingEndpoint, isSimpleSearchEndpoint, isTimeBasedEndpoint, isViewAllEndpoint} from './endpoints/endpoint';
-import {BudgetEndpoint} from './endpoints/budget-endpoints';
+import {BudgetEndpoint} from './endpoints/budget-endpoint';
 import {LocalizationProvider} from '@mui/x-date-pickers';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
 import 'dayjs/locale/de-ch';

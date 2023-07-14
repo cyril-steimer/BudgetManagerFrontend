@@ -2,11 +2,12 @@ import {useState} from "react";
 import {BudgetInPeriodWithExpenses} from "../model/budget";
 import {compareAmount, compareNamedObject, compareNumber} from "../model/common";
 import {sumAmount, sumExpenses, sumValues} from "../model/expense";
-import {CurrencyCell} from "./Common";
+import {CurrencyCell, EditButton} from "./Common";
 import {ColumnSettings, DataTable, TableItem} from "./Data-Table";
 import {Dialog, DialogContent, DialogTitle} from "@mui/material";
 import {ExpensesTable} from "./Expenses-Table";
 import {ExpenseEndpoint} from "../endpoints/expense-endpoints";
+import {BudgetEndpoint} from "../endpoints/budget-endpoint";
 
 class BudgetInPeriodTableItem implements TableItem {
     readonly id: string;
@@ -43,20 +44,28 @@ export function BudgetTable({budgets}: BudgetTableParameters) {
         compare: (a, b) => compareAmount(a.budget.amount, b.budget.amount),
         renderSummary: budgets => <CurrencyCell value={sumAmount(budgets.map(b => b.budget.amount))}/>
     });
+    const edit = ColumnSettings.of<BudgetInPeriodTableItem, 'budget'>('budget', {
+        name: '',
+        render: budget => <EditButton endpoint={endpoint} id={budget.budget.category.name}/>
+    });
 
     const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
     const [budgetForDetails, setBudgetForDetails] = useState<BudgetInPeriodWithExpenses | undefined>();
+
+    const endpoint = new BudgetEndpoint();
 
     return (
         <div>
             <DataTable
                 values={tableItems}
-                columns={[name, spent, budget]}
+                columns={[name, spent, budget, edit]}
                 initialSortColumn={budget}
                 initialSortDirection='desc'
-                onClickRow={row => {
-                    setBudgetForDetails(row.budget);
-                    setOpenDetailsDialog(true);
+                onClickCell={(row, column) => {
+                    if (column !== edit) {
+                        setBudgetForDetails(row.budget);
+                        setOpenDetailsDialog(true);
+                    }
                 }}
                 addSummaryRow
             />

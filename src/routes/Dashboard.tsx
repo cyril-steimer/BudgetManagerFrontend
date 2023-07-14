@@ -10,7 +10,7 @@ import {ExpensesTable} from '../components/Expenses-Table';
 import {ExpenseEndpoint, ExpenseTemplateEndpoint, ScheduledExpenseEndpoint} from '../endpoints/expense-endpoints';
 import {QueryingEndpoint, isTimeBasedEndpoint, isViewAllEndpoint} from '../endpoints/endpoint';
 import {getMonthlyDataUrl, getYearlyDataUrl} from './Endpoint-Routes';
-import {BudgetEndpoint} from '../endpoints/budget-endpoints';
+import {BudgetEndpoint} from '../endpoints/budget-endpoint';
 
 const StyledCardHeader = styled(CardHeader)(({theme}) => ({
     [`&.${cardHeaderClasses.root}`]: {

@@ -2,7 +2,7 @@ import {useState} from "react";
 import {EditorMode, ModifyingEndpoint} from "../endpoints/endpoint";
 import {Budget, BudgetAmount, BudgetAmountPeriod} from "../model/budget";
 import {Box, Button, Grid, Stack, Typography} from "@mui/material";
-import {CurrencyAmountInput, Dropdown, EditButtons, MonthYearPicker, TextInput} from "./Editor";
+import {CurrencyAmountInput, Dropdown, EditButtons, MonthYearPicker, TextInput, isValidAmount} from "./Editor";
 import {useIsNavigating} from "../hooks/hooks";
 import {useNavigate} from "react-router-dom";
 import dayjs from "dayjs";
@@ -38,7 +38,7 @@ function toEditable(original: BudgetAmount): EditableBudgetAmount {
         ...original,
         amount: original.amount.amount.toFixed(2),
         dateError: dateError(original.from, original.to),
-        amountValid: true
+        amountValid: isValidAmount(original.amount.amount.toFixed(2))
     };
 }
 
