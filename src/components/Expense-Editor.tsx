@@ -19,7 +19,7 @@ function namedObject(value: string): NamedObject {
 }
 
 function loadAutocompleteData(loaderFunc: () => Promise<string[]>, setData: (values: string[]) => void) {
-    loaderFunc().then(promise => setData(promise)); // TODO Error handling
+    loaderFunc().then(promise => setData(promise.sort())); // TODO Error handling
 }
 
 type TemplateType = 'template';
@@ -101,10 +101,16 @@ function BaseExpenseEditor<T extends ExpenseSelector>({type, initialExpense, end
     const [endDate, setEndDate] = useState(initialExpense?.endDate);
     const [schedule, setSchedule] = useState(initialExpense?.schedule ?? defaultSchedule);
 
-    const [categoryOptions, setCategoryOptions] = useState<string[]>(['woohoo']);
+    const [categoryOptionsFromBackend, setCategoryOptionsFromBackend] = useState<string[]>([]);
     const [authorOptions, setAuthorOptions] = useState<string[]>();
     const [paymentMethodOptions, setPaymentMethodOptions] = useState<string[]>();
     const [tagOptions, setTagOptions] = useState<string[]>();
+
+    let categoryOptions = categoryOptionsFromBackend;
+    if (categoryOptions.indexOf(category) < 0) {
+        // Ensure the active category can always be selected
+        categoryOptions = [...categoryOptions, category].sort();
+    }
 
     const [amountValid, setAmountValid] = useState(true);
 
@@ -143,7 +149,7 @@ function BaseExpenseEditor<T extends ExpenseSelector>({type, initialExpense, end
         navigate(-1); // Go back to the previous page
     }
 
-    useEffect(() => loadAutocompleteData(getAllBudgetCategories, setCategoryOptions), []);
+    useEffect(() => loadAutocompleteData(getAllBudgetCategories, setCategoryOptionsFromBackend), []);
     useEffect(() => loadAutocompleteData(getAllAuthors, setAuthorOptions), []);
     useEffect(() => loadAutocompleteData(getAllPaymentMethods, setPaymentMethodOptions), []);
     useEffect(() => loadAutocompleteData(getAllTags, setTagOptions), []);
@@ -208,6 +214,7 @@ function BaseExpenseEditor<T extends ExpenseSelector>({type, initialExpense, end
                     value={schedule}
                     onChange={(_, newValue) => setSchedule(newValue ?? defaultSchedule)}
                     options={allSchedules()}
+                    isOptionEqualToValue={(v1, v2) => JSON.stringify(v1) === JSON.stringify(v2)}
                     groupBy={schedule => getScheduleGroup(schedule)}
                     getOptionLabel={schedule => scheduleToString(schedule)}
                     renderInput={(params) => (

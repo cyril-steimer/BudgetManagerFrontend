@@ -20,7 +20,6 @@ export interface ColumnSettingsInterface<T, K extends keyof T> {
 export class ColumnSettings<T> {
     private constructor(
         readonly name: string,
-        readonly id: string,
         readonly render: (value: T) => string | JSX.Element,
         readonly filter: ((value: T, filter: string) => boolean) | undefined,
         readonly compare: ((a: T, b: T) => number) | undefined,
@@ -30,7 +29,6 @@ export class ColumnSettings<T> {
     static of<T, K extends keyof T & string>(key: K, settings: ColumnSettingsInterface<T, K>): ColumnSettings<T> {
         return new ColumnSettings<T>(
             settings.name,
-            key,
             value => settings.render(value[key]),
             settings.filter === undefined ? undefined : (value, filter) => settings.filter!(value[key], filter),
             settings.compare === undefined ? undefined : (a, b) => settings.compare!(a[key], b[key]),
@@ -48,7 +46,7 @@ interface TableRowParameters<T> {
 function DataTableRow<T>({value, columns, onClick}: TableRowParameters<T>) {
     return (
         <StyledTableRow onClick={() => onClick(value)}>
-            {columns.map(c => <TableCell key={c.id}>{c.render(value)}</TableCell>)}
+            {columns.map((column, index) => <TableCell key={index}>{column.render(value)}</TableCell>)}
         </StyledTableRow>
     );
 }
@@ -69,7 +67,7 @@ function DataTableSummaryRow<T>({values, columns}: TableSummaryRowParameters<T>)
 
     return (
         <StyledTableRow>
-            {columns.map(c => <TableCell key={c.id}>{render(c)}</TableCell>)}
+            {columns.map((column, index) => <TableCell key={index}>{render(column)}</TableCell>)}
         </StyledTableRow>
     );
 }
@@ -126,12 +124,12 @@ export function DataTable<T extends TableItem>(
         }
     }
 
-    function headerCell(column: ColumnSettings<T>): JSX.Element {
+    function headerCell(column: ColumnSettings<T>, index: number): JSX.Element {
         if (column.compare === undefined) {
-            return <TableCell key={column.id}>{column.name}</TableCell>;
+            return <TableCell key={index}>{column.name}</TableCell>;
         }
         return (
-            <TableCell key={column.id} sortDirection={sortColumn === column ? sortDirection : false} onClick={() => updateSort(column)}>
+            <TableCell key={index} sortDirection={sortColumn === column ? sortDirection : false} onClick={() => updateSort(column)}>
                 <TableSortLabel active={sortColumn === column} direction={sortColumn === column ? sortDirection : 'asc'}>
                     {column.name}
                 </TableSortLabel>
@@ -150,7 +148,7 @@ export function DataTable<T extends TableItem>(
             <Table>
                 <TableHead>
                     <TableRow>
-                        {columns.map(headerCell)}
+                        {columns.map((column, index) => headerCell(column, index))}
                     </TableRow>
                 </TableHead>
                 <TableBody>

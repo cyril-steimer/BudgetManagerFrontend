@@ -6,11 +6,16 @@ import {useState} from 'react';
 import {getAddUrl} from './Endpoint-Routes';
 import {ModifyingEndpoint} from '../endpoints/endpoint';
 
-function AddMenuItem<T>({endpoint}: {endpoint: ModifyingEndpoint<T>}) {
+function AddMenuItem<T>({endpoint, close}: {endpoint: ModifyingEndpoint<T>, close: () => void}) {
     const navigate = useNavigate();
 
     return (
-        <MenuItem onClick={() => navigate(getAddUrl(endpoint))}>
+        <MenuItem
+            onClick={() => {
+                close();
+                navigate(getAddUrl(endpoint));
+            }}
+        >
             {endpoint.addText}
         </MenuItem>
     );
@@ -40,9 +45,9 @@ export default function Root() {
                 anchorEl={addMenuAnchor}
                 onClose={closeAddMenu}
             >
-                <AddMenuItem endpoint={expenseEndpoint}/>
-                <AddMenuItem endpoint={expenseTemplateEndpoint}/>
-                <AddMenuItem endpoint={scheduledExpenseEndpoint}/>
+                <AddMenuItem endpoint={expenseEndpoint} close={closeAddMenu}/>
+                <AddMenuItem endpoint={expenseTemplateEndpoint} close={closeAddMenu}/>
+                <AddMenuItem endpoint={scheduledExpenseEndpoint} close={closeAddMenu}/>
             </Menu>
         </div>
     );

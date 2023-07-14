@@ -58,7 +58,7 @@ function DuplicateButton<E extends BaseExpense>({sourceEndpoint, id}: {sourceEnd
                 onClose={closeMenu}
             >
                 {targetEndpoints.map(targetEndpoint => (
-                    <MenuItem onClick={() => navigate(getDuplicateUrl(targetEndpoint, sourceEndpoint, id))}>
+                    <MenuItem key={targetEndpoint.endpoint} onClick={() => navigate(getDuplicateUrl(targetEndpoint, sourceEndpoint, id))}>
                         {targetEndpoint.addText}
                     </MenuItem>
                 ))}
