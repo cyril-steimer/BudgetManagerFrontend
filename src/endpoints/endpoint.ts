@@ -41,7 +41,7 @@ export interface ModifyingEndpoint<T> {
     readonly modifyingApiEndpoint: string;
 
     loadExistingObject(id: string): Promise<T>;
-    renderEditor(object: T | undefined, mode: EditorMode): JSX.Element;
+    renderEditor(object: Partial<T>, mode: EditorMode): JSX.Element;
 }
 
 /**

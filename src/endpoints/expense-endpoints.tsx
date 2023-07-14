@@ -5,7 +5,12 @@ import {EditorMode, ModifyingEndpoint, SimpleSearchEndpoint, TimeBasedEndpoint, 
 import {ExpenseTemplatesTable, ExpensesTable, ScheduledExpensesTable} from "../components/Expenses-Table";
 import {ExpenseEditor, ExpenseTemplateEditor, InitialExpense, ScheduledExpenseEditor} from "../components/Expense-Editor";
 
-const emptyInitialExpense: InitialExpense = { id: '' };
+function toInitialExpense(expense: Partial<BaseExpense>): InitialExpense {
+    return {
+        ...expense,
+        id: expense.id ?? ''
+    };
+}
 
 abstract class BasicExpenseEndpoint<T extends BaseExpense> implements ViewAllEndpoint<ListResponse<T>>, SimpleSearchEndpoint<ListResponse<T>>, ModifyingEndpoint<T> {
 
@@ -47,7 +52,7 @@ abstract class BasicExpenseEndpoint<T extends BaseExpense> implements ViewAllEnd
 
     abstract renderData(data: ListResponse<T>, filter: string): JSX.Element;
 
-    abstract renderEditor(object: T | undefined, mode: EditorMode): JSX.Element;
+    abstract renderEditor(object: Partial<T>, mode: EditorMode): JSX.Element;
 
     protected async searchData(query: object): Promise<ListResponse<T>> {
         const url = `/api/v1/${this.endpoint}/search?sort=date&dir=desc`;
@@ -88,8 +93,8 @@ export class ExpenseEndpoint extends BasicExpenseEndpoint<Expense> implements Ti
         return this.loadAllDataAtUrl(`/api/v1/${this.endpoint}/search/${encodeURIComponent(filter)}`);
     }
     
-    renderEditor(object: Expense | undefined, mode: EditorMode): JSX.Element {
-        return <ExpenseEditor endpoint={this} initialExpense={object ??  emptyInitialExpense} mode={mode}/>
+    renderEditor(object: Partial<Expense>, mode: EditorMode): JSX.Element {
+        return <ExpenseEditor endpoint={this} initialExpense={toInitialExpense(object)} mode={mode}/>
     }
 
     private date(year: number, month?: number): dayjs.Dayjs {
@@ -130,8 +135,8 @@ export class ScheduledExpenseEndpoint extends BasicExpenseEndpoint<ScheduledExpe
         super('schedules', 'Add Scheduled Expense', false);
     }
 
-    renderEditor(object: ScheduledExpense | undefined, mode: EditorMode): JSX.Element {
-        return <ScheduledExpenseEditor endpoint={this} initialExpense={object ?? emptyInitialExpense} mode={mode}/>
+    renderEditor(object: Partial<ScheduledExpense>, mode: EditorMode): JSX.Element {
+        return <ScheduledExpenseEditor endpoint={this} initialExpense={toInitialExpense(object)} mode={mode}/>
     }
 
     renderData(data: ListResponse<ScheduledExpense>, filter: string): JSX.Element {
@@ -145,8 +150,8 @@ export class ExpenseTemplateEndpoint extends BasicExpenseEndpoint<ExpenseTemplat
         super('templates', 'Add Expense Template', false);
     }
 
-    renderEditor(object: Expense | undefined, mode: EditorMode): JSX.Element {
-        return <ExpenseTemplateEditor endpoint={this} initialExpense={object ?? emptyInitialExpense} mode={mode}/>;
+    renderEditor(object: Partial<Expense>, mode: EditorMode): JSX.Element {
+        return <ExpenseTemplateEditor endpoint={this} initialExpense={toInitialExpense(object)} mode={mode}/>;
     }
 
     renderData(data: ListResponse<ExpenseTemplate>, filter: string): JSX.Element {
