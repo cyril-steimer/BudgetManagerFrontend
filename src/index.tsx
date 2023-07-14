@@ -26,6 +26,7 @@ import {BudgetInPeriodEndpoint} from './endpoints/budget-endpoints';
 import {LocalizationProvider} from '@mui/x-date-pickers';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
 import 'dayjs/locale/de-ch';
+import {Container} from '@mui/material';
 
 const queryingEndpoints: QueryingEndpoint<any>[] = [new ExpenseEndpoint(), new ScheduledExpenseEndpoint(), new ExpenseTemplateEndpoint(), new BudgetInPeriodEndpoint()];
 const modifyingEndpoints: ModifyingEndpoint<any>[] = [new ExpenseEndpoint(), new ScheduledExpenseEndpoint(), new ExpenseTemplateEndpoint()];
@@ -98,7 +99,9 @@ root.render(
     <React.StrictMode>
         <CurrencyContext.Provider value='CHF'>
             <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale='de-ch'>
-                <RouterProvider router={router}/>
+                <Container maxWidth='xl'>
+                    <RouterProvider router={router}/>
+                </Container>
             </LocalizationProvider>
         </CurrencyContext.Provider>
     </React.StrictMode>
